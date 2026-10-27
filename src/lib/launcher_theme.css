@@ -1,0 +1,1040 @@
+
+
+.launcher[data-design="blockcraft"] :is(button, a) > :is(.game-icon, .service-logo, .loader-logo, .provider-logo, svg) {
+  flex-shrink: 0;
+}
+
+.launcher[data-design="blockcraft"] :is(h2, h3):has(> :is(.game-icon, .service-logo, svg)) {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.launcher[data-design="blockcraft"] :is(.home-version-tabs, .installed-filters, .category-tabs) button,
+.launcher[data-design="blockcraft"] .control-group > label,
+.launcher[data-design="blockcraft"] .news-hub nav button,
+.launcher[data-design="blockcraft"] .install-java,
+.launcher[data-design="blockcraft"] .account-kind,
+.launcher[data-design="blockcraft"] .setting-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.launcher[data-design="blockcraft"] .news-hub .link-section a > span:not(.service-logo) {
+  flex: 1;
+}
+
+.launcher[data-design="blockcraft"] .mod-studio .project-card footer :is(span, strong) {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.launcher[data-design="blockcraft"] .poser-studio .pose-list button {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  column-gap: 8px;
+  align-items: center;
+}
+
+.launcher[data-design="blockcraft"] .poser-studio .pose-list button > .game-icon {
+  grid-row: 1 / 3;
+}
+
+.launcher[data-design="blockcraft"] .poser-studio .pose-list button > small {
+  grid-column: 2;
+}
+
+.launcher[data-design="blockcraft"] {
+  --block-text: #F1EDF8;
+  --block-muted: #B3ADC3;
+  --block-faint: #817B95;
+  --block-line: #27273A;
+  --block-line-hover: rgba(var(--primary-rgb, 168, 85, 247), .55);
+  --block-panel: color-mix(in srgb, rgba(var(--bg-base-rgb, 11, 11, 15), var(--card-opacity, .9)) 88%, rgba(103, 103, 138, var(--card-opacity, .9)) 12%);
+  --block-input: color-mix(in srgb, var(--block-panel) 85%, #0B0B0F 15%);
+  --block-raised: linear-gradient(180deg, #ffffff05, #00000012), var(--block-panel);
+  --block-bevel: inset 0 1px 0 #ffffff0a, inset 0 -2px 0 #00000035;
+  --block-shadow: 0 8px 24px #00000024;
+}
+
+
+.launcher[data-design="blockcraft"] :is(.mod-studio, .settings-suite, .server-hub, .account-workspace, .capture-gallery, .achievements-panel, .poser-studio, .news-hub, .module-panel, .wizard-shell, .gallery-dialog) {
+  --ink: var(--block-text);
+  --text: var(--block-text);
+  --muted: var(--block-muted);
+  --text-muted: var(--block-muted);
+  --panel-text: var(--block-text);
+  --panel-muted: var(--block-muted);
+  --stroke: var(--block-line);
+  --panel-border: var(--block-line);
+  --accent: var(--primary);
+  color: var(--block-text);
+  font-family: "Segoe UI Variable", "Segoe UI", system-ui, sans-serif;
+  font-size: .875rem;
+  min-width: 0;
+}
+
+.launcher[data-design="blockcraft"] :is(.mod-studio, .settings-suite, .server-hub, .account-workspace, .capture-gallery, .achievements-panel, .poser-studio, .news-hub, .module-panel, .wizard-shell, .gallery-dialog) :is(h1, h2, h3, h4) {
+  color: var(--block-text);
+  font-family: var(--font-display, "Consolas", monospace);
+  font-weight: 500;
+  letter-spacing: -.025em;
+  line-height: 1.5;
+  text-wrap: balance;
+}
+
+.launcher[data-design="blockcraft"] :is(.studio-heading, .suite-heading, .page-heading, .gallery-heading, .panel-heading, .studio-header, .installations-header) :is(h1, h2) {
+  font-size: clamp(1.35rem, 1.85vw, 1.85rem);
+  margin-bottom: 10px;
+  text-shadow: 0 2px 0 #00000035;
+}
+
+.launcher[data-design="blockcraft"] :is(.studio-heading, .suite-heading, .page-heading, .gallery-heading, .panel-heading, .studio-header, .installations-header) p {
+  color: var(--block-muted);
+  font-size: .83rem;
+  line-height: 1.7;
+  max-width: 76ch;
+}
+
+.launcher[data-design="blockcraft"] :is(.mod-studio, .settings-suite, .server-hub, .account-workspace, .capture-gallery, .achievements-panel, .poser-studio, .module-panel, .wizard-shell) .eyebrow {
+  color: var(--primary);
+  font-family: var(--font-display, "Consolas", monospace);
+  font-size: .61rem;
+  font-weight: 400;
+  letter-spacing: .08em;
+  line-height: 1.6;
+}
+
+
+.launcher[data-design="blockcraft"] :is(.mod-studio, .settings-suite, .server-hub, .account-workspace, .poser-studio, .module-panel) :is(.surface, .search-surface, .glass, .panel, .module-card) {
+  background: var(--block-raised);
+  border: 1px solid var(--block-line);
+  border-radius: 8px;
+  box-shadow: var(--block-bevel), var(--block-shadow);
+  backdrop-filter: blur(var(--blur-px, 12px));
+  min-width: 0;
+}
+
+.launcher[data-design="blockcraft"] :is(.mod-studio, .settings-suite, .server-hub, .account-workspace, .poser-studio, .module-panel) :is(.surface, .search-surface, .glass, .module-card) {
+  padding: 22px;
+}
+
+.launcher[data-design="blockcraft"] :is(.settings-suite, .server-hub, .account-workspace, .module-panel) :is(.surface, .glass, .module-card):hover {
+  transform: none;
+  border-color: var(--block-line);
+  box-shadow: var(--block-bevel), var(--block-shadow);
+}
+
+
+
+.launcher[data-design="blockcraft"] :is(.mod-studio, .settings-suite, .server-hub, .account-workspace, .capture-gallery, .achievements-panel, .poser-studio, .module-panel, .quick-tools, .gallery-dialog, .wizard-shell, .preview-dialog, .project-detail, .delete-dialog) :is(button, .file-button, .outline) {
+  color: #e6e0f1;
+  font-family: "Segoe UI Variable", "Segoe UI", system-ui, sans-serif;
+  font-size: .78rem;
+  font-weight: 600;
+  line-height: 1.45;
+  border: 1px solid #a89bc329;
+  border-radius: 5px;
+  background: linear-gradient(180deg, #ffffff08, #00000012), var(--block-panel);
+  box-shadow: var(--block-bevel);
+  transition: background-color .16s, border-color .16s, box-shadow .16s, transform .16s;
+}
+
+.launcher[data-design="blockcraft"] :is(.mod-studio, .settings-suite, .server-hub, .account-workspace, .capture-gallery, .achievements-panel, .poser-studio, .module-panel, .quick-tools, .gallery-dialog, .wizard-shell, .preview-dialog, .project-detail, .delete-dialog) :is(button, .file-button, .outline):hover:not(:disabled) {
+  border-color: var(--block-line-hover);
+  color: #f6f1ff;
+  background-color: rgba(var(--primary-rgb), .09);
+  box-shadow: inset 0 1px 0 #ffffff12, inset 0 -2px 0 #0000003d, 0 3px 12px #0000001a;
+}
+
+.launcher[data-design="blockcraft"] :is(.mod-studio, .settings-suite, .server-hub, .account-workspace, .capture-gallery, .achievements-panel, .poser-studio, .module-panel, .quick-tools, .gallery-dialog, .wizard-shell, .preview-dialog, .project-detail, .delete-dialog) :is(button, .file-button, .outline):active:not(:disabled) {
+  transform: translateY(1px);
+  box-shadow: inset 0 2px 3px #00000030;
+}
+
+.launcher[data-design="blockcraft"] :is(.mod-studio, .settings-suite, .server-hub, .account-workspace, .capture-gallery, .achievements-panel, .poser-studio, .module-panel, .quick-tools, .gallery-dialog, .wizard-shell, .preview-dialog, .project-detail, .delete-dialog) :is(button, .file-button, .outline):disabled {
+  opacity: .43;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.launcher[data-design="blockcraft"] :is(.mod-studio, .settings-suite, .server-hub, .account-workspace, .capture-gallery, .achievements-panel, .poser-studio, .module-panel, .wizard-shell, .project-detail, .delete-dialog) :is(.primary, .accent, .primary-action, .install-file) {
+  color: #fbfffa;
+  border-color: color-mix(in srgb, var(--primary) 65%, #ffffff 12%);
+  background: linear-gradient(180deg, #ffffff18, #00000014), color-mix(in srgb, var(--primary) 62%, #102016 38%);
+  box-shadow: inset 0 1px 0 #ffffff36, inset 0 -3px 0 #00000032, 0 3px 10px #00000024;
+  text-shadow: 0 1px 1px #00000060;
+  font-weight: 750;
+}
+
+.launcher[data-design="blockcraft"] :is(.mod-studio, .settings-suite, .server-hub, .account-workspace, .capture-gallery, .achievements-panel, .poser-studio, .module-panel, .wizard-shell, .project-detail, .delete-dialog) :is(.primary, .accent, .primary-action, .install-file):hover:not(:disabled) {
+  background: linear-gradient(180deg, #ffffff26, #00000008), color-mix(in srgb, var(--primary) 72%, #102016 28%);
+  border-color: color-mix(in srgb, var(--primary) 70%, #ffffff 30%);
+  box-shadow: inset 0 1px 0 #ffffff40, inset 0 -3px 0 #00000032, 0 4px 16px rgba(var(--primary-rgb), .17);
+  transform: none;
+}
+
+.launcher[data-design="blockcraft"] :is(.mod-studio, .settings-suite, .server-hub, .account-workspace, .capture-gallery, .achievements-panel, .poser-studio, .module-panel, .wizard-shell, .project-detail) :is(.danger, .danger-button, .delete-mod) {
+  color: #e9a7a2;
+  border-color: #cc75652e;
+}
+
+.launcher[data-design="blockcraft"] :is(.mod-studio, .settings-suite, .server-hub, .account-workspace, .capture-gallery, .achievements-panel, .poser-studio, .module-panel, .quick-tools, .gallery-dialog, .news-hub, .wizard-shell) :is(button, input, select, textarea, a, summary):focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
+}
+
+
+.launcher[data-design="blockcraft"] :is(.mod-studio, .settings-suite, .server-hub, .account-workspace, .capture-gallery, .achievements-panel, .poser-studio, .module-panel, .gallery-dialog, .wizard-shell, .project-detail) :is(input:not([type="checkbox"], [type="radio"], [type="range"], [type="color"], [type="file"]), select, textarea) {
+  color-scheme: dark;
+  color: var(--block-text);
+  font-family: "Segoe UI Variable", "Segoe UI", system-ui, sans-serif;
+  font-size: .81rem;
+  line-height: 1.5;
+  min-width: 0;
+  border: 1px solid #a6c4af28;
+  border-radius: 4px;
+  background: var(--block-input);
+  box-shadow: inset 0 2px 4px #00000028, 0 1px 0 #ffffff05;
+  padding-block: 11px;
+  transition: border-color .16s, box-shadow .16s;
+}
+
+.launcher[data-design="blockcraft"] :is(.mod-studio, .settings-suite, .server-hub, .account-workspace, .capture-gallery, .achievements-panel, .poser-studio, .module-panel, .wizard-shell, .project-detail) :is(input, select, textarea):focus {
+  border-color: rgba(var(--primary-rgb), .65);
+  box-shadow: inset 0 2px 4px #00000020, 0 0 0 2px rgba(var(--primary-rgb), .08);
+}
+
+.launcher[data-design="blockcraft"] :is(.mod-studio, .settings-suite, .server-hub, .account-workspace, .achievements-panel, .poser-studio, .module-panel, .wizard-shell, .project-detail) input::placeholder {
+  color: var(--block-faint);
+  opacity: 1;
+}
+
+.launcher[data-design="blockcraft"] :is(.mod-studio, .settings-suite, .server-hub, .account-workspace, .achievements-panel, .poser-studio, .module-panel, .wizard-shell, .project-detail) :is(option, optgroup) {
+  background: color-mix(in srgb, rgb(var(--bg-base-rgb, 11, 11, 15)) 90%, #263529);
+  color: #e5eee5;
+}
+
+.launcher[data-design="blockcraft"] :is(.mod-studio, .settings-suite, .server-hub, .account-workspace, .achievements-panel, .poser-studio, .module-panel, .wizard-shell) label {
+  color: #bbc9bf;
+  font-size: .77rem;
+  line-height: 1.5;
+}
+
+.launcher[data-design="blockcraft"] :is(.mod-studio, .settings-suite, .server-hub, .account-workspace, .achievements-panel, .poser-studio, .module-panel, .wizard-shell) input:is([type="checkbox"], [type="radio"], [type="range"]) {
+  accent-color: var(--primary);
+}
+
+
+.launcher[data-design="blockcraft"] :is(.mod-studio, .settings-suite, .account-workspace) :is(.segmented, .settings-nav) {
+  gap: 4px;
+  padding: 5px;
+  border-radius: 6px;
+  border-color: var(--block-line);
+  background: #00000024;
+  box-shadow: inset 0 1px 4px #00000020;
+}
+
+.launcher[data-design="blockcraft"] :is(.mod-studio, .settings-suite, .account-workspace, .achievements-panel, .poser-studio, .module-panel) :is(.segmented, .settings-nav, .studio-tabs, .filter-tabs, .detail-tabs, .category-tabs, .installed-filters, .engine-grid, .joint-tabs) button {
+  color: var(--block-muted);
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  border-radius: 4px;
+  font-size: .75rem;
+  min-height: 35px;
+}
+
+.launcher[data-design="blockcraft"] :is(.mod-studio, .settings-suite, .account-workspace, .achievements-panel, .poser-studio, .module-panel) :is(.segmented, .settings-nav, .studio-tabs, .filter-tabs, .detail-tabs, .category-tabs, .installed-filters, .engine-grid, .joint-tabs) button:is(.active, .selected, .chosen) {
+  color: var(--primary);
+  background: rgba(var(--primary-rgb), .12);
+  border-color: rgba(var(--primary-rgb), .32);
+  box-shadow: inset 0 -2px 0 rgba(var(--primary-rgb), .5), inset 0 1px 0 #ffffff06;
+}
+
+.launcher[data-design="blockcraft"] .mod-studio .studio-tabs {
+  gap: 7px;
+  padding-bottom: 13px;
+  border-bottom-color: var(--block-line);
+}
+
+.launcher[data-design="blockcraft"] :is(.mod-studio, .settings-suite, .achievements-panel, .module-panel) :is(.studio-tabs, .filter-tabs, .installed-filters) button > span {
+  border-radius: 3px;
+  background: #ffffff09;
+  color: inherit;
+}
+
+
+.launcher[data-design="blockcraft"] .mod-studio :is(.project-grid, .pack-grid) {
+  gap: 16px;
+}
+
+.launcher[data-design="blockcraft"] .mod-studio :is(.project-card, .pack-card) {
+  color: var(--block-text);
+  border-radius: 7px;
+  border-color: var(--block-line);
+  background: var(--block-raised);
+  box-shadow: var(--block-bevel), 0 4px 14px #00000020;
+}
+
+.launcher[data-design="blockcraft"] .mod-studio .project-card {
+  padding: 20px;
+}
+
+.launcher[data-design="blockcraft"] .mod-studio :is(.project-card, .pack-card):hover:not(:disabled) {
+  transform: translateY(-2px);
+  border-color: var(--block-line-hover);
+  background: var(--block-raised);
+  box-shadow: var(--block-bevel), 0 10px 22px #00000035;
+}
+
+.launcher[data-design="blockcraft"] .mod-studio .project-cover {
+  background: #15251c;
+  border-bottom: 1px solid #ffffff13;
+}
+
+.launcher[data-design="blockcraft"] .mod-studio :is(.project-top img, .project-placeholder, .mod-icon, .pack-card img, .icon-empty, .icon-picker img) {
+  border-radius: 5px;
+  box-shadow: 0 2px 6px #00000030;
+}
+
+.launcher[data-design="blockcraft"] .mod-studio .project-card h4 {
+  font-family: "Segoe UI Variable", "Segoe UI", system-ui, sans-serif;
+  font-size: 1.03rem;
+  font-weight: 750;
+  letter-spacing: -.015em;
+}
+
+.launcher[data-design="blockcraft"] .mod-studio :is(.project-card p, .description-body, .dependency-panel > p, .manager-header p, .create-pack > p) {
+  color: var(--block-muted);
+}
+
+.launcher[data-design="blockcraft"] .mod-studio :is(.author, .project-card footer span, .mod-description, .mod-size, .result-meta, .catalog-summary small) {
+  color: var(--block-faint);
+}
+
+.launcher[data-design="blockcraft"] .mod-studio .project-card footer strong {
+  color: var(--primary);
+  background: rgba(var(--primary-rgb), .09);
+  border: 1px solid rgba(var(--primary-rgb), .23);
+  border-radius: 4px;
+  padding: 6px 9px;
+}
+
+.launcher[data-design="blockcraft"] .mod-studio :is(.tag-row span, .version-tags span, .mod-badges > span) {
+  color: #aebeb1;
+  background: #b2d1b908;
+  border-color: #b2d1b91c;
+  border-radius: 3px;
+}
+
+.launcher[data-design="blockcraft"] .mod-studio .visual-content-note {
+  border-radius: 7px;
+  background: linear-gradient(100deg, rgba(var(--primary-rgb), .11), transparent 85%), var(--block-panel);
+  border-color: rgba(var(--primary-rgb), .25);
+  box-shadow: var(--block-bevel);
+}
+
+.launcher[data-design="blockcraft"] .mod-studio .pack-card.selected {
+  background: rgba(var(--primary-rgb), .1);
+  border-color: rgba(var(--primary-rgb), .55);
+}
+
+.launcher[data-design="blockcraft"] .mod-studio :is(.pack-mod-list, .manager-actions, .mod-file, .dependency-list article) {
+  border-color: var(--block-line);
+}
+
+.launcher[data-design="blockcraft"] .mod-studio .mod-file {
+  padding: 15px 3px;
+}
+
+.launcher[data-design="blockcraft"] .mod-studio .mod-file:hover {
+  background: #ffffff02;
+}
+
+.launcher[data-design="blockcraft"] .mod-studio .switch {
+  border-radius: 4px;
+  background: #36413a;
+  border: 1px solid #a89bc329;
+}
+
+.launcher[data-design="blockcraft"] .mod-studio .switch span {
+  border-radius: 2px;
+  background: #b1beb3;
+}
+
+.launcher[data-design="blockcraft"] .mod-studio .switch.on {
+  background: color-mix(in srgb, var(--primary) 65%, #14231a);
+  border-color: var(--primary);
+}
+
+
+.launcher[data-design="blockcraft"] .module-panel :is(.installed-card, .install-total) {
+  background: var(--block-raised);
+  border-color: var(--block-line);
+  border-radius: 7px;
+  box-shadow: var(--block-bevel);
+}
+
+.launcher[data-design="blockcraft"] .module-panel .installed-card {
+  padding: 17px;
+}
+
+.launcher[data-design="blockcraft"] .module-panel .installed-card:hover {
+  border-color: var(--block-line-hover);
+  transform: none;
+  box-shadow: var(--block-bevel), 0 5px 15px #00000026;
+}
+
+.launcher[data-design="blockcraft"] .module-panel .installed-mark {
+  border-radius: 4px;
+  border-color: rgba(var(--primary-rgb), .25);
+  background: rgba(var(--primary-rgb), .1);
+}
+
+.launcher[data-design="blockcraft"] .module-panel .install-state {
+  border-radius: 3px;
+  font-size: .66rem;
+}
+
+.launcher[data-design="blockcraft"] .module-panel .installed-card-meta {
+  color: var(--block-faint);
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--block-line);
+}
+
+
+.launcher[data-design="blockcraft"] .settings-suite .setting-row {
+  padding-block: 19px;
+  border-color: var(--block-line);
+}
+
+.launcher[data-design="blockcraft"] .settings-suite :is(.toggle span, .toggle span::after) {
+  border-radius: 4px;
+}
+
+.launcher[data-design="blockcraft"] .settings-suite .toggle span {
+  background: #36443b;
+  box-shadow: inset 0 1px 3px #00000035;
+}
+
+.launcher[data-design="blockcraft"] .settings-suite .toggle input:checked + span {
+  background: color-mix(in srgb, var(--primary) 72%, #172a1e);
+}
+
+.launcher[data-design="blockcraft"] .settings-suite :is(.runtime, .account-card) {
+  border-radius: 6px;
+  border: 1px solid var(--block-line);
+  background: #00000014;
+  box-shadow: inset 0 1px 0 #ffffff04;
+}
+
+.launcher[data-design="blockcraft"] .settings-suite .account-card.active {
+  border-color: rgba(var(--primary-rgb), .42);
+  background: rgba(var(--primary-rgb), .06);
+}
+
+.launcher[data-design="blockcraft"] .settings-suite :is(.java-badge, .avatar-placeholder, .account-heading img, .color-input > div) {
+  border-radius: 4px;
+}
+
+.launcher[data-design="blockcraft"] .settings-suite .java-badge {
+  font-family: var(--font-display, "Consolas", monospace);
+  background: rgba(var(--primary-rgb), .08);
+  color: var(--primary);
+  border: 1px solid rgba(var(--primary-rgb), .18);
+}
+
+.launcher[data-design="blockcraft"] .settings-suite .runtime-info code {
+  color: var(--block-faint);
+  font-size: .67rem;
+}
+
+.launcher[data-design="blockcraft"] .settings-suite .theme {
+  border-radius: 5px;
+  color: var(--theme-accent);
+  border-color: color-mix(in srgb, var(--theme-accent) 25%, transparent);
+  min-height: 65px;
+  background: #00000018;
+}
+
+.launcher[data-design="blockcraft"] .settings-suite .theme.selected {
+  border-color: var(--theme-accent);
+  background: color-mix(in srgb, var(--theme-accent) 12%, #101914);
+}
+
+.launcher[data-design="blockcraft"] .settings-suite .theme::after {
+  left: 0;
+  right: 0;
+  height: 3px;
+  box-shadow: none;
+}
+
+
+.launcher[data-design="blockcraft"] .account-workspace .account-summary {
+  border-top: 2px solid rgba(var(--primary-rgb), .65);
+  background: linear-gradient(100deg, rgba(var(--primary-rgb), .07), transparent 65%), var(--block-panel);
+}
+
+.launcher[data-design="blockcraft"] .account-workspace :is(.account-symbol, .skin-card, .cape-card, .drop-zone) {
+  border-radius: 6px;
+}
+
+.launcher[data-design="blockcraft"] .account-workspace :is(.skin-card, .cape-card) {
+  border-color: var(--block-line);
+  background: var(--block-raised);
+  box-shadow: var(--block-bevel);
+}
+
+.launcher[data-design="blockcraft"] .account-workspace :is(.skin-card.selected, .cape-card.equipped) {
+  border-color: rgba(var(--primary-rgb), .58);
+  background: linear-gradient(180deg, rgba(var(--primary-rgb), .05), transparent), var(--block-panel);
+}
+
+.launcher[data-design="blockcraft"] .account-workspace .skin-portrait {
+  border: 0;
+  border-radius: 0;
+  background: radial-gradient(ellipse at 50% 80%, rgba(var(--primary-rgb), .12), transparent 65%), #00000012;
+  box-shadow: inset 0 -1px 0 var(--block-line);
+}
+
+.launcher[data-design="blockcraft"] .account-workspace .skin-portrait:hover:not(:disabled) {
+  background: radial-gradient(ellipse at 50% 80%, rgba(var(--primary-rgb), .2), transparent 70%), #00000012;
+  box-shadow: inset 0 -1px 0 var(--block-line);
+}
+
+.launcher[data-design="blockcraft"] .account-workspace .skin-details h4 {
+  font-family: "Segoe UI Variable", "Segoe UI", system-ui, sans-serif;
+  font-weight: 650;
+  color: var(--block-text);
+}
+
+.launcher[data-design="blockcraft"] .account-workspace .drop-zone {
+  background: rgba(var(--primary-rgb), .035);
+  border-color: rgba(var(--primary-rgb), .3);
+  color: var(--primary);
+}
+
+.launcher[data-design="blockcraft"] .account-workspace .drop-zone:is(:hover, .dragging) {
+  background: rgba(var(--primary-rgb), .1);
+  border-color: var(--primary);
+}
+
+.launcher[data-design="blockcraft"] .account-workspace :is(.subtle, .subtle:hover:not(:disabled)) {
+  background: none;
+  border: 0;
+  box-shadow: none;
+  padding: 5px 0;
+  font-size: .7rem;
+}
+
+
+.launcher[data-design="blockcraft"] .server-hub :is(.server-card, .target-badge, .tunnel-symbol, .lan-state, .share-address) {
+  border-radius: 6px;
+  border-color: var(--block-line);
+  background: #00000018;
+}
+
+.launcher[data-design="blockcraft"] .server-hub .server-card {
+  padding: 17px;
+  box-shadow: inset 0 1px 0 #ffffff05;
+}
+
+.launcher[data-design="blockcraft"] .server-hub .server-card:hover {
+  border-color: rgba(var(--primary-rgb), .3);
+  background: rgba(var(--primary-rgb), .025);
+}
+
+.launcher[data-design="blockcraft"] .server-hub :is(.server-icon, .server-icon img, .steps li > span) {
+  border-radius: 4px;
+}
+
+.launcher[data-design="blockcraft"] .server-hub .server-title h3 {
+  font-family: "Segoe UI Variable", "Segoe UI", system-ui, sans-serif;
+  font-weight: 750;
+}
+
+.launcher[data-design="blockcraft"] .server-hub .search {
+  background: var(--block-input);
+  border-color: var(--block-line);
+  border-radius: 4px;
+  box-shadow: inset 0 2px 4px #00000020;
+}
+
+.launcher[data-design="blockcraft"] .server-hub .search input {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
+.launcher[data-design="blockcraft"] .server-hub :is(.address-copy, .external-link) {
+  background: none;
+  border: 0;
+  box-shadow: none;
+  padding-left: 0;
+  color: var(--block-muted);
+}
+
+.launcher[data-design="blockcraft"] .server-hub .public .share-address {
+  color: #94dbb0;
+  background: #66ad7f0b;
+  border-color: #72bf9245;
+}
+
+
+.launcher[data-design="blockcraft"] .news-hub.news-mode {
+  padding: 24px;
+  border-radius: 8px;
+  border: 1px solid var(--block-line);
+  border-top: 3px solid var(--primary);
+  background: var(--block-raised);
+  box-shadow: var(--block-bevel), var(--block-shadow);
+  backdrop-filter: blur(var(--blur-px, 12px));
+}
+
+.launcher[data-design="blockcraft"] .news-hub .news-card {
+  background: var(--block-panel);
+  border-color: var(--block-line);
+  border-radius: 6px;
+  box-shadow: inset 0 -2px 0 #00000020;
+  transition: border-color .17s, transform .17s;
+}
+
+.launcher[data-design="blockcraft"] .news-hub .news-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--block-line-hover);
+  background: var(--block-panel);
+}
+
+.launcher[data-design="blockcraft"] .news-hub .news-card img {
+  height: 155px;
+  border-bottom: 1px solid #ffffff0c;
+}
+
+.launcher[data-design="blockcraft"] .news-hub .news-card h3 {
+  font-family: "Segoe UI Variable", "Segoe UI", system-ui, sans-serif;
+  color: var(--block-text);
+  font-size: 1rem;
+  font-weight: 750;
+  letter-spacing: -.01em;
+}
+
+.launcher[data-design="blockcraft"] .news-hub .news-card p {
+  color: var(--block-muted);
+}
+
+.launcher[data-design="blockcraft"] .news-hub :is(.content-shortcuts button, footer a, .refresh, .archive-link, nav button) {
+  border-radius: 4px;
+  color: #bdcbbc;
+  border-color: var(--block-line);
+  background: #ffffff03;
+  box-shadow: var(--block-bevel);
+}
+
+.launcher[data-design="blockcraft"] .news-hub nav button.active {
+  color: var(--primary);
+  background: rgba(var(--primary-rgb), .1);
+  border-color: rgba(var(--primary-rgb), .4);
+  box-shadow: inset 0 -2px 0 var(--primary);
+}
+
+.launcher[data-design="blockcraft"] .news-hub .content-shortcuts button {
+  padding: 11px 15px;
+  font-weight: 650;
+}
+
+.launcher[data-design="blockcraft"] .news-hub:not(.news-mode) {
+  border-radius: 8px;
+  border-color: var(--block-line);
+  border-top-color: var(--primary);
+  background-color: #16161E;
+}
+
+
+.launcher[data-design="blockcraft"] .capture-gallery .gallery-meta {
+  border-top-color: var(--block-line);
+  padding: 17px 0;
+}
+
+.launcher[data-design="blockcraft"] .capture-gallery .capture-card {
+  padding: 0;
+  border-radius: 6px;
+  border-color: var(--block-line);
+  background: var(--block-raised);
+  box-shadow: var(--block-bevel), 0 4px 15px #00000020;
+}
+
+.launcher[data-design="blockcraft"] .capture-gallery .capture-card:hover:not(:disabled) {
+  transform: translateY(-2px);
+  border-color: var(--block-line-hover);
+  background: var(--block-raised);
+}
+
+.launcher[data-design="blockcraft"] .capture-gallery .thumbnail {
+  border-bottom: 1px solid var(--block-line);
+}
+
+.launcher[data-design="blockcraft"] .capture-gallery .thumbnail > span {
+  border-radius: 3px;
+  background: #0B0B0Fdc;
+  color: #e6e0f1;
+}
+
+.launcher[data-design="blockcraft"] .capture-gallery .caption {
+  gap: 8px;
+  padding: 17px;
+}
+
+.launcher[data-design="blockcraft"] .capture-gallery .caption strong {
+  font-size: .82rem;
+  color: var(--block-text);
+}
+
+.launcher[data-design="blockcraft"] .capture-gallery .caption small {
+  color: var(--block-faint);
+}
+
+.launcher[data-design="blockcraft"] .capture-gallery kbd {
+  font-family: var(--font-display, "Consolas", monospace);
+  border-radius: 2px;
+  background: #ffffff08;
+  box-shadow: inset 0 -2px 0 #00000035;
+}
+
+
+.launcher[data-design="blockcraft"] .achievements-panel :is(.collection-overview, .collection-emblem, .discovery-note, .achievement-card) {
+  background: var(--block-raised);
+  border-color: var(--block-line);
+  border-radius: 7px;
+  box-shadow: var(--block-bevel);
+}
+
+.launcher[data-design="blockcraft"] .achievements-panel .collection-overview {
+  border-top: 2px solid rgba(var(--primary-rgb), .5);
+}
+
+.launcher[data-design="blockcraft"] .achievements-panel :is(.progress-overview strong, .collection-stats dd) {
+  font-family: var(--font-display, "Consolas", monospace);
+  font-size: 1.45rem;
+  line-height: 1.6;
+}
+
+.launcher[data-design="blockcraft"] .achievements-panel .achievement-card {
+  padding: 20px;
+}
+
+.launcher[data-design="blockcraft"] .achievements-panel .achievement-card.discovered {
+  border-color: rgba(var(--primary-rgb), .38);
+  background: linear-gradient(145deg, rgba(var(--primary-rgb), .065), transparent 65%), var(--block-panel);
+}
+
+.launcher[data-design="blockcraft"] .achievements-panel .achievement-card.legendary.discovered {
+  border-color: #d1b57965;
+  background: linear-gradient(145deg, #d1b5790e, transparent 70%), var(--block-panel);
+}
+
+.launcher[data-design="blockcraft"] .achievements-panel .secret-illustration {
+  border-radius: 3px;
+  box-shadow: inset 0 1px 0 #ffffff12, inset 0 -3px 0 #00000035;
+}
+
+.launcher[data-design="blockcraft"] .achievements-panel .secret-illustration.obscured {
+  background: #08080D;
+  border-color: #27273A;
+  box-shadow: inset 0 2px 12px #00000075;
+}
+
+.launcher[data-design="blockcraft"] .achievements-panel .concealed {
+  background: linear-gradient(145deg, #16161Eee, #0B0B0Fed);
+}
+
+.launcher[data-design="blockcraft"] .achievements-panel .difficulty {
+  border-radius: 3px;
+}
+
+.launcher[data-design="blockcraft"] .achievements-panel .filter-fields :is(input, select) {
+  height: 43px;
+}
+
+
+.launcher[data-design="blockcraft"] .poser-studio .panel {
+  padding: 18px;
+}
+
+.launcher[data-design="blockcraft"] .poser-studio .preview-panel {
+  padding: 0;
+  background: radial-gradient(ellipse at 50% 40%, rgba(var(--primary-rgb), .06), transparent 70%), var(--block-panel);
+}
+
+.launcher[data-design="blockcraft"] .poser-studio .preview-title {
+  padding: 19px 20px 12px;
+  border-bottom: 1px solid var(--block-line);
+}
+
+.launcher[data-design="blockcraft"] .poser-studio .pose-list {
+  gap: 6px;
+  padding-right: 3px;
+}
+
+.launcher[data-design="blockcraft"] .poser-studio .pose-list button {
+  background: #00000014;
+  border-color: #ffffff09;
+  color: var(--block-muted);
+  padding: 11px;
+}
+
+.launcher[data-design="blockcraft"] .poser-studio .pose-list button.active {
+  background: rgba(var(--primary-rgb), .1);
+  border-color: rgba(var(--primary-rgb), .4);
+  color: var(--block-text);
+  box-shadow: inset 3px 0 0 var(--primary);
+}
+
+.launcher[data-design="blockcraft"] .poser-studio :is(.pose-list small, .export-note, .studio-header p, .project-credits p) {
+  color: var(--block-faint);
+}
+
+.launcher[data-design="blockcraft"] .poser-studio :is(output, summary, .panel-title span) {
+  color: var(--primary);
+}
+
+.launcher[data-design="blockcraft"] .poser-studio :is(details, .save-panel, .project-credits) {
+  border-color: var(--block-line);
+}
+
+.launcher[data-design="blockcraft"] .poser-studio :is(.open-source, .project-credits) {
+  border-radius: 5px;
+  background: #00000015;
+  color: var(--block-muted);
+}
+
+
+.launcher[data-design="blockcraft"] :is(.project-detail, .preview-dialog, .gallery-dialog, .delete-dialog) {
+  color: var(--block-text);
+  background: linear-gradient(160deg, rgba(var(--primary-rgb), .045), transparent 55%), color-mix(in srgb, rgb(var(--bg-base-rgb, 11, 11, 15)) 92%, #16161E);
+  border: 1px solid rgba(var(--primary-rgb), .3);
+  border-radius: 9px;
+  box-shadow: inset 0 1px 0 #ffffff10, 0 25px 90px #00000080;
+  scrollbar-width: thin;
+  scrollbar-color: #817B95 #0B0B0F;
+}
+
+.launcher[data-design="blockcraft"] :is(.project-detail, .preview-dialog, .gallery-dialog, .delete-dialog)::backdrop {
+  background: #0B0B0Fcc;
+  backdrop-filter: blur(8px);
+}
+
+.launcher[data-design="blockcraft"] .project-detail :is(.detail-header h2, .detail-tabs button) {
+  color: var(--block-text);
+}
+
+.launcher[data-design="blockcraft"] .project-detail .detail-header > img {
+  border-radius: 6px;
+}
+
+.launcher[data-design="blockcraft"] .project-detail .detail-tabs button.active {
+  color: var(--primary);
+  border-color: rgba(var(--primary-rgb), .45);
+  background: rgba(var(--primary-rgb), .12);
+  box-shadow: inset 0 -2px 0 rgba(var(--primary-rgb), .5);
+}
+
+.launcher[data-design="blockcraft"] :is(.mod-studio, .settings-suite, .project-detail, .wizard-shell) :is(th, td) {
+  border-color: var(--block-line);
+}
+
+.launcher[data-design="blockcraft"] :is(.mod-studio, .settings-suite, .project-detail, .wizard-shell) th {
+  background: #ffffff03;
+  color: var(--block-faint);
+  font-size: .63rem;
+  line-height: 1.6;
+}
+
+.launcher[data-design="blockcraft"] :is(.mod-studio, .settings-suite, .project-detail, .wizard-shell) td {
+  color: #c9c1d8;
+}
+
+.launcher[data-design="blockcraft"] :is(.mod-studio, .settings-suite, .project-detail, .wizard-shell) tbody tr:hover {
+  background: rgba(var(--primary-rgb), .035);
+}
+
+.launcher[data-design="blockcraft"] :is(.preview-dialog .full-preview, .gallery-dialog .preview) {
+  border-radius: 4px;
+  background: #0B0B0F;
+}
+
+.launcher[data-design="blockcraft"] .gallery-dialog .shots article {
+  border-color: var(--block-line);
+  background: #ffffff03;
+  border-radius: 6px;
+}
+
+
+.launcher[data-design="blockcraft"] .content-progress {
+  border-radius: 6px;
+  border-color: rgba(var(--primary-rgb), .35);
+  background: linear-gradient(110deg, rgba(var(--primary-rgb), .08), transparent), color-mix(in srgb, rgb(var(--bg-base-rgb, 11, 11, 15)) 92%, #16161E);
+  box-shadow: var(--block-bevel), var(--block-shadow);
+  color: var(--block-text);
+}
+
+.launcher[data-design="blockcraft"] .content-progress.completed {
+  border-color: #87cfa15c;
+}
+
+.launcher[data-design="blockcraft"] .content-progress.failed {
+  border-color: #d6827465;
+}
+
+.launcher[data-design="blockcraft"] .content-progress :is(.progress-heading span, .progress-detail) {
+  color: var(--block-muted);
+}
+
+.launcher[data-design="blockcraft"] :is(.content-progress progress, .content-progress progress::-webkit-progress-bar, .content-progress progress::-webkit-progress-value, .progress-track, .progress-fill, .progress-overview progress, .progress-overview progress::-webkit-progress-value) {
+  border-radius: 2px;
+}
+
+.launcher[data-design="blockcraft"] .content-progress progress::-webkit-progress-value {
+  background: linear-gradient(90deg, var(--secondary), var(--primary));
+}
+
+.launcher[data-design="blockcraft"] :is(.console-output, .mini-console-output) {
+  border-radius: 5px;
+  border: 1px solid var(--block-line);
+  background: #0B0B0Ff0;
+  box-shadow: inset 0 2px 5px #00000035;
+  color: #c9c1d8;
+  font-family: "Cascadia Mono", "Consolas", monospace;
+  font-size: .77rem;
+  line-height: 1.8;
+}
+
+.launcher[data-design="blockcraft"] .dismiss-operation {
+  border-radius: 3px;
+  background: #16161E;
+  color: #b3adc3;
+  border-color: var(--block-line);
+}
+
+.launcher[data-design="blockcraft"] :is(.mod-studio, .settings-suite, .server-hub, .account-workspace, .capture-gallery, .achievements-panel, .poser-studio) :is(.empty, .empty-state, .install-empty) {
+  border-radius: 7px;
+  border-color: #a89bc329;
+  background: #00000016;
+  box-shadow: inset 0 1px 0 #ffffff03;
+}
+
+.launcher[data-design="blockcraft"] :is(.mod-studio, .settings-suite, .server-hub, .account-workspace, .capture-gallery, .poser-studio) :is(.notice, .status, .studio-message, .error, .tool-message) {
+  border-radius: 5px;
+}
+
+
+.launcher[data-design="blockcraft"] .wizard-window {
+  border-radius: 10px;
+  border-color: rgba(var(--primary-rgb), .35);
+  background: color-mix(in srgb, rgb(var(--bg-base-rgb, 11, 11, 15)) 96%, #27273A);
+  box-shadow: var(--block-bevel), 0 30px 110px #00000090;
+}
+
+.launcher[data-design="blockcraft"] .wizard-rail {
+  border-right-color: var(--block-line);
+  background: linear-gradient(155deg, rgba(var(--primary-rgb), .1), transparent 75%), #00000014;
+}
+
+.launcher[data-design="blockcraft"] .wizard-shell :is(.step-number, .runtime-card, .java-number, .wizard-themes button, .connect-card, .language-table, .account-symbol) {
+  border-radius: 5px;
+  border-color: var(--block-line);
+}
+
+.launcher[data-design="blockcraft"] .wizard-shell :is(.brand, .step-count, .current .step-number, .memory-amount) {
+  color: var(--primary);
+}
+
+.launcher[data-design="blockcraft"] .wizard-shell .current .step-number {
+  background: rgba(var(--primary-rgb), .15);
+  border-color: var(--primary);
+  box-shadow: var(--block-bevel);
+}
+
+.launcher[data-design="blockcraft"] .wizard-shell .language-button {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
+.launcher[data-design="blockcraft"] .wizard-shell thead {
+  background: #16161E;
+}
+
+
+.launcher[data-design="blockcraft"] :is(.mod-studio, .settings-suite, .server-hub, .capture-gallery, .achievements-panel, .poser-studio, .news-hub, .module-panel, .gallery-dialog, .project-detail) * {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--primary) 30%, #5b4b70) transparent;
+}
+
+.launcher[data-design="blockcraft"] :is(.mod-studio, .settings-suite, .server-hub, .capture-gallery, .achievements-panel, .poser-studio, .news-hub, .module-panel, .gallery-dialog, .project-detail) ::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+.launcher[data-design="blockcraft"] :is(.mod-studio, .settings-suite, .server-hub, .capture-gallery, .achievements-panel, .poser-studio, .news-hub, .module-panel, .gallery-dialog, .project-detail) ::-webkit-scrollbar-thumb {
+  border: 1px solid #16161E;
+  background: #655274;
+  border-radius: 2px;
+}
+
+@media (max-width: 900px) {
+  .launcher[data-design="blockcraft"] :is(.mod-studio, .settings-suite, .server-hub, .account-workspace, .poser-studio, .module-panel) :is(.surface, .search-surface, .glass, .module-card) {
+    padding: 18px;
+  }
+
+  .launcher[data-design="blockcraft"] .news-hub.news-mode {
+    padding: 18px;
+  }
+
+  .launcher[data-design="blockcraft"] .mod-studio .project-grid {
+    grid-template-columns: repeat(auto-fill, minmax(min(225px, 100%), 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .launcher[data-design="blockcraft"] :is(.mod-studio, .settings-suite, .server-hub, .account-workspace, .poser-studio, .module-panel) :is(.surface, .search-surface, .glass, .module-card) {
+    padding: 15px;
+  }
+
+  .launcher[data-design="blockcraft"] :is(.studio-heading, .suite-heading, .page-heading, .gallery-heading, .panel-heading, .studio-header, .installations-header) :is(h1, h2) {
+    font-size: 1.3rem;
+    line-height: 1.5;
+  }
+
+  .launcher[data-design="blockcraft"] .news-hub.news-mode {
+    padding: 15px;
+  }
+
+  .launcher[data-design="blockcraft"] :is(.project-detail, .preview-dialog, .gallery-dialog) {
+    max-width: calc(100vw - 20px);
+    max-height: 94dvh;
+    padding: 16px;
+  }
+
+  .launcher[data-design="blockcraft"] .capture-gallery .capture-grid {
+    gap: 14px;
+  }
+
+  .launcher[data-design="blockcraft"] .mod-studio .project-card {
+    padding: 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .launcher[data-design="blockcraft"] *,
+  .launcher[data-design="blockcraft"] *::before,
+  .launcher[data-design="blockcraft"] *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

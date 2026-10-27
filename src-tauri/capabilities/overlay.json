@@ -1,0 +1,20 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "tp-overlay",
+  "description": "Receive local HUD/profile events in the optional game overlay.",
+  "windows": [
+    "tp-hud-overlay"
+  ],
+  "permissions": [
+    "core:event:allow-listen",
+    "core:event:allow-unlisten",
+    {
+      "identifier": "opener:allow-open-url",
+      "allow": [
+        {
+          "url": "https://modrinth.com/*"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,144 @@
+[
+  {
+    "id": "skin_layers",
+    "name": "Capas de skin en 3D",
+    "projects": [
+      "zV5r3pPn",
+      "Ni3Wk7yd",
+      "2h1UqXQ4"
+    ],
+    "slug": "3dskinlayers",
+    "description": "Capas de la skin con relieve, según el cargador y versión compatibles."
+  },
+  {
+    "id": "wavey_capes",
+    "name": "Físicas de capa",
+    "projects": [
+      "kYuIpRLv",
+      "Hmd9emlf"
+    ],
+    "slug": "wavey-capes",
+    "description": "Movimiento segmentado de capas con Wavey Capes."
+  },
+  {
+    "id": "old_animations",
+    "name": "Animaciones clásicas",
+    "projects": [
+      "4Hfmgaef",
+      "UD5CuiYt"
+    ],
+    "slug": "animations",
+    "description": "Animaciones clásicas con el proyecto compatible para esa edición."
+  },
+  {
+    "id": "freelook",
+    "name": "Cámara libre",
+    "projects": [
+      "g4pR0Fmy",
+      "DSA6X7rF"
+    ],
+    "slug": "freelook",
+    "description": "Perspectiva libre; se configura con los controles del mod."
+  },
+  {
+    "id": "block_outline",
+    "name": "Borde de bloque personalizado",
+    "projects": [
+      "Eps2maQC",
+      "izMzA6Lo"
+    ],
+    "slug": "custom-block-highlight",
+    "description": "Opciones de borde y resaltado de bloques."
+  },
+  {
+    "id": "motion_blur",
+    "name": "Desenfoque de movimiento",
+    "projects": [
+      "fWundlde",
+      "aTVPwf6V"
+    ],
+    "slug": "motionblur",
+    "description": "Desenfoque mediante un mod cliente compatible."
+  },
+  {
+    "id": "low_fire",
+    "name": "Fuego bajo",
+    "projects": [
+      "9ZPMzrQQ",
+      "Gou1gmGj"
+    ],
+    "slug": "low-fire-reborn",
+    "description": "Reduce la obstrucción visual del fuego."
+  },
+  {
+    "id": "clean_view",
+    "name": "Ocultar partículas propias",
+    "projects": [
+      "aDIwNM7S"
+    ],
+    "slug": "cleanview-particles",
+    "description": "Control visual de las partículas de poción propias."
+  },
+  {
+    "id": "hit_color",
+    "name": "Color de entidades al recibir daño",
+    "projects": [
+      "vJofZXEN",
+      "6zatK8W5",
+      "x1ODWD2A"
+    ],
+    "slug": "no-ones-hit-color",
+    "description": "Color de daño configurable con Hit Color compatible."
+  },
+  {
+    "id": "particle_multiplier",
+    "name": "Partículas de combate",
+    "projects": [
+      "36uzTK0c",
+      "zd8Ic68Q"
+    ],
+    "slug": "sharpness-particles-refurbished",
+    "description": "Partículas de afilado del proyecto compatible."
+  },
+  {
+    "id": "self_nametag",
+    "name": "Nombre propio en tercera persona",
+    "projects": [
+      "ZS0HNETF",
+      "b1BQdN7H",
+      "HnGNQANl"
+    ],
+    "slug": "third-person-nametags",
+    "description": "Muestra la etiqueta del jugador en tercera persona."
+  },
+  {
+    "id": "ragdolls",
+    "name": "Caída visual de criaturas",
+    "projects": [
+      "I3mWDgfy"
+    ],
+    "slug": "sable-ragdolls",
+    "description": "Físicas visuales con Sable: Ragdolls compatible."
+  },
+  {
+    "id": "tnt_timer",
+    "name": "Temporizador sobre la TNT",
+    "projects": [
+      "AihRqJiY",
+      "pQFm0mAJ",
+      "WLMFg0eR"
+    ],
+    "slug": "tnt-timer",
+    "description": "Cuenta atrás visible encima de la TNT encendida."
+  },
+  {
+    "id": "light_levels",
+    "name": "Niveles de iluminación",
+    "projects": [
+      "x7yVEhOq"
+    ],
+    "slug": "light-level-overlay",
+    "category": "technical",
+    "description": "Light Level Overlay: valores de luz sobre los bloques para localizar zonas de aparición. Mod externo MIT; F7 y Shift+F7 según sus controles. Requiere reiniciar tras instalar."
+  }
+]

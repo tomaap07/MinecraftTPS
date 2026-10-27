@@ -1,36 +1,77 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "minecrafttps",
-  "version": "0.1.0",
+  "productName": "TP LAUNCHER",
+  "version": "0.1.1",
   "identifier": "TPS",
   "build": {
-    "beforeDevCommand": "npm run dev",
-    "devUrl": "http://localhost:1420",
-    "beforeBuildCommand": "npm run build",
+    "beforeDevCommand": "npm run build:bridge && npm run dev",
+    "devUrl": "http://127.0.0.1:1420",
+    "beforeBuildCommand": "npm run build:desktop",
     "frontendDist": "../build"
   },
   "app": {
     "windows": [
       {
-        "title": "minecrafttps",
-        "width": 800,
-        "height": 600,
+        "title": "TP LAUNCHER",
+        "width": 1280,
+        "height": 820,
+        "minWidth": 860,
+        "minHeight": 620,
+        "center": true,
         "transparent": true
       }
     ],
     "security": {
-      "csp": null
+      "csp": "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' asset: https: http: data: blob:; connect-src ipc: http://ipc.localhost https: http://127.0.0.1:* ws://127.0.0.1:*; font-src 'self' data:; media-src 'self' blob: data: https:; worker-src 'self' blob:",
+      "devCsp": null
     }
   },
   "bundle": {
     "active": true,
-    "targets": "all",
+    "license": "GPL-3.0-only",
+    "licenseFile": "../LICENSE",
+    "resources": {
+      "../tp-companion/build/libs/tp-companion-0.1.0.jar": "companions/tp-companion-0.1.0.jar",
+      "../tp-bridge/build/tp-bridge-0.1.0.jar": "companions/tp-bridge-0.1.0.jar",
+      "../LICENSE": "licenses/TP-LAUNCHER-GPL-3.0.txt",
+      "../static/legal/THIRD-PARTY-NOTICES.txt": "licenses/THIRD-PARTY-NOTICES.txt",
+      "installer/TAURI-LICENSE-MIT.txt": "licenses/TAURI-INSTALLER-MIT.txt"
+    },
+    "targets": [
+      "nsis"
+    ],
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
       "icons/128x128@2x.png",
-      "icons/icon.icns",
       "icons/icon.ico"
-    ]
+    ],
+    "publisher": "TP Studios",
+    "shortDescription": "TP LAUNCHER · Tu próxima aventura empieza aquí",
+    "longDescription": "TP LAUNCHER 0.1.1. Gestor independiente de Minecraft Java con versiones, contenido, perfiles locales y Microsoft, HUD y herramientas de creación.",
+    "homepage": "https://github.com/tomaap07/MinecraftTPS",
+    "copyright": "Copyright © 2026 TP Studios",
+    "windows": {
+      "webviewInstallMode": {
+        "type": "offlineInstaller",
+        "silent": true
+      },
+      "nsis": {
+        "template": "installer/installer.nsi",
+        "installerHooks": "installer/hooks.nsh",
+        "headerImage": "installer/header.bmp",
+        "sidebarImage": "installer/sidebar.bmp",
+        "installerIcon": "icons/icon.ico",
+        "uninstallerIcon": "icons/icon.ico",
+        "installMode": "currentUser",
+        "languages": [
+          "Spanish"
+        ],
+        "displayLanguageSelector": false,
+        "compression": "lzma",
+        "startMenuFolder": "TP LAUNCHER",
+        "uninstallerHeaderImage": "installer/header.bmp"
+      }
+    }
   }
 }

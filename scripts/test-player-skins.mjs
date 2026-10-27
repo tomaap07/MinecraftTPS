@@ -1,0 +1,30 @@
+import assert from 'node:assert/strict';
+import {readFileSync}from'node:fs';
+import {resolve}from'node:path';
+import ts from'typescript';
+const source=readFileSync(resolve(import.meta.dirname,'../src/lib/player_skins.ts'),'utf8');
+const code=ts.transpileModule(source,{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext}}).outputText
+ .replace(/import\s*\{\s*invoke\s*\}\s*from\s*['"]@tauri-apps\/api\/core['"];?/,'const invoke=()=>Promise.reject(new Error("Unexpected IPC during a pure helper test"));')
+ .replace(/import\s*\{\s*FALLBACK_SKIN\s*\}\s*from\s*['"]\.\/poses_catalog['"];?/,'const FALLBACK_SKIN="/skins/tp-explorer.png";');
+const {createDefaultSkinResolver,crafatarSkinUrl,isFallbackSkin,defaultPlayerAppearance,loadSkinImage}=await import('data:text/javascript;base64,'+Buffer.from(code).toString('base64'));
+const png='data:image/png;base64,iVBORw0KGgo=';
+const appearance=(name='Steve',model='default')=>({name,model,skin_data:png,cape_data:'',avatar_data:png});
+let now=0,calls=0,complete;
+const shared=createDefaultSkinResolver(()=>{calls++;return new Promise(resolve=>complete=resolve);},()=>now);
+const a=shared('steve'),b=shared('steve');assert.equal(a,b,'Concurrent consumers should share a request');await Promise.resolve();assert.equal(calls,1);complete(appearance());assert.equal((await a).name,'Steve');await b;
+assert.equal((await shared('steve')).name,'Steve');assert.equal(calls,1,'Successful defaults should be reused');
+now=30*60*1000+1;const expired=shared('steve');await Promise.resolve();assert.equal(calls,2);complete(appearance('Steve','slim'));assert.equal((await expired).model,'slim','A service result must retain its real arm model');
+let attempts=0;now=0;const recover=createDefaultSkinResolver(async()=>{if(++attempts===1)throw new Error('Offline');return appearance('Alex','slim');},()=>now);
+await assert.rejects(recover('alex'),/Offline/);await assert.rejects(recover('alex'),/Offline/);assert.equal(attempts,1,'A failed endpoint must not be retried on every UI update');now=30001;assert.equal((await recover('alex')).model,'slim');assert.equal(attempts,2,'Connection failures need a retry after the cooldown');
+const malformed=createDefaultSkinResolver(async()=>({...appearance(),skin_data:'https://example.invalid/not-validated.png'}));await assert.rejects(malformed('steve'),/no es válida/);
+assert.equal(crafatarSkinUrl('C06F8906-4C8A-4911-9C29-EA1DBD1AAB82'),'https://crafatar.com/skins/c06f89064c8a49119c29ea1dbd1aab82?default=MHF_Steve');
+assert.match(crafatarSkinUrl('6ab4317889fd490597f60f67d9d76fd9','alex'),/default=MHF_Alex$/);
+for(const input of ['Steve','Willyrex','../skin','https://example.invalid/','00000000000000000000000000000000','c06f89064c8a49119c29ea1dbd1aab82?token=secret'])assert.equal(crafatarSkinUrl(input),null);
+assert.ok(isFallbackSkin(''));assert.ok(isFallbackSkin('/skins/tp-explorer.png'));assert.equal(isFallbackSkin('data:image/png;base64,skin'),false);
+await assert.rejects(defaultPlayerAppearance('steve'),/al abrir el launcher/);
+let imageLoads=0;
+globalThis.Image=class{width=64;height=64;set src(value){this.value=value;if(value)queueMicrotask(()=>{imageLoads++;if(value==='broken')this.onerror?.();else{if(value==='wrong-size')this.width=16;this.onload?.();}});}get src(){return this.value;}};
+const first=loadSkinImage('valid'),second=loadSkinImage('valid');assert.equal(first,second);await first;await second;assert.equal(imageLoads,1);await loadSkinImage('valid');assert.equal(imageLoads,1);
+await assert.rejects(loadSkinImage('broken'));await assert.rejects(loadSkinImage('broken'));assert.equal(imageLoads,3,'Failed image loads should not poison the cache');await assert.rejects(loadSkinImage('wrong-size'),/formato de skin/);
+delete globalThis.Image;
+console.log('Player skins: UUID-only Crafatar URLs, request deduplication, success TTL, offline retry, preserved arm models, SSR isolation and bounded image decoding verified.');

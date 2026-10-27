@@ -1,0 +1,108 @@
+{
+  "generated_at": "2026-10-27T15:03:45.285Z",
+  "scope": "10 isolated client startup cases: main menu, renderer, audio initialization and at least 18 seconds of stable process/window. No gameplay, worlds or multiplayer authentication was tested. This does not assert execution of the entire 920-version catalogue.",
+  "passed": 10,
+  "failed": 0,
+  "cases": [
+    {
+      "id": "1.12.2",
+      "runtime": "Java 8",
+      "started": true,
+      "sound_initialized": true,
+      "renderer_observed": true,
+      "title_screen": false,
+      "errors": [],
+      "elapsed_seconds": 40.2
+    },
+    {
+      "id": "1.21.1",
+      "runtime": "Java 21",
+      "started": true,
+      "sound_initialized": true,
+      "renderer_observed": true,
+      "title_screen": false,
+      "errors": [],
+      "elapsed_seconds": 74.7
+    },
+    {
+      "id": "26.2",
+      "runtime": "Java 25",
+      "started": true,
+      "sound_initialized": true,
+      "renderer_observed": true,
+      "title_screen": true,
+      "errors": [],
+      "elapsed_seconds": 53.1
+    },
+    {
+      "id": "26.3",
+      "runtime": "Java 25",
+      "started": true,
+      "sound_initialized": true,
+      "renderer_observed": true,
+      "title_screen": true,
+      "errors": [],
+      "elapsed_seconds": 46.1
+    },
+    {
+      "id": "fabric-loader-0.20.1-1.21.1",
+      "runtime": "Java 21",
+      "started": true,
+      "sound_initialized": true,
+      "renderer_observed": true,
+      "title_screen": true,
+      "errors": [],
+      "elapsed_seconds": 59.3
+    },
+    {
+      "id": "fabric-loader-0.20.1-26.2",
+      "runtime": "Java 25",
+      "started": true,
+      "sound_initialized": true,
+      "renderer_observed": true,
+      "title_screen": true,
+      "errors": [],
+      "elapsed_seconds": 44.7
+    },
+    {
+      "id": "fabric-loader-0.20.1-26.3",
+      "runtime": "Java 25",
+      "started": true,
+      "sound_initialized": true,
+      "renderer_observed": true,
+      "title_screen": true,
+      "errors": [],
+      "elapsed_seconds": 44.3
+    },
+    {
+      "id": "neoforge-21.1.248",
+      "runtime": "Java 21",
+      "started": true,
+      "sound_initialized": true,
+      "renderer_observed": true,
+      "title_screen": true,
+      "errors": [],
+      "elapsed_seconds": 94.7
+    },
+    {
+      "id": "1.12.2-forge-14.23.5.2860",
+      "runtime": "Java 8",
+      "started": true,
+      "sound_initialized": true,
+      "renderer_observed": true,
+      "title_screen": false,
+      "errors": [],
+      "elapsed_seconds": 36.3
+    },
+    {
+      "id": "1.12.2-OptiFine-G5",
+      "runtime": "Java 8",
+      "started": true,
+      "sound_initialized": true,
+      "renderer_observed": true,
+      "title_screen": false,
+      "errors": [],
+      "elapsed_seconds": 31.7
+    }
+  ]
+}

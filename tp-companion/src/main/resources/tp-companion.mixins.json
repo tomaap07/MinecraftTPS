@@ -1,0 +1,18 @@
+{
+  "required": true,
+  "package": "dev.tplauncher.companion.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "GameRendererMixin",
+    "ScreenMixin",
+    "ChatHudMixin",
+    "ClientNetworkMixin",
+    "InGameHudMixin",
+    "FogMixin",
+    "ItemPhysicsMixin",
+    "TitleScreenMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

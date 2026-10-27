@@ -1,0 +1,202 @@
+[
+  {
+    "id": "m_health",
+    "name": "Vida",
+    "group": "survival",
+    "metric": "health",
+    "source": "world",
+    "unit": " corazones",
+    "format": "hearts",
+    "description": "Lectura real del cliente. Se oculta si la edición o el servidor no aporta este dato."
+  },
+  {
+    "id": "m_food",
+    "name": "Hambre",
+    "group": "survival",
+    "metric": "food",
+    "source": "world",
+    "unit": " / 20",
+    "format": "number",
+    "description": "Lectura real del cliente. Se oculta si la edición o el servidor no aporta este dato."
+  },
+  {
+    "id": "m_saturation",
+    "name": "Saturación",
+    "group": "survival",
+    "metric": "saturation",
+    "source": "world",
+    "unit": "",
+    "format": "decimal",
+    "description": "Lectura real del cliente. Se oculta si la edición o el servidor no aporta este dato."
+  },
+  {
+    "id": "m_oxygen",
+    "name": "Oxígeno",
+    "group": "survival",
+    "metric": "oxygen",
+    "source": "world",
+    "unit": " s",
+    "format": "ticks",
+    "description": "Lectura real del cliente. Se oculta si la edición o el servidor no aporta este dato."
+  },
+  {
+    "id": "m_xp_level",
+    "name": "Nivel de experiencia",
+    "group": "survival",
+    "metric": "xp_level",
+    "source": "world",
+    "unit": "",
+    "format": "number",
+    "description": "Lectura real del cliente. Se oculta si la edición o el servidor no aporta este dato."
+  },
+  {
+    "id": "m_inventory_free",
+    "name": "Espacios libres",
+    "group": "survival",
+    "metric": "inventory_free",
+    "source": "world",
+    "unit": " / 36",
+    "format": "number",
+    "description": "Lectura real del cliente. Se oculta si la edición o el servidor no aporta este dato."
+  },
+  {
+    "id": "m_count_arrow",
+    "name": "Flechas",
+    "group": "pvp",
+    "metric": "count_arrow",
+    "source": "world",
+    "unit": "",
+    "format": "number",
+    "description": "Lectura real del cliente. Se oculta si la edición o el servidor no aporta este dato."
+  },
+  {
+    "id": "m_count_ender_pearl",
+    "name": "Perlas de Ender",
+    "group": "pvp",
+    "metric": "count_ender_pearl",
+    "source": "world",
+    "unit": "",
+    "format": "number",
+    "description": "Lectura real del cliente. Se oculta si la edición o el servidor no aporta este dato."
+  },
+  {
+    "id": "m_count_golden_apple",
+    "name": "Manzanas doradas",
+    "group": "pvp",
+    "metric": "count_golden_apple",
+    "source": "world",
+    "unit": "",
+    "format": "number",
+    "description": "Lectura real del cliente. Se oculta si la edición o el servidor no aporta este dato."
+  },
+  {
+    "id": "m_count_totem_of_undying",
+    "name": "Tótems",
+    "group": "pvp",
+    "metric": "count_totem_of_undying",
+    "source": "world",
+    "unit": "",
+    "format": "number",
+    "description": "Lectura real del cliente. Se oculta si la edición o el servidor no aporta este dato."
+  },
+  {
+    "id": "m_count_firework_rocket",
+    "name": "Cohetes",
+    "group": "survival",
+    "metric": "count_firework_rocket",
+    "source": "world",
+    "unit": "",
+    "format": "number",
+    "description": "Lectura real del cliente. Se oculta si la edición o el servidor no aporta este dato."
+  },
+  {
+    "id": "m_attack_cooldown",
+    "name": "Recarga de ataque",
+    "group": "pvp",
+    "metric": "attack_cooldown",
+    "source": "world",
+    "unit": "%",
+    "format": "percent",
+    "description": "Lectura real del cliente. Se oculta si la edición o el servidor no aporta este dato."
+  },
+  {
+    "id": "m_block_light",
+    "name": "Luz de bloque",
+    "group": "technical",
+    "metric": "block_light",
+    "source": "world",
+    "unit": " / 15",
+    "format": "number",
+    "description": "Lectura real del cliente. Se oculta si la edición o el servidor no aporta este dato."
+  },
+  {
+    "id": "m_sky_light",
+    "name": "Luz del cielo",
+    "group": "technical",
+    "metric": "sky_light",
+    "source": "world",
+    "unit": " / 15",
+    "format": "number",
+    "description": "Lectura real del cliente. Se oculta si la edición o el servidor no aporta este dato."
+  },
+  {
+    "id": "m_nether_coords",
+    "name": "Conversión de coordenadas Nether",
+    "group": "technical",
+    "metric": "nether_coords",
+    "source": "derived",
+    "format": "derived",
+    "unit": "",
+    "description": "Calculado con datos reales y sus unidades; respeta las restricciones del servidor."
+  },
+  {
+    "id": "m_chunk_coords",
+    "name": "Coordenadas del chunk",
+    "group": "technical",
+    "metric": "chunk_coords",
+    "source": "derived",
+    "format": "derived",
+    "unit": "",
+    "description": "Calculado con datos reales y sus unidades; respeta las restricciones del servidor."
+  },
+  {
+    "id": "m_chunk_local",
+    "name": "Posición dentro del chunk",
+    "group": "technical",
+    "metric": "chunk_local",
+    "source": "derived",
+    "format": "derived",
+    "unit": "",
+    "description": "Calculado con datos reales y sus unidades; respeta las restricciones del servidor."
+  },
+  {
+    "id": "m_world_dimension",
+    "name": "Dimensión actual",
+    "group": "technical",
+    "metric": "world_dimension",
+    "source": "derived",
+    "format": "derived",
+    "unit": "",
+    "description": "Calculado con datos reales y sus unidades; respeta las restricciones del servidor."
+  },
+  {
+    "id": "m_target_distance",
+    "name": "Distancia al punto de impacto",
+    "group": "pvp",
+    "metric": "target_distance",
+    "source": "world",
+    "format": "decimal",
+    "unit": " bloques",
+    "description": "Distancia del ojo a la intersección real con la entidad apuntada. El servidor decide el alcance válido."
+  },
+  {
+    "id": "m_combo",
+    "name": "Combo de impactos confirmados",
+    "group": "pvp",
+    "metric": "combo",
+    "source": "world",
+    "format": "number",
+    "unit": " golpes",
+    "description": "Impactos del servidor sobre el mismo objetivo, separados por menos de dos segundos; se reinicia al recibir daño."
+  }
+]

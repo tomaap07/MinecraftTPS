@@ -4,10 +4,28 @@ node_modules
 /.svelte-kit
 /package
 /src-tauri/logs/
+/src-tauri/config/
+/src-tauri/local/
+/src-tauri/essential/
+/src-tauri/textures_*.png
 /src-tauri/target/
 *.log
+/.codex-tmp/
+# Credenciales locales: nunca deben publicarse en el repositorio.
 .env
 .env.*
 !.env.example
+curseforge-key.dat
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+/tp-api/.vercel/
+/tp-api/dist/
+/supabase/.temp/
+
+# Per-device provider credentials; never bundled.
+integrations.env
+
+/tp-bridge/build/
+
+# Adjuntos de trabajo; nunca empaquetar ni publicar capturas o prompts personales.
+/.codex-remote-attachments/

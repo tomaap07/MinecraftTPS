@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+  <title>Entorno dimensional de TP: ilustración original para previsualizar el HUD</title>
+  <defs>
+    <linearGradient id="sky" x2="0" y2="1"><stop stop-color="#171124"/><stop offset="1" stop-color="#433359"/></linearGradient>
+    <linearGradient id="ground" x2="0" y2="1"><stop stop-color="#282238"/><stop offset="1" stop-color="#0B0B0F"/></linearGradient>
+    <pattern id="tiles" width="88" height="56" patternUnits="userSpaceOnUse"><path d="M0 0h88v56H0Z" fill="none" stroke="#A855F7" stroke-opacity=".13"/></pattern>
+  </defs>
+  <path fill="url(#sky)" d="M0 0h1280v720H0Z"/>
+  <g fill="#D8B4FE"><path d="M85 78h3v3h-3zM295 122h3v3h-3zM460 58h3v3h-3zM741 93h3v3h-3zM1035 161h3v3h-3zM1195 73h3v3h-3z"/><path d="m962 64 6 12 12 6-12 6-6 12-6-12-12-6 12-6z"/></g>
+  <path fill="#30263F" d="m0 362 140-124 80 44 178-99 82 125 132-62 120 128 116-107 128 98 164-115 140 137v333H0Z"/>
+  <path fill="#1C1929" d="m0 437 156-72 163 63 188-99 151 117 165-46 189 25 132-58 136 99v254H0Z"/>
+  <path fill="url(#ground)" d="M0 489h1280v231H0Z"/>
+  <path fill="url(#tiles)" d="M0 489h1280v231H0Z"/>
+  <g fill="#1A1624" stroke="#76559D" stroke-width="2"><path d="m174 418 36-129 36 129-36 25z"/><path d="m1006 449 46-188 46 188-46 29z"/><path d="m803 508 24-87 24 87-24 18z"/></g>
+  <g fill="#A855F7"><path d="m210 320 9 56-9 21-9-21zM1052 305l12 91-12 26-12-26zM827 449l6 32-6 15-6-15z"/></g>
+  <path d="M625 360h30m-15-15v30" stroke="#E9D5FF" stroke-opacity=".55"/>
+  <text x="28" y="690" fill="#A69AB9" font-family="sans-serif" font-size="12" letter-spacing="2">TP LAUNCHER · VISTA PREVIA</text>
+</svg>

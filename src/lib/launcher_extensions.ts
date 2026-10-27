@@ -1,0 +1,9 @@
+export type SocialLinks={discord:string;youtube:string;twitch:string;twitter:string;github:string};
+export type TpCosmetics={cape:'none'|'end';wings:boolean;aura:boolean};
+export type SocialProfileData={schema_version:1;show_links:boolean;links:SocialLinks;cosmetics:TpCosmetics};
+export const defaultSocialProfile=():SocialProfileData=>({schema_version:1,show_links:true,
+  links:{discord:'',youtube:'',twitch:'',twitter:'',github:''},cosmetics:{cape:'none',wings:false,aura:false}});
+export type OverlayState={running:boolean;username:string;version:string;server:string;active_games:number};
+export type HudKeys={w:boolean;a:boolean;s:boolean;d:boolean;lmb:boolean;rmb:boolean};
+export type HudTelemetry={schema_version:number;pid:number;timestamp_ms:number;has_world:boolean;metrics?:Record<string,number>;world_metrics?:Record<string,number>;labels?:Record<string,string>;game_fps:number|null;frame_time_ms?:number|null;fps_low?:number|null;singleplayer?:boolean;world_time?:number|null;world_time_source?:string;game_time?:number|null;biome?:string;dimension?:string;server_address?:string;attack_cooldown?:number|null;target_distance?:number|null;speed?:number|null;target_kind?:string;hit_sequence?:number|null;source:string;status:string;capabilities:string[];coordinates_restricted:boolean;x:number;y:number;z:number;direction:string;ping:number|null;ping_source?:string;armor:{name:string;remaining:number;maximum:number;item_id?:string;slot?:string}[];map:{pixels:string;origin_x:number;origin_z:number}|null};
+export type OverlaySnapshot=OverlayState&{total_memory_gb:number;available_memory_gb:number;updated_at:number;game_fps:number|null;fps_source:string;keys:HudKeys;left_cps:number;right_cps:number;editing:boolean;attached:boolean;focused:boolean;pid:number;telemetry:HudTelemetry|null;message:string};

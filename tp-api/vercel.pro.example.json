@@ -1,0 +1,9 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "npm run build",
+  "outputDirectory": "public",
+  "framework": null,
+  "regions": ["gru1"],
+  "functions": { "api/v1/worker/sync.ts": { "maxDuration": 60 }, "api/v1/servers/submit.ts": { "maxDuration": 30 } },
+  "crons": [{ "path": "/api/v1/worker/sync", "schedule": "*/5 * * * *" }]
+}

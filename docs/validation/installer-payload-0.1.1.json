@@ -1,0 +1,180 @@
+{
+  "schemaVersion": 1,
+  "auditedAt": "2026-10-27T15:25:41.355Z",
+  "status": "definitive",
+  "installer": {
+    "fileName": "TP LAUNCHER_0.1.1_x64-setup.exe",
+    "sizeBytes": 223100169,
+    "sha256": "07015ccbb245415e31085d446ee2dffc27b73f65f56fa6c16736e20a5f85a8cf"
+  },
+  "extraction": {
+    "method": "Official portable 7-Zip 26.05; archive-only extraction into a new empty directory",
+    "installerExecutedForExtraction": false,
+    "softwareInstalledByExtractor": false,
+    "registryModifiedByExtractor": false,
+    "fileCount": 15
+  },
+  "uiValidation": {
+    "uiPreviewOnly": true,
+    "previewOpenedByCoordinator": true,
+    "installationPerformed": false,
+    "reportedByCoordinator": true
+  },
+  "pe": {
+    "payloadFile": "launchertps.exe",
+    "sizeBytes": 14168064,
+    "sha256": "56c7d15761c13a74abb99a2a5058d7a89d7de96ed5ac9657e88166bd1141fe70",
+    "releaseSha256": "56c7d15761c13a74abb99a2a5058d7a89d7de96ed5ac9657e88166bd1141fe70",
+    "matchesRelease": true,
+    "comparison": "Exact byte-for-byte comparison; no normalization"
+  },
+  "licenses": [
+    {
+      "file": "licenses/TP-LAUNCHER-GPL-3.0.txt",
+      "source": "LICENSE",
+      "present": true,
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+      "matchesSource": true
+    },
+    {
+      "file": "licenses/THIRD-PARTY-NOTICES.txt",
+      "source": "static/legal/THIRD-PARTY-NOTICES.txt",
+      "present": true,
+      "sha256": "eb716d67219179ff6f5748414c523f5fae2ea624487e7c1b15a98fcab3a4f034",
+      "matchesSource": true
+    },
+    {
+      "file": "licenses/TAURI-INSTALLER-MIT.txt",
+      "source": "src-tauri/installer/TAURI-LICENSE-MIT.txt",
+      "present": true,
+      "sha256": "9dd42ea92cff2ede5cd477cbfcce051b2d0115c0ac7f368ee88cb545055dff1d",
+      "matchesSource": true
+    }
+  ],
+  "licensePageConfigured": true,
+  "privateFilesFound": [],
+  "jars": [
+    {
+      "file": "companions/tp-bridge-0.1.0.jar",
+      "entryCount": 63,
+      "minecraftOwnedPaths": [],
+      "privateEntries": [],
+      "licenseEntries": [
+        "ASM-LICENSE.txt",
+        "LICENSE"
+      ]
+    },
+    {
+      "file": "companions/tp-companion-0.1.0.jar",
+      "entryCount": 39,
+      "minecraftOwnedPaths": [],
+      "privateEntries": [],
+      "licenseEntries": [
+        "LICENSE_TP_LAUNCHER"
+      ]
+    }
+  ],
+  "exactSecrets": {
+    "variables": [
+      "CURSEFORGE_API_KEY",
+      "TP_DB_BRIDGE_TOKEN",
+      "TP_MASTER_SECRET",
+      "CRON_SECRET"
+    ],
+    "filesCompared": 515,
+    "comparisons": 2060,
+    "matches": 0,
+    "encodings": [
+      "UTF-8",
+      "UTF-16LE"
+    ],
+    "payloadAndExpandedJarFiles": 101
+  },
+  "heuristics": {
+    "highFindings": 0,
+    "informationalFindings": 3
+  },
+  "payload": [
+    {
+      "file": "$PLUGINSDIR/modern-header.bmp",
+      "sizeBytes": 25818,
+      "sha256": "209daa8ce9bd2944c76ee717d8da143aa61d9fff567b0d581aca2ac24521afad"
+    },
+    {
+      "file": "$PLUGINSDIR/modern-wizard.bmp",
+      "sizeBytes": 154542,
+      "sha256": "ec08f8adb37f9e06d20d705bbe7708e19a2e5d7bcefe7e3bd3db3b6d19d2925f"
+    },
+    {
+      "file": "$PLUGINSDIR/nsDialogs.dll",
+      "sizeBytes": 9728,
+      "sha256": "9c76f4d53ceee2a471c936e0899688405e1009ce962d140e9acb49ed68d114cb"
+    },
+    {
+      "file": "$PLUGINSDIR/nsis_tauri_utils.dll",
+      "sizeBytes": 34304,
+      "sha256": "5ba143b5db4a87d32d6e7802e033330aae56cbceabe0d1e3ba41948385ad4709"
+    },
+    {
+      "file": "$PLUGINSDIR/skin-install.bmp",
+      "sizeBytes": 318374,
+      "sha256": "8b2a0ac1f12d3c16047107b6357f94890316aa96b0d9a084fa7b49d3208eefce"
+    },
+    {
+      "file": "$PLUGINSDIR/StartMenu.dll",
+      "sizeBytes": 7680,
+      "sha256": "39870682e7d1c026cd2b33ca25591db28250dde17de7eb1feec404222d534ffc"
+    },
+    {
+      "file": "$PLUGINSDIR/System.dll",
+      "sizeBytes": 12288,
+      "sha256": "afe032f942e2ed0bf7494ec08ba813f5739fb522c640bde81d30ecaf9f894432"
+    },
+    {
+      "file": "$TEMP/MicrosoftEdgeWebView2RuntimeInstaller.exe",
+      "sizeBytes": 214884560,
+      "sha256": "1c401b327fbc7bb9731b4e350a2194f083cbc3ede46508d52e1cae6610a39bea"
+    },
+    {
+      "file": "companions/tp-bridge-0.1.0.jar",
+      "sizeBytes": 184222,
+      "sha256": "23f21a92fb74f9d6c2d278443151b8b7300dd395c96fede0cbc50de90d8f8d9c"
+    },
+    {
+      "file": "companions/tp-companion-0.1.0.jar",
+      "sizeBytes": 73794,
+      "sha256": "7e7333698d97cfec51f7202cc4b73b08c53c5fde30145a58d77751b772c23789"
+    },
+    {
+      "file": "launchertps.exe",
+      "sizeBytes": 14168064,
+      "sha256": "56c7d15761c13a74abb99a2a5058d7a89d7de96ed5ac9657e88166bd1141fe70"
+    },
+    {
+      "file": "licenses/TAURI-INSTALLER-MIT.txt",
+      "sizeBytes": 1090,
+      "sha256": "9dd42ea92cff2ede5cd477cbfcce051b2d0115c0ac7f368ee88cb545055dff1d"
+    },
+    {
+      "file": "licenses/THIRD-PARTY-NOTICES.txt",
+      "sizeBytes": 74242,
+      "sha256": "eb716d67219179ff6f5748414c523f5fae2ea624487e7c1b15a98fcab3a4f034"
+    },
+    {
+      "file": "licenses/TP-LAUNCHER-GPL-3.0.txt",
+      "sizeBytes": 35149,
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+    },
+    {
+      "file": "uninstall.exe",
+      "sizeBytes": 136896,
+      "sha256": "0ae0e5cbc732e9ae754c4261ef89bb9a780829c633e2cac713120fe012c20163"
+    }
+  ],
+  "limitations": [
+    "Exact matching covers the four supplied local secret values; unrelated secrets require separate review.",
+    "The archive auditor did not execute the setup. The coordinator separately opened its UI without installing.",
+    "This validation does not certify copyright permissions or all possible security properties."
+  ],
+  "passed": true
+}

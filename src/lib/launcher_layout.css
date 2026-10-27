@@ -1,0 +1,201 @@
+
+
+.launcher[data-design="blockcraft"] .workspace-shell {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+}
+
+.launcher[data-design="blockcraft"] .workspace-shell > .content {
+  flex: 1 1 0;
+  min-height: 0;
+  min-width: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-gutter: stable;
+}
+
+.launcher[data-design="blockcraft"] .workspace-shell > .download-progress {
+  position: relative;
+  flex: 0 0 auto;
+  inset: auto;
+  margin: 0 24px 9px;
+  z-index: 7;
+}
+
+.launcher[data-design="blockcraft"] .home-content > .play-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(230px, 1fr);
+  grid-template-rows: auto;
+  align-items: stretch;
+  gap: 22px;
+  min-height: 0;
+  padding: 0;
+}
+
+.launcher[data-design="blockcraft"] .home-content .play-layout > .launch-panel {
+  grid-column: 1;
+  grid-row: 1;
+  min-width: 0;
+  align-self: start;
+}
+
+.launcher[data-design="blockcraft"] .home-content .play-layout > .background-character {
+  position: relative;
+  grid-column: 2;
+  grid-row: 1;
+  inset: auto;
+  width: 100%;
+  height: auto;
+  min-height: 400px;
+  align-self: stretch;
+}
+
+.launcher[data-design="blockcraft"] .home-content .background-character::after {
+  content: none;
+}
+
+.launcher[data-design="blockcraft"] .home-content .background-character > .ambient-character {
+  height: 100%;
+}
+
+.launcher[data-design="blockcraft"] .home-content .launch-panel > .bottom-bar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(155px, .5fr);
+  grid-template-areas: "heading heading" "version play" "player memory";
+  align-items: center;
+  gap: 19px 18px;
+  padding: 23px;
+}
+
+.launcher[data-design="blockcraft"] .home-content .bottom-bar > .launch-block-title {
+  grid-area: heading;
+  padding-bottom: 17px;
+}
+
+.launcher[data-design="blockcraft"] .home-content .bottom-bar .controls-wrapper {
+  display: contents;
+}
+
+.launcher[data-design="blockcraft"] .home-content .bottom-bar .control-group:has(#version) {
+  grid-area: version;
+  min-width: 0;
+}
+
+.launcher[data-design="blockcraft"] .home-content .bottom-bar .control-group:has(#nick) {
+  grid-area: player;
+  min-width: 0;
+}
+
+.launcher[data-design="blockcraft"] .home-content .bottom-bar .ram-control {
+  grid-area: memory;
+  min-width: 0;
+  align-self: end;
+  padding-bottom: 7px;
+}
+
+.launcher[data-design="blockcraft"] .home-content .bottom-bar .play-btn {
+  grid-area: play;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 72px;
+  box-sizing: border-box;
+  white-space: normal;
+  padding: 15px 13px;
+  font-size: .75rem;
+  line-height: 1.7;
+  align-self: center;
+  gap: 10px;
+}
+
+.launcher[data-design="blockcraft"] .home-content .home-version-tabs {
+  max-height: 71px;
+  margin-bottom: 5px;
+}
+
+.launcher[data-design="blockcraft"] .home-content .java-recommendation {
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.launcher[data-design="blockcraft"] .home-overview {
+  display: grid;
+  gap: 18px;
+  margin-top: 29px;
+}
+
+.launcher[data-design="blockcraft"] .home-content > .hero {
+  margin: 0 0 22px;
+}
+
+.launcher[data-design="blockcraft"] .home-content > .hero h1 {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: .65ch;
+}
+
+.launcher[data-design="blockcraft"] .home-content > .hero .hero-message {
+  margin-bottom: 10px;
+}
+
+.launcher[data-design="blockcraft"] .home-content > .hero .secret-moment {
+  margin-bottom: 0;
+}
+
+.launcher[data-design="blockcraft"] .home-overview > :is(.status-log, .selected-pack-banner) {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+@media (max-width: 1250px) {
+  .launcher[data-design="blockcraft"] .home-content > .play-layout {
+    grid-template-columns: minmax(0, 1.7fr) minmax(190px, 1fr);
+    gap: 14px;
+  }
+  .launcher[data-design="blockcraft"] .home-content .launch-panel > .bottom-bar {
+    grid-template-columns: minmax(0, 1fr) 155px;
+    padding: 19px;
+    gap: 17px 14px;
+  }
+  .launcher[data-design="blockcraft"] .home-content .home-version-tabs button {
+    padding: 5px 7px;
+  }
+}
+
+@media (max-width: 1050px) {
+  .launcher[data-design="blockcraft"] .home-content > .play-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .launcher[data-design="blockcraft"] .home-content .play-layout > .background-character {
+    grid-column: 1;
+    grid-row: 2;
+    height: 320px;
+    min-height: 0;
+  }
+  .launcher[data-design="blockcraft"] .home-content .launch-panel > .bottom-bar {
+    grid-template-columns: minmax(0, 1fr) 190px;
+  }
+}
+
+@media (max-width: 640px) {
+  .launcher[data-design="blockcraft"] .home-content .launch-panel > .bottom-bar {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "heading" "version" "play" "player" "memory";
+    padding: 17px;
+    gap: 17px;
+  }
+  .launcher[data-design="blockcraft"] .home-content .bottom-bar .play-btn {
+    min-height: 57px;
+  }
+  .launcher[data-design="blockcraft"] .workspace-shell > .download-progress {
+    margin: 0 12px 7px;
+  }
+}

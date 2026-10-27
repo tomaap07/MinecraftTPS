@@ -1,0 +1,98 @@
+[
+  {
+    "file": "quilt.svg",
+    "url": "https://raw.githubusercontent.com/QuiltMC/art/master/brand/svg/quilt_mini_icon_transparent.svg",
+    "policy": "https://github.com/QuiltMC/art/blob/master/brand/LICENSE",
+    "bytes": 604,
+    "sha256": "406dd9dd5c6c378c8af93e15694d820ec45568f0521fcfa3d654db2ff618af1a",
+    "modified": false
+  },
+  {
+    "file": "neoforge.png",
+    "url": "https://neoforged.net/img/authors/neoforged.png",
+    "policy": "https://github.com/neoforged/websites/blob/main/LICENSE.txt",
+    "bytes": 976,
+    "sha256": "884d0637dda196443b5b277fc1bb607678f813923fb703273ed05aab89076226",
+    "modified": false
+  },
+  {
+    "file": "microsoft.svg",
+    "url": "https://learn.microsoft.com/en-us/entra/identity-platform/media/howto-add-branding-in-apps/ms-symbollockup_mssymbol_19.svg",
+    "policy": "https://learn.microsoft.com/en-us/entra/identity-platform/howto-add-branding-in-apps",
+    "bytes": 343,
+    "sha256": "929f48f88c8ca7f3f5d294be47ec4caf51acc28ac25340c19a903125d7ecd84a",
+    "modified": false
+  },
+  {
+    "file": "github.svg",
+    "url": "https://github.githubassets.com/favicons/favicon-dark.svg",
+    "policy": "https://brand.github.com/foundations/logo",
+    "bytes": 957,
+    "sha256": "aaefddf5fb6fb27b69945bb1c3d4452fc06923d6f68396fac5f786c3a12487ac",
+    "modified": false
+  },
+  {
+    "file": "discord.png",
+    "url": "https://discord.com/branding",
+    "policy": "https://discord.com/branding",
+    "bytes": 557,
+    "sha256": "11848b5f1c8a7f294c6211c2f0d0dc83a8a28bfe1ef0829a8dacfdf475c5e5a2",
+    "modified": false
+  },
+  {
+    "file": "fabric.png",
+    "url": "https://fabricmc.net/assets/logo.png",
+    "bytes": 5867,
+    "sha256": "a41878c3c4c5790cfc920eabf98d3404103a74a6f3df69d632ceb220c9ec9dc7",
+    "modified": false,
+    "note": "Official website logo; restored at user request. No blanket trademark permission asserted."
+  },
+  {
+    "file": "forge.svg",
+    "url": "https://files.minecraftforge.net/static/images/logo.svg",
+    "bytes": 3223,
+    "sha256": "5101739f9d86ed95c4776fd6dc2014bdfc20525a8c77ce3f50d9167b1e94856b",
+    "modified": false,
+    "note": "Unmodified official source logo."
+  },
+  {
+    "file": "forge-anvil.svg",
+    "url": "https://files.minecraftforge.net/static/images/logo.svg",
+    "bytes": 682,
+    "sha256": "e871cd73ded9a5bf768bcdc3aced8a622b041ac69847e1b7257070bdbc415247",
+    "modified": true,
+    "note": "Official anvil path only, unchanged geometry, square viewBox; no horizontal wordmark."
+  },
+  {
+    "file": "optifine.png",
+    "url": "https://optifine.net/images/of16r.png",
+    "bytes": 320,
+    "sha256": "915ed134630e3c2fb2c1bbd53be4e6d789722f3fe9b3125805bfe7e6ab86089d",
+    "modified": false,
+    "note": "Official favicon; restored for compatibility identification."
+  },
+  {
+    "file": "modrinth.svg",
+    "url": "https://raw.githubusercontent.com/modrinth/code/main/packages/assets/branding/logo.svg",
+    "bytes": 1730,
+    "sha256": "25af58c5f90b9d27d3ccdfed03cf05e632e577f3ab1ebf6693427833bf867dfd",
+    "modified": true,
+    "note": "Official geometry; explicit green currentColor presentation. Branding rights reserved by Rinth."
+  },
+  {
+    "file": "curseforge.ico",
+    "url": "https://console.curseforge.com/favicon.ico",
+    "bytes": 5430,
+    "sha256": "b1c9f08adaa8f91957bcd20e2796814557683ed051173ae31779752632efc5b9",
+    "modified": false,
+    "note": "Unmodified official favicon; identifies the catalogue provider."
+  },
+  {
+    "file": "blockbench.png",
+    "url": "https://blockbench.net/images/logos/icon.png",
+    "policy": "https://blockbench.net/wiki/blockbench/logos/",
+    "bytes": 136798,
+    "sha256": "7ae8d8c5a37c81b43ff3f9dad96b9ab94c008145b02f9de0425edcd2df166e9b",
+    "modified": false
+  }
+]

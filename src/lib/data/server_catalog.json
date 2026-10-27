@@ -1,0 +1,362 @@
+[
+  {
+    "id": "hypixel",
+    "name": "Hypixel Network",
+    "ip": "mc.hypixel.net",
+    "category": "Minijuegos",
+    "region": "Global",
+    "lang": "EN",
+    "featured": true
+  },
+  {
+    "id": "universocraft",
+    "name": "UniversoCraft",
+    "ip": "mc.universocraft.com",
+    "category": "Multimodo",
+    "region": "LATAM / ES",
+    "lang": "ES",
+    "featured": true
+  },
+  {
+    "id": "wynncraft",
+    "name": "Wynncraft MMORPG",
+    "ip": "play.wynncraft.com",
+    "category": "RPG",
+    "region": "Global",
+    "lang": "EN",
+    "featured": true
+  },
+  {
+    "id": "cubecraft",
+    "name": "CubeCraft Games",
+    "ip": "play.cubecraft.net",
+    "category": "Minijuegos",
+    "region": "Global",
+    "lang": "EN",
+    "featured": true
+  },
+  {
+    "id": "donutsmp",
+    "name": "DonutSMP",
+    "ip": "donutsmp.net",
+    "category": "Survival / Hardcore",
+    "region": "Global",
+    "lang": "EN",
+    "featured": true
+  },
+  {
+    "id": "minelatino",
+    "name": "MineLatino Network",
+    "ip": "mc.minelatino.com",
+    "category": "Survival / PvP",
+    "region": "LATAM",
+    "lang": "ES",
+    "featured": true
+  },
+  {
+    "id": "librecraft",
+    "name": "LibreCraft",
+    "ip": "mc.librecraft.com",
+    "category": "Multimodo",
+    "region": "ES / LATAM",
+    "lang": "ES",
+    "featured": false
+  },
+  {
+    "id": "zonacraft",
+    "name": "ZonaCraft Network",
+    "ip": "mc.zonacraft.net",
+    "category": "Survival / Minijuegos",
+    "region": "LATAM / ES",
+    "lang": "ES",
+    "featured": false
+  },
+  {
+    "id": "mineaqua",
+    "name": "MineAqua",
+    "ip": "play.mineaqua.us",
+    "category": "BoxPvP / Survival",
+    "region": "LATAM",
+    "lang": "ES",
+    "featured": false
+  },
+  {
+    "id": "supercraft",
+    "name": "SuperCraft",
+    "ip": "mc.supercraft.es",
+    "category": "Survival / SkyBlock",
+    "region": "ES / LATAM",
+    "lang": "ES",
+    "featured": false
+  },
+  {
+    "id": "luvicraft",
+    "name": "LuviCraft",
+    "ip": "mc.luvicraft.net",
+    "category": "Survival / Roleplay",
+    "region": "LATAM",
+    "lang": "ES",
+    "featured": false
+  },
+  {
+    "id": "2b2t",
+    "name": "2b2t",
+    "ip": "2b2t.org",
+    "category": "Anarquía",
+    "region": "NA",
+    "lang": "EN",
+    "featured": false
+  },
+  {
+    "id": "2b2tespanol",
+    "name": "2b2t en Español",
+    "ip": "2b2t.es",
+    "category": "Anarquía",
+    "region": "ES / LATAM",
+    "lang": "ES",
+    "featured": false
+  },
+  {
+    "id": "mccisland",
+    "name": "MCC Island",
+    "ip": "play.mccisland.net",
+    "category": "Minijuegos",
+    "region": "Global",
+    "lang": "EN",
+    "featured": true
+  },
+  {
+    "id": "hoplite",
+    "name": "Hoplite Battle Royale",
+    "ip": "hoplite.gg",
+    "category": "PvP / UHC",
+    "region": "Global",
+    "lang": "EN",
+    "featured": false
+  },
+  {
+    "id": "minemen",
+    "name": "Minemen Club",
+    "ip": "minemen.club",
+    "category": "PvP Practice",
+    "region": "NA / SA / EU",
+    "lang": "EN",
+    "featured": true
+  },
+  {
+    "id": "pvplegacy",
+    "name": "PvP Legacy",
+    "ip": "play.pvplegacy.net",
+    "category": "PvP 1.9+",
+    "region": "NA",
+    "lang": "EN",
+    "featured": false
+  },
+  {
+    "id": "originrealms",
+    "name": "Origin Realms",
+    "ip": "play.originrealms.com",
+    "category": "Survival Custom",
+    "region": "Global",
+    "lang": "EN",
+    "featured": true
+  },
+  {
+    "id": "earthmc",
+    "name": "EarthMC",
+    "ip": "play.earthmc.net",
+    "category": "Geopolítico / Towny",
+    "region": "Global",
+    "lang": "EN",
+    "featured": false
+  },
+  {
+    "id": "complex",
+    "name": "Complex Gaming",
+    "ip": "hub.mc-complex.com",
+    "category": "Pixelmon / Survival",
+    "region": "NA",
+    "lang": "EN",
+    "featured": false
+  },
+  {
+    "id": "pikanetwork",
+    "name": "PikaNetwork",
+    "ip": "play.pika-network.net",
+    "category": "BedWars / SkyBlock",
+    "region": "Global",
+    "lang": "EN",
+    "featured": false
+  },
+  {
+    "id": "jartex",
+    "name": "JartexNetwork",
+    "ip": "play.jartexnetwork.com",
+    "category": "Minijuegos / Factions",
+    "region": "Global",
+    "lang": "EN",
+    "featured": false
+  },
+  {
+    "id": "minehut",
+    "name": "Minehut Lobby",
+    "ip": "mc.minehut.com",
+    "category": "Comunidad",
+    "region": "NA",
+    "lang": "EN",
+    "featured": false
+  },
+  {
+    "id": "purpleprison",
+    "name": "Purple Prison",
+    "ip": "purpleprison.net",
+    "category": "Prison",
+    "region": "Global",
+    "lang": "EN",
+    "featured": false
+  },
+  {
+    "id": "opblocks",
+    "name": "OPBlocks",
+    "ip": "hub.opblocks.com",
+    "category": "Prison / SkyBlock",
+    "region": "Global",
+    "lang": "EN",
+    "featured": false
+  },
+  {
+    "id": "herobrine",
+    "name": "Herobrine.org",
+    "ip": "mc.herobrine.org",
+    "category": "Survival / Minijuegos",
+    "region": "Global",
+    "lang": "EN",
+    "featured": false
+  },
+  {
+    "id": "blockdrop",
+    "name": "BlockDrop Network",
+    "ip": "mc.blockdrop.org",
+    "category": "SkyBlock / BedWars",
+    "region": "Global",
+    "lang": "EN",
+    "featured": false
+  },
+  {
+    "id": "lokamc",
+    "name": "Loka MC",
+    "ip": "play.lokamc.com",
+    "category": "Conquest / PvP",
+    "region": "NA / EU",
+    "lang": "EN",
+    "featured": false
+  },
+  {
+    "id": "moxmc",
+    "name": "MoxMC",
+    "ip": "moxmc.net",
+    "category": "Minijuegos / Parkour",
+    "region": "NA",
+    "lang": "EN",
+    "featured": false
+  },
+  {
+    "id": "minecadia",
+    "name": "Minecadia",
+    "ip": "play.minecadia.com",
+    "category": "Factions / SkyBlock",
+    "region": "NA",
+    "lang": "EN",
+    "featured": false
+  },
+  {
+    "id": "tulipsurvival",
+    "name": "TulipSurvival",
+    "ip": "play.tulipsurvival.com",
+    "category": "Survival SMP",
+    "region": "NA",
+    "lang": "EN",
+    "featured": false
+  },
+  {
+    "id": "vulcanmc",
+    "name": "VulcanMC",
+    "ip": "play.vulcanmc.com",
+    "category": "SkyBlock / Prison",
+    "region": "Global",
+    "lang": "EN",
+    "featured": false
+  },
+  {
+    "id": "mineheart",
+    "name": "MineHeart",
+    "ip": "play.mineheart.net",
+    "category": "Lifesteal SMP",
+    "region": "Global",
+    "lang": "EN",
+    "featured": false
+  },
+  {
+    "id": "loverfella",
+    "name": "LoverFella Server",
+    "ip": "play.loverfella.com",
+    "category": "Survival / Economía",
+    "region": "NA",
+    "lang": "EN",
+    "featured": false
+  },
+  {
+    "id": "smashmc",
+    "name": "SmashMC",
+    "ip": "play.smashmc.co",
+    "category": "Pixelmon",
+    "region": "NA",
+    "lang": "EN",
+    "featured": false
+  },
+  {
+    "id": "pokefind",
+    "name": "PokeFind",
+    "ip": "play.pokefind.co",
+    "category": "Pixelmon / Cobblemon",
+    "region": "Global",
+    "lang": "EN",
+    "featured": false
+  },
+  {
+    "id": "mineberry",
+    "name": "MineBerry",
+    "ip": "play.mineberry.org",
+    "category": "Survival / Anarquía",
+    "region": "EU",
+    "lang": "EN",
+    "featured": false
+  },
+  {
+    "id": "gamster",
+    "name": "Gamster Network",
+    "ip": "mc.gamster.org",
+    "category": "Multimodo",
+    "region": "EU",
+    "lang": "EN",
+    "featured": false
+  },
+  {
+    "id": "ecocitycraft",
+    "name": "EcoCityCraft",
+    "ip": "play.ecocitycraft.com",
+    "category": "Economía",
+    "region": "NA",
+    "lang": "EN",
+    "featured": false
+  },
+  {
+    "id": "Constantiam",
+    "name": "Constantiam",
+    "ip": "constantiam.net",
+    "category": "Anarquía",
+    "region": "Global",
+    "lang": "EN",
+    "featured": false
+  }
+]

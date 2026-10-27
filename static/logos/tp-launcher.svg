@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" fill="none" role="img" aria-labelledby="title description">
+  <title id="title">TP LAUNCHER</title>
+  <desc id="description">Monograma TP en un cubo dimensional violeta con canales oscuros. Versión vectorial de la referencia aportada por el autor del proyecto.</desc>
+  <defs>
+    <linearGradient id="left" x1="39" y1="103" x2="120" y2="232" gradientUnits="userSpaceOnUse"><stop stop-color="#B84DFF"/><stop offset="1" stop-color="#7432CD"/></linearGradient>
+    <linearGradient id="right" x1="135" y1="151" x2="219" y2="207" gradientUnits="userSpaceOnUse"><stop stop-color="#A531ED"/><stop offset="1" stop-color="#7224BD"/></linearGradient>
+  </defs>
+  <rect x="1" y="1" width="254" height="254" rx="45" fill="#131315"/>
+  <path d="m135 18 94 54q10 6 10 18v92q0 12-10 18l-94 54q-7 4-14 0l-94-54q-10-6-10-18V90q0-12 10-18l94-54q7-4 14 0Z" transform="translate(7 0) scale(.95)" fill="#0D0B14" stroke="#352144" stroke-width="3.5"/>
+  <path d="m128 36 91 52-91 52-91-52 91-52Zm0 20L73 88l55 32 55-32-55-32Z" fill="#DDB6FA" fill-rule="evenodd"/>
+  <path d="m128 72 26 16-26 15-26-15 26-16Z" fill="#F0DDFA"/>
+  <path d="m37 102 83 48v22l-29-17v68l-21-12v-68l-33-19v-22Z" fill="url(#left)"/>
+  <path d="m37 136 20 12v62l-20-12v-62Z" fill="#5C2188"/>
+  <path d="m103 177 17 10v53l-17-10v-53Z" fill="#56217F"/>
+  <path d="m135 150 84-48v66l-62 36v24l-22 13v-91Zm22 13v20l41-24v-20l-41 24Z" fill="url(#right)" fill-rule="evenodd"/>
+  <path d="m169 213 50-29v24l-50 29v-24Z" fill="#552092"/>
+</svg>

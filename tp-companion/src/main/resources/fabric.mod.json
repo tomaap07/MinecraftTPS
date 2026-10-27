@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "id": "tp_companion",
+  "version": "${version}",
+  "name": "TP Companion",
+  "description": "Opt-in client HUD and interface companion for TP LAUNCHER. Minecraft 1.21.1 Fabric.",
+  "authors": ["TP LAUNCHER contributors"],
+  "license": "GPL-3.0-only",
+  "environment": "client",
+  "entrypoints": { "client": ["dev.tplauncher.companion.TpCompanion"] },
+  "mixins": ["tp-companion.mixins.json"],
+  "depends": { "fabricloader": ">=0.16.0", "minecraft": "1.21.1", "java": ">=21", "fabric-api": "*" }
+}

@@ -1,0 +1,10 @@
+{
+  "generated_at": "2026-10-27T09:25:55.761Z",
+  "manifest_sha1": "f09921bbfd54646ce1ddbe92caf6a8dce4502a9a",
+  "platform": "Windows x64",
+  "scope": "Valida manifiestos, hashes de JSON y respuestas de descarga. No equivale a arrancar cada cliente ni a comprobar todos sus recursos dentro del juego.",
+  "total": 920,
+  "passed": 920,
+  "failed": 0,
+  "download_endpoints": 1844
+}
