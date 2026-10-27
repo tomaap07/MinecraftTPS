@@ -1,4 +1,4 @@
-# TP LAUNCHER 0.1.1 — preparación de publicación
+# TP LAUNCHER 0.1.1 — versión de prueba
 
 ## Cambios de esta entrega
 
@@ -32,4 +32,4 @@ Los arranques comprueban proceso, ventana, renderizado y audio inicializados, co
 
 El instalador no está firmado digitalmente. La revisión visual recorre bienvenida, licencia, destino, menú Inicio y resumen; no ejecuta una instalación sobre el equipo del autor. El informe del contenido extraído y su SHA-256 están en [la validación del instalador](validation/installer-payload-0.1.1.json).
 
-La publicación remota continúa pendiente del alcance solicitado para la campaña de arranques: no se ha afirmado que cada cliente del catálogo haya sido ejecutado. El repositorio vinculado debe conservar su visibilidad privada. El instalador se adjuntará como asset de una publicación de GitHub y no como un binario dentro del historial de fuentes.
+Por indicación del autor, esta entrega se publica como versión de prueba en el repositorio privado vinculado, con el alcance de validación descrito. No se afirma que cada cliente del catálogo haya sido ejecutado. El instalador se distribuye como asset de [la publicación v0.1.1](https://github.com/tomaap07/MinecraftTPS/releases/tag/v0.1.1), acompañado de sus sumas SHA-256; no se incluye como binario dentro del historial de fuentes.
