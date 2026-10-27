@@ -453,7 +453,7 @@ fn selected_release_clients_real_smoke() {
         .expect("No se pudo validar el catálogo de Mojang");
     let mut allowed: HashSet<String> = manifest.versions.into_iter().map(|v| v.id).collect();
     allowed.extend(
-        list_installed_versions()
+        list_installed_versions_inner()
             .unwrap()
             .into_iter()
             .filter(|v| v.json)

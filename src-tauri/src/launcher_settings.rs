@@ -15,6 +15,7 @@ use tauri_plugin_opener::OpenerExt;
 #[serde(default)]
 pub struct LauncherSettings {
     pub language: String,
+    pub translate_dynamic_content: bool,
     pub launch_behavior: String,
     pub data_root: String,
     pub discord_presence: bool,
@@ -35,7 +36,8 @@ pub struct LauncherSettings {
 impl Default for LauncherSettings {
     fn default() -> Self {
         Self {
-            language: "es-419".into(),
+            language: String::new(),
+            translate_dynamic_content: false,
             launch_behavior: "keep".into(),
             data_root: String::new(),
             discord_presence: false,

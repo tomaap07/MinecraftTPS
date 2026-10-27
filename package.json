@@ -1,13 +1,13 @@
 {
   "name": "launchertps",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "TP LAUNCHER · Minecraft Java, contenido y creación",
   "type": "module",
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
     "build:companion": "node scripts/build-companion.mjs",
-    "build:desktop": "npm run build:bridge && npm run build:companion && npm run build",
+    "build:desktop": "npm run build:installer-ui && npm run build:bridge && npm run build:companion && npm run build",
     "preview": "vite preview",
     "prepare": "svelte-kit sync || echo ''",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
@@ -15,7 +15,8 @@
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
     "tauri": "tauri",
     "build:bridge": "node scripts/build-bridge.mjs",
-    "test:hud": "node scripts/test-hud-metrics.mjs && node scripts/test-bridge.mjs"
+    "test:hud": "node scripts/test-hud-metrics.mjs && node scripts/test-bridge.mjs",
+    "build:installer-ui": "node scripts/build-installer-ui.mjs"
   },
   "license": "GPL-3.0-only",
   "dependencies": {
@@ -32,6 +33,7 @@
     "@sveltejs/vite-plugin-svelte": "^7.1.2",
     "@tauri-apps/cli": "^2",
     "@types/node": "^22.20.5",
+    "playwright-core": "^1.64.1",
     "svelte": "^5.56.3",
     "svelte-check": "^4.6.0",
     "typescript": "~6.0.3",

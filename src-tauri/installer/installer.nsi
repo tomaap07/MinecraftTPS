@@ -12,7 +12,7 @@ ManifestDPIAwareness PerMonitorV2
   SetCompress off
 !else
 
-  SetCompressor /SOLID "{{compression}}"
+  SetCompressor "{{compression}}"
 !endif
 
 
@@ -81,7 +81,8 @@ Var OldMainBinaryName
 Var TpsDesktopChoice
 
 Name "${PRODUCTNAME}"
-SetFont "Segoe UI" 9
+SetFont "Segoe UI" 10
+ChangeUI all "${TPS_ART_ROOT}\build\tp-installer-ui.exe"
 BrandingText "${COPYRIGHT}"
 OutFile "${OUTFILE}"
 
@@ -489,6 +490,7 @@ FunctionEnd
 {{#each languages}}
 !insertmacro MUI_LANGUAGE "{{this}}"
 {{/each}}
+!include "${TPS_ART_ROOT}\languages.nsh"
 !insertmacro MUI_RESERVEFILE_LANGDLL
 {{#each language_files}}
   !include "{{this}}"

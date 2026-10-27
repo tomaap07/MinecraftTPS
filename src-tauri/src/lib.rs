@@ -17,6 +17,9 @@ use uuid::Uuid;
 
 mod account_licensing;
 mod addon_compatibility;
+mod content_targets;
+mod first_run;
+mod dynamic_translation;
 mod export_policy;
 mod game_session;
 mod hud_bridge;
@@ -43,6 +46,7 @@ mod optifine_discovery;
 mod poser;
 mod poser_assets;
 mod private_integrations;
+mod process_probe;
 #[cfg(test)]
 mod release_client_smoke;
 mod server_directory;
@@ -51,7 +55,7 @@ mod servers;
 mod skin_library;
 mod studio_progress;
 
-#[derive(Serialize)]
+#[derive(Clone, Serialize)]
 struct JavaInfo {
     installed: bool,
     major: u8,
@@ -663,14 +667,27 @@ fn diagnose_game_exit(version_id: &str, exit_code: Option<i32>, details: &str) -
     )
 }
 fn inspect_java(path: &Path, portable: bool) -> Option<JavaInfo> {
-    let output = Command::new(path)
-        .args(["-XshowSettings:properties", "-version"])
-        .output()
-        .ok()?;
+    type ProbeCache = std::collections::HashMap<PathBuf, (u64, Option<std::time::SystemTime>, Option<JavaInfo>)>;
+    static CACHE: OnceLock<Mutex<ProbeCache>> = OnceLock::new();
+    let path = fs::canonicalize(path).ok()?;
+    let meta = fs::metadata(&path).ok()?;
+    let stamp = (meta.len(),meta.modified().ok());
+    let mut cache = CACHE.get_or_init(||Mutex::new(ProbeCache::new())).lock().ok()?;
+    if let Some((size,modified,result))=cache.get(&path) {
+        if (*size,*modified)==stamp {return result.clone().map(|mut info|{info.is_portable=portable;info});}
+    }
+    let result=inspect_java_uncached(&path,portable);
+    if cache.len()>128 {cache.clear();}
+    cache.insert(path,(stamp.0,stamp.1,result.clone()));
+    result
+}
+fn inspect_java_uncached(path: &Path, portable: bool) -> Option<JavaInfo> {
+    let output=process_probe::run(path, &["-XshowSettings:properties", "-version"], std::time::Duration::from_secs(4)).ok()?;
+    let stdout=output.stdout;let stderr=output.stderr;let status=output.status;
     let details = format!(
         "{}\n{}",
-        String::from_utf8_lossy(&output.stderr),
-        String::from_utf8_lossy(&output.stdout)
+        String::from_utf8_lossy(&stderr),
+        String::from_utf8_lossy(&stdout)
     );
     let major = parse_java_major(&details)?;
     let text = details
@@ -683,7 +700,7 @@ fn inspect_java(path: &Path, portable: bool) -> Option<JavaInfo> {
         .unwrap_or("Java detectado")
         .to_string();
     Some(JavaInfo {
-        installed: output.status.success(),
+        installed: status.success(),
         major,
         version: text,
         path: path.to_string_lossy().into_owned(),
@@ -776,7 +793,10 @@ fn discover_java_installations() -> Vec<JavaInstallation> {
     candidates
 }
 #[tauri::command]
-fn check_java() -> Result<JavaInfo, String> {
+async fn check_java() -> Result<JavaInfo, String> {
+    tauri::async_runtime::spawn_blocking(check_java_inner).await.map_err(|error|error.to_string())?
+}
+fn check_java_inner() -> Result<JavaInfo, String> {
     discover_java_installations()
         .into_iter()
         .max_by_key(|candidate| candidate.major)
@@ -987,7 +1007,10 @@ async fn install_portable_java(app: AppHandle, major: u8) -> Result<String, Stri
 }
 
 #[tauri::command]
-fn list_java_runtimes() -> Result<Vec<RuntimeStatus>, String> {
+async fn list_java_runtimes() -> Result<Vec<RuntimeStatus>, String> {
+    tauri::async_runtime::spawn_blocking(list_java_runtimes_inner).await.map_err(|error|error.to_string())?
+}
+fn list_java_runtimes_inner() -> Result<Vec<RuntimeStatus>, String> {
     let mut list: Vec<_> = discover_java_installations()
         .into_iter()
         .map(|java| RuntimeStatus {
@@ -1149,7 +1172,10 @@ fn append_launch_arguments(
     }
 }
 #[tauri::command]
-fn list_installed_versions() -> Result<Vec<InstalledVersion>, String> {
+async fn list_installed_versions()->Result<Vec<InstalledVersion>,String>{
+    tauri::async_runtime::spawn_blocking(list_installed_versions_inner).await.map_err(|error|error.to_string())?
+}
+fn list_installed_versions_inner() -> Result<Vec<InstalledVersion>, String> {
     let root = root_dir()?.join("versions");
     let mut result = Vec::new();
     for entry in fs::read_dir(&root)
@@ -2020,7 +2046,7 @@ fn legacy_optifine_catalog() -> Vec<OptiFineVersion> {
 #[tauri::command]
 async fn fetch_optifine_versions() -> Result<Vec<OptiFineVersion>, String> {
     let root = root_dir()?;
-    Ok(list_installed_versions()?
+    Ok(list_installed_versions_inner()?
         .into_iter()
         .filter(|v| v.loader == "optifine")
         .map(|v| {
@@ -4745,6 +4771,9 @@ pub fn run() {
         })
         .invoke_handler(tauri::generate_handler![
             launcher_settings::get_launcher_settings,
+            first_run::get_system_locale,
+            first_run::available_java_versions,
+            dynamic_translation::translate_public_text,
             game_session::get_game_session,
             launcher_display::get_launcher_display_info,
             launcher_display::preview_launcher_scale,
@@ -4807,6 +4836,7 @@ pub fn run() {
             mod_studio::studio_categories,
             mod_studio::hud_install_content,
             mod_studio::studio_project,
+            content_targets::studio_install_targets,
             mod_studio::studio_dependency_projects,
             mod_studio::studio_loader_versions,
             mod_studio::studio_create_pack,

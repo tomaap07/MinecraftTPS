@@ -1438,3 +1438,17 @@ INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
 CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 THE POSSIBILITY OF SUCH DAMAGE.
+
+
+Misode website icon
+Source: https://github.com/misode/misode.github.io/blob/master/src/favicon-32.png
+Copyright (c) 2020 Misode. MIT license; full notice: static/logos/licenses/misode-MIT.txt
+Used unmodified to identify an external community link. No endorsement is implied.
+
+NSIS dialog resources
+NSIS 3.13 dialog resources, modified geometry and theme by TP LABS.
+The full NSIS distribution notices are included in licenses/NSIS-LICENSE.txt.
+
+Fariiuh installer skin
+Included at the project author’s express request for the installer welcome artwork.
+This attribution does not relicense Minecraft or grant rights to unrelated skins.

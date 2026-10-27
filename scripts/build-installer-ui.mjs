@@ -1,0 +1,17 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import {execFileSync} from 'node:child_process';
+const root=path.resolve(import.meta.dirname,'..');
+const tools=path.join(root,'src-tauri/installer/build');fs.mkdirSync(tools,{recursive:true});
+const x86=process.env['ProgramFiles(x86)']??'C:/Program Files (x86)';
+const vswhere=path.join(x86,'Microsoft Visual Studio/Installer/vswhere.exe');
+const vs=execFileSync(vswhere,['-latest','-products','*','-requires','Microsoft.VisualStudio.Component.VC.Tools.x86.x64','-property','installationPath'],{encoding:'utf8',windowsHide:true}).trim();
+if(!vs)throw new Error('Visual Studio C++ build tools are required for the native installer theme.');
+const latest=dir=>fs.readdirSync(dir).sort((a,b)=>b.localeCompare(a,undefined,{numeric:true}))[0];
+const vc=path.join(vs,'VC/Tools/MSVC',latest(path.join(vs,'VC/Tools/MSVC')));
+const sdk=path.join(x86,'Windows Kits/10');const version=latest(path.join(sdk,'Include'));
+const include=[path.join(vc,'include'),...['ucrt','shared','um'].map(dir=>path.join(sdk,'Include',version,dir))];
+const libraries=[path.join(vc,'lib/x86'),...['ucrt','um'].map(dir=>path.join(sdk,'Lib',version,dir,'x86'))];
+fs.writeFileSync(path.join(tools,'TPNative.def'),'LIBRARY TPNative\nEXPORTS\nApply\n');
+execFileSync(path.join(vc,'bin/Hostx64/x86/cl.exe'),['/nologo','/LD','/MT','/EHsc','/std:c++17','/W4','/O2','/DUNICODE','/D_UNICODE',...include.map(dir=>'/I'+dir),path.join(root,'src-tauri/installer/native-ui.cpp'),'/Fo'+path.join(tools,'native-ui.obj'),'/link','/OUT:'+path.join(tools,'TPNative.dll'),'/DEF:'+path.join(tools,'TPNative.def'),'/IMPLIB:'+path.join(tools,'TPNative.lib'),...libraries.map(dir=>'/LIBPATH:'+dir),'user32.lib','gdi32.lib','comctl32.lib','dwmapi.lib','uxtheme.lib'],{windowsHide:true,stdio:'inherit'});
+execFileSync('python',[path.join(root,'scripts/prepare-installer-ui.py')],{windowsHide:true,stdio:'inherit'});

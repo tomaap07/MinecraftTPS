@@ -39,8 +39,9 @@ static COMMAND:tokio::sync::Mutex<()>=tokio::sync::Mutex::const_new(());
 #[derive(Serialize)]pub struct Pack{pub name:String,pub enabled:bool,pub order:usize}
 #[derive(Serialize)]pub struct Server{pub name:String,pub address:String}
 #[derive(Serialize)]pub struct Content{pub game_version:String,pub loader:String,pub shader_loader:Option<String>,pub resourcepacks:Vec<Pack>,pub shaderpacks:Vec<Pack>,pub servers:Vec<Server>,pub options:BTreeMap<String,String>}
-fn shader_loader(dir:&Path,loader:&str)->Option<String>{
+pub(crate) fn shader_loader(dir:&Path,loader:&str)->Option<String>{
  if loader=="optifine"{return Some("OptiFine".into());}
+ if !["fabric","forge","neoforge","quilt"].contains(&loader){return None;}
  for entry in fs::read_dir(dir.join("mods")).ok()?.take(512).filter_map(Result::ok){
   let Ok(meta)=entry.metadata()else{continue};if entry.file_type().is_ok_and(|v|v.is_symlink())||!meta.is_file()||meta.len()>128*1024*1024||entry.path().extension().is_none_or(|s|s!="jar"){continue;}
   let Ok(file)=fs::File::open(entry.path())else{continue};let Ok(mut jar)=zip::ZipArchive::new(file)else{continue};

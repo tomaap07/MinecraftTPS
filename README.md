@@ -1,4 +1,4 @@
-# TP LAUNCHER
+# TP LAUNCHER · TP LABS
 
 Launcher de Minecraft Java para Windows con Tauri 2, Rust, Svelte 5 y TypeScript. Los clientes, runtimes, loaders y mods se descargan desde sus proveedores durante la instalación.
 
@@ -44,7 +44,7 @@ npm run tauri build
 ## Jugar y crear
 
 - **Jugar:** catálogos Vanilla y loaders, personaje integrado en el fondo con una de las poses del catálogo elegida al iniciar, skin oficial o vista previa del nick offline y aspecto predeterminado obtenido de servicios públicos o recursos locales disponibles; Java automático, RAM y estadísticas por versión.
-- **Mods y modpacks:** búsqueda Modrinth/CurseForge con filtros y páginas; fichas con descripción, galería, archivos y dependencias; instalación de un archivo concreto con sus dependencias obligatorias.
+- **Mods y modpacks:** búsqueda Modrinth/CurseForge con filtros y páginas; fichas con descripción, galería, archivos y dependencias. Instalar elige el archivo más reciente para modpacks; mods, shaders y recursos muestran un selector con instalaciones y modpacks descargados compatibles. Se conservan las dependencias obligatorias y la selección manual de un archivo desde la ficha.
 - **Modpack Studio:** instancias aisladas con Vanilla, Fabric, Forge, NeoForge, Quilt u OptiFine; gestión de mods, exportación ZIP/`.mrpack` e importación de formatos MinecraftTPS, Modrinth y CurseForge. Incluye progreso por etapas y archivo, avisos de éxito, descargas por streaming y reintentos con caché verificada. Las exportaciones excluyen OptiFine y binarios con permiso no verificable, muestran un informe de omisiones y pueden referenciar descargas Modrinth verificadas por hash. La instalación original permanece intacta.
 - **Cuenta:** sesión Microsoft, skin y capas oficiales, armario local persistente, importación por nick y sincronización de una skin guardada.
 - **Estudio 3D:** catálogo de poses, poses propias, rotación XYZ de siete articulaciones, posición del personaje, luz, cámara y segunda capa; renders PNG transparentes en HD y copia de imagen al portapapeles.
@@ -134,3 +134,9 @@ y la [revisión actual de derechos e implementación](docs/implementation-review
 - [Asistente de instalación](src-tauri/installer/README.md): arte original TP Explorer, logo vigente y pasos de instalación por usuario.
 
 Las compilaciones de Hit Color identificadas por huella que rompen los shaders de 26.3 se pausan únicamente cuando el launcher gestiona ese archivo; el resto del perfil se conserva. Las pruebas reales de arranque y sus límites figuran en el informe de validación de la versión.
+
+## Versión 0.1.2
+
+Instalador con Fariiuh, marco propio, tema negro y violeta y diez idiomas. El primer inicio ofrece idioma detectado de Windows, Java opcional y perfil local o Microsoft. Las comprobaciones de Java no abren consola, tienen límite de tiempo y se ejecutan en segundo plano.
+
+[Instalador y fuentes privados](https://github.com/tomaap07/MinecraftTPS/releases/tag/v0.1.2) · [Traducciones y MyMemory](docs/translations.md) · [SmartScreen y firma](docs/distribution-windows.md) · [Tema NSIS](src-tauri/installer/README.md).

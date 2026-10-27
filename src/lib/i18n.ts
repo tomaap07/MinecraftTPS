@@ -35,9 +35,18 @@ export function getLanguage(): string { return get(locale); }
 export function detectSystemLanguage(): string {
   return normalizeLocale(typeof navigator === 'undefined' ? 'es-419' : navigator.languages?.[0] ?? navigator.language);
 }
+export async function detectNativeLanguage(): Promise<string> {
+  try {
+    if(typeof window!=='undefined'&&'__TAURI_INTERNALS__' in window){
+      const {invoke}=await import('@tauri-apps/api/core');
+      return normalizeLocale(await invoke<string>('get_system_locale'));
+    }
+  }catch{}
+  return detectSystemLanguage();
+}
 
 export function translate(message: string, code = get(locale), values?: Record<string, string | number>): string {
-  let result = catalogs[code]?.[message] ?? message;
+  let result = catalogs[code]?.[message] ?? catalogs[code]?.[message.replace(/\s+/g, ' ').trim()] ?? message;
   if (values) for (const [key, value] of Object.entries(values)) result = result.replaceAll(`{${key}}`, String(value));
   return result;
 }

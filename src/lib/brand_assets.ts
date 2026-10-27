@@ -13,6 +13,7 @@ export const brandAssets: Record<string, {src:string; label:string}> = {
   curseforge: {src:'/logos/curseforge.ico',label:'CurseForge'},
   neoforge: {src:'/logos/neoforge.png',label:'NeoForge'},
   blockbench: {src:'/logos/blockbench.png',label:'Blockbench'},
+  misode: {src:'/logos/misode.png',label:'Misode'},
   quilt: {src:'/logos/quilt.svg',label:'Quilt'},
 };
 export const serviceSymbols: Record<string,string> = {

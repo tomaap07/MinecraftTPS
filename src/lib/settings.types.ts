@@ -1,5 +1,6 @@
 export type LauncherSettings = {
   language: string;
+  translate_dynamic_content: boolean;
   launch_behavior: 'keep' | 'minimize' | 'tray' | 'close';
   data_root: string;
   discord_presence: boolean;
@@ -37,7 +38,7 @@ export type QuickFolder = 'root' | 'screenshots' | 'saves' | 'resourcepacks' | '
 export type SettingsTab = 'general' | 'display' | 'language' | 'appearance' | 'minecraft' | 'java' | 'accounts';
 export type Result = void | string | Promise<void | string>;
 export const DEFAULT_LAUNCHER_SETTINGS: LauncherSettings = {
-  language: 'es-419', launch_behavior: 'keep', data_root: '', discord_presence: false,
+  language: '', translate_dynamic_content: false, launch_behavior: 'keep', data_root: '', discord_presence: false,
   discord_application_id: '', automatic_updates: true, first_run_completed: false,
   ui_scale_percent: 100, launcher_width: 1280, launcher_height: 820, launcher_maximized: false,
   resolution_width: 1280, resolution_height: 720, fullscreen: false, ram_gb: 4, fps_boost: false, gc_mode: 'g1gc'

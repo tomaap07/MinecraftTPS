@@ -1,4 +1,5 @@
 <script lang="ts">
+  import {observeSize} from "./observe_size";
   import { onMount } from "svelte";
   import type { SkinViewer } from "skinview3d";
   import type { DirectionalLight, Mesh, Group, Material, Quaternion, Vector3, Euler } from "three";
@@ -286,7 +287,7 @@
 
   onMount(() => {
     let cancelled = false;
-    let observer: ResizeObserver | undefined;
+    let stopResize: (()=>void) | undefined;
     const motionPreference = window.matchMedia("(prefers-reduced-motion: reduce)");
     const updateMotionPreference = () => { reducedMotion = motionPreference.matches; };
     updateMotionPreference();
@@ -341,18 +342,18 @@
       if(cancelled||!viewer)return;
       viewer.loadSkin(initial.image,{model:initial.model});
       finishSkinLoad(initial.generic);
-      const resize = () => {
+      const resize = (width:number, height:number) => {
         if (!viewer) return;
-        viewer.setSize(Math.max(160,Math.floor(viewport.clientWidth)), Math.max(220,Math.floor(viewport.clientHeight)));
+        viewer.setSize(Math.max(160,width),Math.max(220,height));
         fitAmbientCamera();
       };
-      observer = new ResizeObserver(resize); observer.observe(viewport); resize();
+      stopResize=observeSize(viewport,resize);
       viewerReady = true;
 
       void preparePoserTextures($localGameArtwork.textures,$localGameArtwork.models).then(()=>{if(!cancelled)updateEquipment();});
     }).catch((error) => { viewerError = `El visor 3D no pudo iniciarse: ${String(error)}`; });
     return () => {
-      cancelled = true; skinSequence++; observer?.disconnect();
+      cancelled = true; skinSequence++; stopResize?.();
       motionPreference.removeEventListener("change", updateMotionPreference);
       window.removeEventListener("pointermove", lookAtPointer);
       clearEquipment();

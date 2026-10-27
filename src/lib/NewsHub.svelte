@@ -1,6 +1,7 @@
 <script lang="ts">
+  import DynamicText from "./DynamicText.svelte";
   import BrandWordmark from "./BrandWordmark.svelte";
-  import GameIcon from "./GameIcon.svelte";
+
   import ServiceLogo from "./ServiceLogo.svelte";
   import { onMount } from "svelte";
   import { invoke } from "@tauri-apps/api/core";
@@ -45,10 +46,10 @@
           {:else if news.length}
             <div class="news-grid">
               {#each news as item}
-                <a class="news-card" href={item.url} onclick={(event)=>{event.preventDefault();void open(item.url);}}>
+                <article class="news-card">
                   <NewsArtwork image={item.image} fallback={item.image_fallback} category={item.category}/>
-                  <div><small>{item.category} · {item.date}</small><h3>{item.title}</h3><p>{item.summary}</p><span>Leer en Minecraft.net <UiIcon name="arrow" size={14}/></span></div>
-                </a>
+                  <div><small>{item.category} · {item.date}</small><h3><a href={item.url} onclick={event=>{event.preventDefault();void open(item.url);}}>{item.title}</a></h3><p><DynamicText text={item.summary}/></p><button class="read-news" onclick={()=>void open(item.url)}>Leer en Minecraft.net <UiIcon name="arrow" size={14}/></button></div>
+                </article>
               {/each}
             </div>
           {:else}<p class="muted">El feed oficial todavía no tiene noticias disponibles.</p>{/if}
@@ -72,7 +73,7 @@
     {/if}
   </div>
   {#if tab==='news'}<footer>{#each links as [title,url,logo]}<a href={url} onclick={(event)=>{event.preventDefault();void open(url);}}><ServiceLogo name={logo} size={17}/><span>{title}</span><UiIcon name="arrow" size={13}/></a>{/each}</footer>{/if}
-  {#if onexplore}<div class="content-shortcuts" aria-label="Explorar shaders y recursos"><button onclick={()=>onexplore?.('shader')}><GameIcon name="ender_eye" size={18}/>Explorar shaders<UiIcon name="arrow" size={13}/></button><button onclick={()=>onexplore?.('resourcepack')}><GameIcon name="painting" size={18}/>Explorar recursos<UiIcon name="arrow" size={13}/></button></div>{/if}
+  {#if onexplore}<div class="content-shortcuts" aria-label="Explorar shaders y recursos"><button onclick={()=>onexplore?.('shader')}><UiIcon name="sun" size={18}/>Explorar shaders<UiIcon name="arrow" size={13}/></button><button onclick={()=>onexplore?.('resourcepack')}><UiIcon name="layers" size={18}/>Explorar recursos<UiIcon name="arrow" size={13}/></button></div>{/if}
 </section>
 
 <style>
@@ -87,8 +88,9 @@
   aside{border-left:1px solid #ffffff12;background:#0a0d124d;padding:23px 23px 20px;display:flex;flex-direction:column;gap:25px;min-width:0}.link-section h3{font-size:.86rem;margin:0 0 13px;color:#dadde4}.link-section a{display:flex;align-items:center;justify-content:space-between;gap:8px;color:#acb0d6;font-size:.72rem;line-height:1.5;margin-top:10px;text-underline-offset:3px}.link-section a:hover{color:#e0dfff}.link-section :global(svg){flex-shrink:0;opacity:.65}.archive-link{display:flex;align-items:center;gap:10px;padding:13px 11px;background:#ffffff04;border:1px solid #ffffff14;border-radius:4px;text-decoration:none;color:#bfc3df;font-size:.71rem}.archive-link>span{flex:1}.archive-link small{display:block;color:#818998;font-size:.6rem;margin-top:4px}.archive-link:hover{border-color:var(--primary)}.edition-mark{padding-top:20px;margin-top:auto;border-top:1px solid #ffffff12}.edition-mark>span{font-size:1.1rem;font-weight:900;letter-spacing:.03em;color:#a0a6b2}.edition-mark>small{display:block;font-size:.48rem;letter-spacing:.1em;color:#6f7888;margin-top:7px}a:focus-visible,button:focus-visible{outline:2px solid var(--primary);outline-offset:4px}
   .news-hub.news-mode{border:1px solid rgba(var(--primary-rgb),.2);border-radius:18px;padding:22px;background:rgba(var(--bg-base-rgb),.52);backdrop-filter:blur(12px);box-shadow:none}
   .news-mode header{padding:0;margin-bottom:17px;border:0;background:none}.news-mode header small{color:var(--primary)}.news-mode h2{font-size:1.2rem;letter-spacing:normal}.news-mode .news-layout{display:block}.news-mode .editorial{padding:0}.news-mode nav{gap:7px;border:0;margin-bottom:18px}.news-mode nav button{border:1px solid #abb5dd24;border-radius:9px;padding:9px 12px;background:#98a6e10b;color:#dbe3fa}.news-mode nav button.active{border-color:var(--primary);color:var(--primary)}.news-mode .news-content{max-height:none;overflow:visible;padding:0}
-  .news-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(230px,100%),1fr));gap:14px;max-height:490px;overflow:auto;scrollbar-width:thin;scrollbar-color:#555966 transparent}.news-card{border:1px solid #abb5dd24;border-radius:9px;background:#98a6e10b;color:#dbe3fa;overflow:hidden;text-align:left;display:flex;flex-direction:column;min-width:0;text-decoration:none}.news-card:hover{border-color:var(--primary);background:rgba(var(--primary-rgb),.1)}.news-card>div{padding:15px;display:flex;flex-direction:column;gap:9px;flex:1}.news-card small{font-size:.62rem;color:#a7b5d1}.news-card h3{font-size:.95rem;margin:0;line-height:1.4}.news-card p{font-size:.76rem;line-height:1.55;color:#b1bfd5;margin:0;display:-webkit-box;-webkit-line-clamp:3;line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}.news-card span{display:flex;align-items:center;gap:5px;font-size:.68rem;color:var(--primary);margin-top:auto}.news-mode .source-note{border:0;padding:12px 0 0}footer{display:flex;gap:7px;flex-wrap:wrap;padding-top:18px;margin-top:18px;border-top:1px solid #a3aee01c}footer a{display:flex;align-items:center;gap:6px;font-size:.67rem;text-decoration:none;border:1px solid #abb5dd24;background:#98a6e10b;color:#dbe3fa;border-radius:9px;padding:9px 12px}footer a:hover{border-color:var(--primary);color:var(--primary)}
+  .news-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(230px,100%),1fr));gap:14px;max-height:490px;overflow:auto;scrollbar-width:thin;scrollbar-color:#555966 transparent}.news-card{border:1px solid #abb5dd24;border-radius:9px;background:#98a6e10b;color:#dbe3fa;overflow:hidden;text-align:left;display:flex;flex-direction:column;min-width:0;text-decoration:none}.news-card:hover{border-color:var(--primary);background:rgba(var(--primary-rgb),.1)}.news-card>div{padding:15px;display:flex;flex-direction:column;gap:9px;flex:1}.news-card small{font-size:.62rem;color:#a7b5d1}.news-card h3{font-size:.95rem;margin:0;line-height:1.4}.news-card p{font-size:.76rem;line-height:1.55;color:#b1bfd5;margin:0;display:-webkit-box;-webkit-line-clamp:3;line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}.news-mode .source-note{border:0;padding:12px 0 0}footer{display:flex;gap:7px;flex-wrap:wrap;padding-top:18px;margin-top:18px;border-top:1px solid #a3aee01c}footer a{display:flex;align-items:center;gap:6px;font-size:.67rem;text-decoration:none;border:1px solid #abb5dd24;background:#98a6e10b;color:#dbe3fa;border-radius:9px;padding:9px 12px}footer a:hover{border-color:var(--primary);color:var(--primary)}
   @media(max-width:850px){.news-layout{grid-template-columns:minmax(0,1fr) 190px}.editorial{padding:0 20px}aside{padding:22px 17px}header{padding:23px 20px}}
   @media(max-width:600px){.news-hub.news-mode{padding:16px}.news-layout{grid-template-columns:1fr}aside{border-left:0;border-top:1px solid #ffffff12;display:grid;grid-template-columns:1fr 1fr;gap:22px}.edition-mark{margin:0}.article-scroll{max-height:440px}nav{gap:14px}nav button{font-size:.68rem}.news-article h3{font-size:1rem}}
   @media(prefers-reduced-motion:no-preference){a,button{transition:color .15s,border-color .15s,background .15s}}
+.news-card h3 a{color:inherit;text-decoration:none}.news-card h3 a:hover{text-decoration:underline}.read-news{margin-top:auto;display:inline-flex;align-items:center;gap:8px;border:0;background:none;color:var(--primary,#a855f7);padding:8px 0;font:inherit;font-size:.72rem;cursor:pointer}
 </style>

@@ -359,7 +359,7 @@ fn loaders(value: &Value) -> Vec<String> {
     strings(value)
         .into_iter()
         .map(|s| s.to_ascii_lowercase())
-        .filter(|s| ["forge", "fabric", "neoforge", "quilt", "vanilla"].contains(&s.as_str()))
+        .filter(|s| ["forge", "fabric", "neoforge", "quilt", "vanilla", "iris", "optifine", "oculus", "canvas"].contains(&s.as_str()))
         .collect()
 }
 fn cf_loader(loader: &str) -> Option<u32> {
@@ -1027,6 +1027,7 @@ pub async fn studio_project(provider: String, project_id: String) -> Result<Stud
         let versions = cf_files(&client, &project_id, "all", "all")
             .await?
             .iter()
+            .filter(|file|file["isAvailable"].as_bool()!=Some(false))
             .map(cf_version)
             .collect::<Vec<_>>();
         let mut project = cf_project(data, "mod");
@@ -1316,7 +1317,7 @@ pub(crate) async fn install_loader(
         "https://maven.neoforged.net/releases/net/neoforged/neoforge"
     };
     let root = crate::root_dir()?;
-    let existing = crate::list_installed_versions()?
+    let existing = crate::list_installed_versions_inner()?
         .into_iter()
         .find(|v| loader_profile_matches(&root, &v.id, game, loader, version));
     if let Some(existing) = existing {
@@ -1447,7 +1448,7 @@ pub(crate) async fn install_loader(
             "El instalador {artifact} terminó con {output}. Revisa la consola."
         ));
     }
-    crate::list_installed_versions()?
+    crate::list_installed_versions_inner()?
         .into_iter()
         .find(|v| loader_profile_matches(&root, &v.id, game, loader, version))
         .map(|v| v.id)
@@ -3027,10 +3028,17 @@ async fn install_version_inner(
     let (dir, game, loader) = if let Some(destination) = destination {
         destination
     } else if let Some(pack) = pack_id.as_deref().filter(|s| !s.is_empty()) {
+        ensure_pack_ready(pack)?;
         let metadata = read_pack(pack)?;
+        if !crate::content_targets::installed_profile(&crate::root_dir()?, &metadata.version_id) {
+            return Err("La versión del modpack no está instalada. Termina o repara la instalación antes de añadir contenido.".into());
+        }
         (pack_game_dir(pack)?, metadata.game_version, metadata.loader)
     } else {
         let root = crate::root_dir()?;
+        if !crate::content_targets::installed_profile(&root, &version_id) {
+            return Err("Elige una versión ya instalada para añadir contenido.".into());
+        }
         let (game, loader) = crate::resolve_mod_game_version(&root, &version_id)?;
         (
             crate::version_game_dir(&root, &username, &version_id)?,
@@ -3039,6 +3047,7 @@ async fn install_version_inner(
         )
     };
     let visual_content = matches!(project_type.as_str(), "resourcepack" | "shader");
+    let shader_loader = crate::hud_controls::shader_loader(&dir, &loader);
     let folder = match project_type.as_str() {
         "resourcepack" => "resourcepacks",
         "shader" => "shaderpacks",
@@ -3082,9 +3091,7 @@ async fn install_version_inner(
             if let Some(previous)=seen.get(&project){if previous!=&info.id{return Err(format!("Conflicto de dependencias: el proyecto {project} requiere los archivos exactos {previous} y {}. No se modificó la instalación.",info.id));}continue;}
             seen.insert(project.clone(),info.id.clone());
             if seen.len()>256{return Err("La cadena de dependencias supera el límite de seguridad".into());}
-            if !info.game_versions.contains(&game)
-                || (!visual_content && !info.loaders.is_empty() && !info.loaders.contains(&loader))
-            {
+            if !crate::content_targets::file_compatible(&project_type, &info.game_versions, &info.loaders, &game, &loader, shader_loader.as_deref()) {
                 return Err(format!(
                     "{} no es compatible con Minecraft {game} / {loader}",
                     info.name

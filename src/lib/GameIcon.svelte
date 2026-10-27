@@ -2,7 +2,6 @@
   import type { SecretIconName } from './achievement_catalog';
   import SecretIcon from './SecretIcon.svelte';
   import UiIcon from './UiIcon.svelte';
-  import TpPixelIcon from './TpPixelIcon.svelte';
   import { interfaceIcon } from './interface_icons';
   import {localVersionArtwork} from './local_game_art';
 
@@ -15,7 +14,6 @@
 
 <span class="game-icon" style:--icon-size={`${size}px`} style:width={`${size}px`} style:height={`${size}px`} aria-hidden="true">
   {#if localTexture}<img src={localTexture} alt="" width={size} height={size}/>
-  {:else if icon.pixel}<TpPixelIcon name={icon.pixel} {size}/>
   {:else if fallback}<SecretIcon name={fallback} {size}/>
   {:else}<UiIcon name={icon.ui} {size}/>{/if}
 </span>

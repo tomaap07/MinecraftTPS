@@ -15,6 +15,8 @@
   import PlayerAvatar from "$lib/PlayerAvatar.svelte";
   import SettingsSuite from "$lib/SettingsSuite.svelte";
   import SetupWizard from "$lib/SetupWizard.svelte";
+  import WindowChrome from "$lib/WindowChrome.svelte";
+  import {dynamicTranslationEnabled} from "$lib/dynamic_translation";
   import ServersPanel from "$lib/ServersPanel.svelte";
   import HostingOptions from "$lib/HostingOptions.svelte";
   import NewsHub from "$lib/NewsHub.svelte";
@@ -38,7 +40,7 @@
   import LoaderLogo from "$lib/LoaderLogo.svelte";
   import VersionIcon from "$lib/VersionIcon.svelte";
   import { DEFAULT_LAUNCHER_SETTINGS, type LauncherSettings, type AppearanceSettings, type AccountSummary, type SettingsTab, type QuickFolder } from "$lib/settings.types";
-  import { setLocale, translateUi } from "$lib/i18n";
+  import { setLocale, translateUi, detectNativeLanguage } from "$lib/i18n";
   import { FALLBACK_SKIN, FALLBACK_AVATAR } from "$lib/poses_catalog";
   import {defaultPlayerAppearance,crafatarSkinUrl,type PublicPlayerAppearance} from "$lib/player_skins";
   import {refreshLocalGameArtwork} from '$lib/local_game_art';
@@ -431,7 +433,8 @@
     loadConfig();
     try {
       settings=await invoke<LauncherSettings>("get_launcher_settings");
-      setLocale(settings.language);ramGb=settings.ram_gb;
+      if(!settings.language){settings={...settings,language:await detectNativeLanguage()};settings=await invoke<LauncherSettings>("save_launcher_settings",{settings});}
+      setLocale(settings.language);dynamicTranslationEnabled.set(settings.translate_dynamic_content);ramGb=settings.ram_gb;
       showWizard=!settings.first_run_completed;
       const memory=await invoke<{total_memory_gb:number;recommended_ram_gb:number}>("get_system_summary");totalMemoryGb=memory.total_memory_gb;
       if(showWizard){ramGb=memory.recommended_ram_gb;settings={...settings,ram_gb:ramGb};}
@@ -1202,7 +1205,7 @@
 
     const pending=settingsSaveQueue.then(async()=>{
       settings=await invoke<LauncherSettings>("save_launcher_settings",{settings:{...settings,...patch}});
-      setLocale(settings.language);ramGb=settings.ram_gb;saveConfig();
+      setLocale(settings.language);dynamicTranslationEnabled.set(settings.translate_dynamic_content);ramGb=settings.ram_gb;saveConfig();
       if(patch.data_root!==undefined){rootPath=await invoke<string>("get_root_path");await refreshInstallations();await refreshStudioPacks();}
     });
     settingsSaveQueue=pending.catch(()=>{});
@@ -1243,6 +1246,7 @@
 </script>
 
 
+<WindowChrome/>
 <main
   class="launcher"
   data-design="blockcraft"
@@ -1562,7 +1566,7 @@
   {/if}
   </div>
   <ExportReportDialog report={exportReport} onclose={()=>exportReport=null}/>
-  {#if showWizard}<SetupWizard {settings} onchange={changeSettings} {appearance} onappearance={changeAppearance} {themes} runtimes={javaRuntimes} onscanjava={refreshJavaRuntimes} oninstalljava={installJavaVersion} onconnectmicrosoft={addMicrosoftAccount} oncomplete={finishWizard} {totalMemoryGb} accountName={microsoftProfile?.name}/>{/if}
+  {#if showWizard}<SetupWizard {settings} onchange={changeSettings} {appearance} onappearance={changeAppearance} {themes} runtimes={javaRuntimes} onscanjava={refreshJavaRuntimes} oninstalljava={installJavaVersion} onconnectmicrosoft={addMicrosoftAccount} onaddoffline={addOfflineAccount} oncomplete={finishWizard} {totalMemoryGb} accountName={microsoftProfile?.name}/>{/if}
 </main>
 
 <style>
@@ -1594,7 +1598,8 @@
 
   .launcher {
     display: flex;
-    height: 100vh;
+    height: calc(100vh - 38px);
+    margin-top: 38px;
     background: rgba(var(--bg-base-rgb), var(--bg-opacity));
     transition: background 0.25s ease;
   }

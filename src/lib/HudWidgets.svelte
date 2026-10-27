@@ -1,4 +1,5 @@
 <script lang="ts">
+ import {observeSize} from "./observe_size";
  import {invoke} from '@tauri-apps/api/core';
  import {isHudWidget,type HudProfile} from './launcher_plugins';
  import type {OverlaySnapshot} from './launcher_extensions';
@@ -23,8 +24,8 @@
  type Module=HudProfile['modules'][number];
  let scene:HTMLDivElement;let sizes=$state<Record<string,HudSize>>({});let viewport=$state<HudSize>({width:0,height:0});let drag=$state<{id:string;pointer:number;startX:number;startY:number;left:number;top:number;width:number;height:number}|null>(null);
  let visible=$derived(profile.modules.filter(m=>m.enabled&&isHudWidget(m.id)&&(preview||hudMetricState(m.id,frame).available)&&!(m.id==='days'&&profile.days_with_fps&&(preview||hudMetricState('fps',frame).available)&&profile.modules.some(p=>p.id==='fps'&&p.enabled))));
- function measure(node:HTMLElement,id:string){const observer=new ResizeObserver(()=>{sizes[id]={width:node.offsetWidth,height:node.offsetHeight};});observer.observe(node);return{destroy(){observer.disconnect();}};}
- function measureViewport(node:HTMLElement){const update=()=>{viewport={width:node.clientWidth,height:node.clientHeight};};update();const observer=new ResizeObserver(update);observer.observe(node);return{destroy(){observer.disconnect();}};}
+ function measure(node:HTMLElement,id:string){return{destroy:observeSize(node,(width,height)=>{sizes[id]={width,height};},'offset')};}
+ function measureViewport(node:HTMLElement){return{destroy:observeSize(node,(width,height)=>{viewport={width,height};})};}
  function position(module:Module){
   const scale=module.scale??profile.scale;
   if(module.x!=null&&module.y!=null){const visible=visibleWidgetPosition({x:module.x,y:module.y},viewport,sizes[module.id]??{width:0,height:0},scale);return `left:${visible.x*100}%;top:${visible.y*100}%;transform:scale(${scale});transform-origin:top left`;}

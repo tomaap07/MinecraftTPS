@@ -9,6 +9,7 @@ node_modules
 /src-tauri/essential/
 /src-tauri/textures_*.png
 /src-tauri/target/
+/src-tauri/installer/build/
 *.log
 /.codex-tmp/
 # Credenciales locales: nunca deben publicarse en el repositorio.

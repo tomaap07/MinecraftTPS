@@ -1,6 +1,5 @@
 <script lang="ts">
   import UiIcon from './UiIcon.svelte';
-  import TpPixelIcon from './TpPixelIcon.svelte';
   import { brandAssets, serviceSymbols } from './brand_assets';
 
   let { name, size = 24, remote = false }: { name: string; size?: number; remote?:boolean } = $props();
@@ -20,7 +19,7 @@
   {#if source && !failed}
     <img src={source} alt="" width={size} height={size} loading="lazy" decoding="async" draggable="false" referrerpolicy="no-referrer" onerror={() => failed = true}/>
   {:else}
-    {#if ['vanilla','minecraft'].includes(key)}<TpPixelIcon name="dimension" {size}/>{:else}<UiIcon name={serviceSymbols[key] ?? 'external'} {size}/>{/if}
+    <UiIcon name={serviceSymbols[key] ?? 'external'} {size}/>
   {/if}
 </span>
 

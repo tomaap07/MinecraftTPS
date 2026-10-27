@@ -1,5 +1,5 @@
 <script lang="ts">
- import TpPixelIcon from './TpPixelIcon.svelte';
+ import UiIcon from './UiIcon.svelte';
  import {localVersionArtwork} from './local_game_art';
  let{name,size=16}:{name:'dimension'|'release'|'snapshot'|'legacy';size?:number}=$props();
  const ids={dimension:'stone_block',release:'grass_block',snapshot:'redstone',legacy:'cobblestone_block'};
@@ -27,7 +27,7 @@
    {#each right as face}<image href={face.src} width="16" height="16" transform="matrix(.875 -.5 0 .875 16 17)" filter={face.tinted?`url(#${filterId})`:undefined}/>{/each}
    <path d="M2 9 16 17v14L2 23Z" fill="#000" opacity=".12"/><path d="m16 17 14-8v14l-14 8Z" fill="#000" opacity=".3"/>
   </svg>
- {:else}<TpPixelIcon {name} {size}/>{/if}
+ {:else}<UiIcon name={name==='snapshot'?'flask':name==='legacy'?'layers':'cube'} {size}/>{/if}
 </span>
 
 <style>.version-icon{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;vertical-align:middle;line-height:0}.version-icon img,.version-icon svg{display:block;image-rendering:pixelated;object-fit:contain}</style>

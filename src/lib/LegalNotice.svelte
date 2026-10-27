@@ -18,7 +18,7 @@
   }
 </script>
 
-<div class="legal-footer" class:compact><p class="legal-notice">TP LAUNCHER es un proyecto independiente de TP Studios. No es un producto oficial de Minecraft ni está aprobado o asociado con Mojang, Microsoft o las comunidades enlazadas.</p>{#if onterms}<button type="button" class="terms-link" onclick={onterms}>Términos y condiciones<span aria-hidden="true">↗</span></button>{/if}</div>
+<div class="legal-footer" class:compact><p class="legal-notice">TP LAUNCHER es un proyecto independiente de TP LABS. No es un producto oficial de Minecraft ni está aprobado o asociado con Mojang, Microsoft o las comunidades enlazadas.</p>{#if onterms}<button type="button" class="terms-link" onclick={onterms}>Términos y condiciones<span aria-hidden="true">↗</span></button>{/if}</div>
 <details class="credits">
   <summary>Créditos y licencias de terceros</summary>
   <p>Fabric, Forge, OptiFine, Modrinth y CurseForge identifican los proyectos y proveedores integrados. Los logos y marcas pertenecen a sus respectivos titulares; no forman parte del arte original de TP. NeoForge: equipo NeoForged · CC BY 4.0. Quilt: QuiltMC/art · CC0 1.0. Monocraft: Idrees Hassan y colaboradores · SIL OFL 1.1. Visor 3D: skinview3d y Three.js · MIT.</p>

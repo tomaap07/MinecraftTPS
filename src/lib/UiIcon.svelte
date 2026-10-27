@@ -2,6 +2,8 @@
   let { name, size = 18 }: { name: string; size?: number } = $props();
   const paths: Record<string,string> = {
     play: 'M8 5v14l11-7z', cube: 'm12 3 9 5v8l-9 5-9-5V8z M3 8l9 5 9-5 M12 13v8',
+    archive:'M3 4h18v5H3z M5 9v12h14V9 M9 13h6', flask:'M9 3h6 M10 3v6l-6 10a2 2 0 0 0 2 3h12a2 2 0 0 0 2-3L14 9V3 M7 15h10',
+    maximize:'M4 4h16v16H4z',restore:'M8 8h12v12H8z M4 16V4h12',
 
     creeper: 'M6 5h12v14H6z M9 9h6v6H9z M2 8h4 M2 16h4 M18 8h4 M18 16h4 M9 2v3 M15 19v3',
     enderman: 'm12 2 8 5v10l-8 5-8-5V7z M8 9l4-3 4 3v6l-4 3-4-3z',

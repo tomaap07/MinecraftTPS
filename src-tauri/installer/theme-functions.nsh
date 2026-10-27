@@ -11,7 +11,7 @@ Function TpsOptionsCreate
   ${OrIf} $UpdateMode = 1
     Abort
   ${EndIf}
-  !insertmacro MUI_HEADER_TEXT "Personaliza tu instalación" "Revisa el destino y elige tus accesos directos."
+  !insertmacro MUI_HEADER_TEXT "$(TpOptionsTitle)" "$(TpOptionsSubtitle)"
   nsDialogs::Create 1018
   Pop $0
   ${If} $0 == error
@@ -21,7 +21,7 @@ Function TpsOptionsCreate
   ${NSD_CreateLabel} 0 0 100% 14u "TP LAUNCHER · v${VERSION}"
   Pop $0
   SetCtlColors $0 C480FF 100C19
-  ${NSD_CreateLabel} 0 18u 100% 12u "DESTINO DE INSTALACIÓN"
+  ${NSD_CreateLabel} 0 18u 100% 12u "$(TpFolder)"
   Pop $0
   SetCtlColors $0 BCA7CE 100C19
   ${NSD_CreateLabel} 0 32u 100% 22u "$INSTDIR"
@@ -29,7 +29,7 @@ Function TpsOptionsCreate
   SetCtlColors $0 F5EAFE 100C19
   ${NSD_CreateHLine} 0 60u 100% 1u ""
   Pop $0
-  ${NSD_CreateCheckbox} 0 70u 100% 16u "Crear acceso directo en el Escritorio"
+  ${NSD_CreateCheckbox} 0 70u 100% 16u "$(TpDesktop)"
   Pop $TpsOptionsDesktopCheckbox
   System::Call 'uxtheme::SetWindowTheme(p $TpsOptionsDesktopCheckbox, w "", w "")'
   SetCtlColors $TpsOptionsDesktopCheckbox F5EAFE 100C19
@@ -40,14 +40,14 @@ Function TpsOptionsCreate
   ${EndIf}
   StrCpy $1 $AppStartMenuFolder 1
   ${If} $1 == ">"
-    StrCpy $1 "Menú Inicio: no crear acceso directo"
+    StrCpy $1 "$(TpStartMenu): $(TpNoShortcut)"
   ${Else}
-    StrCpy $1 "Menú Inicio: $AppStartMenuFolder"
+    StrCpy $1 "$(TpStartMenu): $AppStartMenuFolder"
   ${EndIf}
   ${NSD_CreateLabel} 0 92u 100% 16u "$1"
   Pop $0
   SetCtlColors $0 BCA7CE 100C19
-  ${NSD_CreateLabel} 0 110u 100% 24u "Pulsa Instalar para preparar el launcher. El contenido del juego se obtiene al elegir una versión."
+  ${NSD_CreateLabel} 0 110u 100% 24u "$(TpInstallNote)"
   Pop $0
   SetCtlColors $0 BCA7CE 100C19
   nsDialogs::Show
@@ -59,6 +59,7 @@ FunctionEnd
 
 !macro TPS_THEME_FUNCTIONS PREFIX
 Function ${PREFIX}TpsThemeInit
+  TPNative::Apply
   Push $0
   SetCtlColors $HWNDPARENT F5EAFE 100C19
   GetDlgItem $0 $HWNDPARENT 1028

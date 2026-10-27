@@ -1,3 +1,4 @@
+import expanded from './expanded';
 import releaseUi0 from './release-ui-pt-BR';
 import releaseUi1 from './release-ui-fr-FR';
 import releaseUi2 from './release-ui-de-DE';
@@ -270,6 +271,8 @@ Object.assign(partialCatalogs['ko-KR'],releaseUi6);
 Object.assign(partialCatalogs['zh-CN'],releaseUi7);
 Object.assign(partialCatalogs['ca-ES'],releaseUi8);
 Object.assign(partialCatalogs['eo-UY'],releaseUi9);
+Object.assign(english,expanded['en-US']);
+for(const [code,values] of Object.entries(expanded)){if(partialCatalogs[code])Object.assign(partialCatalogs[code],values);}
 for(const [key,value] of Object.entries(english)){
  if(!partialCatalogs['en-PT'][key])partialCatalogs['en-PT'][key]=dialect(value,pirateWords);
  if(!partialCatalogs['lol-US'][key])partialCatalogs['lol-US'][key]=dialect(value,catWords);
