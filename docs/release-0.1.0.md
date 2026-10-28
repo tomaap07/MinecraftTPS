@@ -20,7 +20,7 @@ Account, settings and first-run screens link to the official Minecraft purchase 
 
 - The main README is in English, with a complete Spanish README and valid Markdown file tables.
 - Current guides describe the implemented account requirement. Dated reports and Git history are retained as historical records rather than rewritten as descriptions of the current build.
-- Obsolete release downloads are being withdrawn as part of this transition. The repository is authorized for public access after the source/history security checks.
+- The five obsolete release downloads were withdrawn as part of this transition. The repository was made public after the source/history security checks; Git history and historical tags were retained.
 - No Microsoft/Mojang approval has been confirmed. The current Client ID still needs its Minecraft Services access review; this release does not bypass an HTTP 403 or guarantee approval.
 - The installer remains unsigned because no trusted signing identity is configured. Signature preparation tooling is available, but an Authenticode signature is not claimed.
 
@@ -33,3 +33,14 @@ Account, settings and first-run screens link to the official Minecraft purchase 
 - HTTP authentication fixtures retain the successful chain and rejected Microsoft/Minecraft scenarios without logging private response bodies.
 
 The tests do not establish successful live Microsoft/Minecraft authorization for the pending application registration, universal Minecraft/HUD compatibility, or legal certification. The API provider and applicable terms remain authoritative.
+
+## Installer verification
+
+- File: `TP-LAUNCHER-0.1.0-Windows-x64-Setup.exe`, 220704168 bytes.
+- Installer SHA-256: `cbc8f7e2b03e291dde85578546760c926434a3c768304aa436fe102d9489c07f`.
+- Bundled executable SHA-256: `c345c8d38a67b2a42eaa71a8accaca9370b27446134899640a50fdb4820aef12`.
+- The NSIS payload and companion JARs were extracted for inspection. All 19 current frontend chunks were confirmed in the executable; 52 embedded assets were decompressed for inspection. Only Tauri's expected three-byte bundle-type marker differs from the standalone executable.
+- Source/history and extracted-payload audit: 567 text files scanned, 476 historical blobs, 786 files compared against four local secrets; no matches and no high-severity findings. Seven informational findings identify public OAuth application IDs. A heuristic audit is not an absolute guarantee that secrets cannot exist.
+- The final installer's local Microsoft Defender custom scan completed without detecting threats. No protections, exclusions or trusted certificates were changed. This is not a security certification or a SmartScreen reputation result.
+- Authenticode status: `NotSigned`. A trusted signing identity is not configured.
+- Final production browser tests used isolated Edge and simulated IPC: first-run licence blocking, 403 failure/retry, licensed unlock, local profile creation, cached licensed repeat setup without another online login, ten language choices, optional Java skip, official store links and relocking after evidence revocation. No browser runtime errors were observed. This is not a live Microsoft/Minecraft sign-in test.
