@@ -103,4 +103,4 @@ Some optional visuals can read resources from the user's installed game JAR. Loc
 
 The Windows build has **no Authenticode signing identity configured**. A signing workflow is available for a valid certificate; service approval and executable signing are separate requirements. See [Windows distribution](docs/distribution-windows.md). Automated checks do not certify every Minecraft version, adapter or third-party modpack.
 
-This 0.1.0 release is an explicit version renumbering accompanying the Microsoft-first account policy; it does not represent the absence of earlier development versions. Existing 0.1.1–0.1.3 installations require manual installation because 0.1.0 is lower under semantic versioning. Removing obsolete release downloads does not change the Git development history.
+
