@@ -83,4 +83,3 @@ Algunos recursos visuales opcionales pueden leerse de un JAR instalado por el us
 
 La compilación de Windows **no tiene identidad de firma Authenticode configurada**. La compilación firmada requiere un certificado válido. La autorización del servicio y la firma del ejecutable son requisitos distintos; [distribución Windows](docs/distribution-windows.md). Las pruebas automatizadas no certifican todas las versiones ni todos los contenidos.
 
-Esta 0.1.0 es una renumeración explícita junto con la nueva política de cuentas Microsoft; no afirma que no existieran versiones de desarrollo anteriores. Las instalaciones 0.1.1–0.1.3 requieren instalación manual porque 0.1.0 es inferior según el versionado semántico. Retirar descargas obsoletas no modifica el historial de desarrollo de Git.
