@@ -14,6 +14,8 @@ const LOOPBACK_PORT: u16 = 8080;
 const AUTHORIZE_URL: &str = "https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize";
 const TOKEN_URL: &str = "https://login.microsoftonline.com/consumers/oauth2/v2.0/token";
 static LOGIN: tokio::sync::Mutex<()> = tokio::sync::Mutex::const_new(());
+const REAUTHENTICATION_REQUIRED: &str = "La sesión necesita volver a iniciarse con la aplicación Microsoft propia de TP LAUNCHER";
+pub(crate) fn is_reauthentication_error(message: &str) -> bool { message == REAUTHENTICATION_REQUIRED }
 pub fn client_id() -> Result<String, String> {
     configured_client_id(
         std::env::var("VITE_MS_CLIENT_ID").ok(),
@@ -131,7 +133,7 @@ async fn token(form: &[(&str, &str)]) -> Result<serde_json::Value, String> {
     let value: serde_json::Value =
         serde_json::from_slice(&bytes).map_err(|_| "Microsoft devolvió una respuesta inválida")?;
     if !success || value.get("error").is_some() {
-        return Err(match value["error"].as_str(){Some("invalid_grant")=>"La sesión necesita volver a iniciarse con la aplicación Microsoft propia de TP LAUNCHER",Some("unauthorized_client"|"invalid_client")=>"Microsoft no acepta esta aplicación para cuentas personales. Revisa su Client ID y los tipos de cuenta en Microsoft Entra",Some("invalid_scope")=>"Microsoft rechazó los permisos Xbox solicitados. Revisa la autorización Xbox/Minecraft de esta aplicación",_=>"Microsoft rechazó la solicitud. Revisa el registro de tu aplicación, los permisos Xbox y la redirección http://localhost:8080"}.into());
+        return Err(match value["error"].as_str(){Some("invalid_grant")=>REAUTHENTICATION_REQUIRED,Some("unauthorized_client"|"invalid_client")=>"Microsoft no acepta esta aplicación para cuentas personales. Revisa su Client ID y los tipos de cuenta en Microsoft Entra",Some("invalid_scope")=>"Microsoft rechazó los permisos Xbox solicitados. Revisa la autorización Xbox/Minecraft de esta aplicación",_=>"Microsoft rechazó la solicitud. Revisa el registro de tu aplicación, los permisos Xbox y la redirección http://localhost:8080"}.into());
     }
     if !value["access_token"]
         .as_str()

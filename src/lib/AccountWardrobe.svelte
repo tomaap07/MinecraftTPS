@@ -1,6 +1,7 @@
 <script lang="ts">
   import GameIcon from "./GameIcon.svelte";
   import ServiceLogo from "./ServiceLogo.svelte";
+  import OfficialGameStore from "./OfficialGameStore.svelte";
   import { onMount } from "svelte";
   import { invoke } from "@tauri-apps/api/core";
   import { openUrl } from "@tauri-apps/plugin-opener";
@@ -14,6 +15,7 @@
     profile: Profile | null; skinUrl: string; fallbackSkinUrl?:string; capeUrl?: string; model?: "default" | "slim" | "auto-detect"; username: string;
     loginBusy?: boolean; loginMessage?: string;offlineAllowed?:boolean;offlineMessage?:string; onlogin: () => void; onlogout: () => void; onoffline: () => void; onprofile: (value: Profile) => void; onposer: () => void; onpreview?: (url: string, model: "default" | "slim") => void;
   } = $props();
+  let offlineNotice = $derived(offlineMessage || (offlineAllowed ? 'Disponible después de verificar una cuenta Microsoft con licencia de Minecraft.' : 'Para utilizar perfiles locales, debes iniciar sesión con una cuenta Microsoft al menos una vez en este equipo'));
   let skins = $state<SavedSkin[]>([]);
   let busy = $state(false);
   let loading = $state(true);
@@ -191,9 +193,11 @@
 <div class="account-workspace">
   <header class="page-heading"><div><span class="eyebrow">TU IDENTIDAD EN MINECRAFT</span><h2><GameIcon name="name_tag" size={28}/>Cuenta y armario</h2><p>Tu personaje, tus capas y tus skins favoritas en un mismo lugar.</p></div><button class="outline" onclick={onposer}><GameIcon name="armor_stand" size={18}/>Abrir Estudio 3D <UiIcon name="external" size={14}/></button></header>
   <section class="account-summary glass">
-    <div class="account-identity"><div class="account-symbol" aria-hidden="true">{#if profile}<ServiceLogo name="microsoft" size={28}/>{:else}<GameIcon name="name_tag" size={28}/>{/if}</div><div><h3>{profile ? `Cuenta Premium: ${profile.name}` : `Modo offline · ${username || "Steve"}`}</h3><p>{profile ? "Sesión Microsoft protegida y renovada automáticamente en este dispositivo." : "El armario local está disponible. Conecta tu cuenta para aplicar skins y capas oficiales."}</p></div></div>
-    {#if profile}<button class="outline" onclick={onlogout} disabled={busy}><UiIcon name="close" size={16}/>Cerrar sesión</button>{:else}<div class="auth-actions"><button class="primary" onclick={onlogin} disabled={loginBusy}><ServiceLogo name="microsoft" size={18}/>{loginBusy ? "Esperando a Microsoft…" : "Iniciar sesión con Microsoft"}</button><button class="outline" disabled={loginBusy||!offlineAllowed} title={offlineMessage} onclick={onoffline}><UiIcon name="user" size={16}/>Modo offline</button></div>{/if}
+    <div class="account-identity"><div class="account-symbol" aria-hidden="true">{#if profile}<ServiceLogo name="microsoft" size={28}/>{:else}<GameIcon name="name_tag" size={28}/>{/if}</div><div><h3>{profile ? `Cuenta Premium: ${profile.name}` : (offlineAllowed ? `Modo offline · ${username || "Steve"}` : "Conectar cuenta")}</h3><p>{profile ? "Sesión Microsoft protegida y renovada automáticamente en este dispositivo." : "El armario local está disponible. Conecta tu cuenta para aplicar skins y capas oficiales."}</p></div></div>
+    {#if profile}<button class="outline" onclick={onlogout} disabled={busy}><UiIcon name="close" size={16}/>Cerrar sesión</button>{:else}<div class="auth-actions"><button class="primary" onclick={onlogin} disabled={loginBusy}><ServiceLogo name="microsoft" size={18}/>{loginBusy ? "Esperando a Microsoft…" : "Iniciar sesión con Microsoft"}</button><button class="outline" disabled={loginBusy||!offlineAllowed} title={offlineNotice} onclick={onoffline}><UiIcon name="user" size={16}/>Modo offline</button></div>{/if}
+    <p class="account-note" role="status">{offlineNotice}</p>
     {#if loginMessage}<p class="account-note">{loginMessage}</p>{/if}
+    <OfficialGameStore/>
   </section>
 
   <section class="discovery-banner" aria-labelledby="skin-discovery-title">

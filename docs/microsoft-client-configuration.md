@@ -1,12 +1,14 @@
-# Microsoft y perfiles desconectados
+# Microsoft y Offline Mode tras verificar Minecraft Java
+
+Guía de comportamiento vigente. Los informes de versiones anteriores conservan su fecha y documentan el comportamiento de aquellas compilaciones; véase el [índice de documentación](README.md).
 
 ## Rechazo de Minecraft Services después del login de Microsoft
 
-En los registros de la versión 0.1.2 se observó un HTTP 403 al llamar a `authentication/login_with_xbox`, después de Microsoft y Xbox. Un error de esta etapa impide obtener el token de Minecraft y no debe mostrarse como una cuenta conectada. Ajustes mostraba «Listo» porque la interfaz capturaba el error sin rechazar la operación; esto se corrige en 0.1.3 para Ajustes, Cuenta y el asistente inicial.
+En los registros de una compilación de desarrollo 0.1.2 se observó HTTP 403 al llamar a `authentication/login_with_xbox`, después de Microsoft y Xbox. Ese error impide obtener el token de Minecraft. El código actual conserva la corrección que propaga el fallo a Ajustes, Cuenta y el asistente, sin mostrar «Listo» ni una cuenta conectada cuando la autenticación no terminó.
 
 Las aplicaciones nuevas deben solicitar el acceso a Minecraft Services. Registrar la aplicación en Entra y obtener un token de Microsoft son pasos diferentes de esta aprobación. El HTTP 403 es compatible con una aplicación pendiente de aprobación; por sí solo no prueba esa causa ni que falte la licencia del usuario. Si la aplicación ya está aprobada, hay que revisar el rechazo con el soporte del servicio.
 
-Formulario de revisión: https://aka.ms/mce-reviewappid. El titular debe indicar TP LAUNCHER, el Client ID propio registrado y la información del proyecto que solicite el formulario. No se ha enviado esta solicitud en nombre del titular ni se considera concedido el acceso. La biblioteca documenta el requisito y enlaza el formulario: https://minecraft-launcher-lib.readthedocs.io/en/stable/tutorial/microsoft_login.html#apply-for-permission.
+Formulario de revisión: https://aka.ms/mce-reviewappid. El titular está preparando su solicitud y debe indicar TP LAUNCHER, su Client ID y los datos reales que solicite el formulario. No hay aprobación confirmada. La biblioteca documenta el requisito y enlaza el formulario: https://minecraft-launcher-lib.readthedocs.io/en/stable/tutorial/microsoft_login.html#apply-for-permission.
 
 La página de retorno del navegador solo confirma la recepción de la autorización de Microsoft. El resultado definitivo está en el launcher, después de Xbox/XSTS, Minecraft Services, licencia, perfil y almacenamiento protegido. El progreso no incluye tokens ni respuestas privadas.
 
@@ -73,24 +75,19 @@ que se acepta el inicio de autorización; todavía no acredita un inicio de sesi
 completo ni los canjes posteriores Xbox Live/XSTS/Minecraft, que requieren que
 el propietario complete el acceso en Microsoft.
 
-## Perfiles Offline / locales
+## Primer inicio y Offline Mode
 
-Los perfiles locales se crean con un nick válido sin conectar Microsoft. No
-requieren una licencia cacheada de 30 días ni se convierten en cuentas oficiales.
-El botón Modo offline crea o selecciona el perfil local usando el nick actual.
-Al seleccionarlo, restaurar el launcher o pulsar Jugar no intenta renovar una
-cuenta Microsoft antigua. Las credenciales Microsoft guardadas se conservan por
-separado para que su propietario pueda volver a elegirlas.
+El primer paso del asistente exige una cuenta Microsoft cuya autenticación complete Xbox/XSTS, Minecraft Services, la comprobación de licencia Java y la obtención del perfil. El idioma de Windows se detecta para presentar el asistente; la configuración de idioma y Java opcional viene después de ese requisito de cuenta.
 
-El juego recibe un UUID local estable, `accessToken=0` y `userType=legacy`.
-Se mantiene el algoritmo anterior del UUID para conservar los mundos existentes.
-No habilita servidores que exigen autenticación Microsoft. La skin pública en el
-visor no cambia estas limitaciones. Usa una copia del juego que tengas derecho
-a utilizar.
+El modo de creación y uso de perfiles locales queda disponible únicamente cuando la biblioteca de ese equipo contiene al menos una cuenta Microsoft con su token de renovación cifrado por DPAPI y descifrable por el usuario de Windows, más un registro de licencia Java verificada que corresponda a esa cuenta y siga vigente. Un nombre, un UUID escrito en el JSON o un antiguo perfil local no bastan. La comprobación se aplica en Rust a la elegibilidad, creación, activación y lanzamiento; deshabilitar un botón no es la única barrera.
 
-Sin red, Java, cliente, bibliotecas y assets deben estar ya instalados. Un perfil
-local no hace disponibles archivos que faltan ni catálogos online. El acceso
-oficial Microsoft conserva PKCE, tokens protegidos y comprobación de propiedad.
+Cuando falta esa evidencia se muestra: **«Para utilizar perfiles locales, debes iniciar sesión con una cuenta Microsoft al menos una vez en este equipo»**. La interfaz incluye un enlace a la [tienda oficial](https://www.minecraft.net/es-es/store/minecraft-deluxe-collection-pc?tabs=%7B%22details%22%3A0%7D) para quien necesite adquirir el juego.
+
+El registro de verificación cifrado tiene una ventana de 30 días, una política del launcher para revalidar periódicamente con conexión. No se atribuye ese plazo a una norma específica de Microsoft. Si deja de existir una cuenta Microsoft apta o caduca la verificación, los perfiles locales vuelven a quedar bloqueados hasta completar la comprobación.
+
+Después de cumplir el requisito, el propietario puede crear y alternar perfiles locales con nombres válidos en su armario. Un perfil sin conexión usa identidad local estable y no representa una sesión autenticada ante servidores oficiales. La vista previa de una skin por nombre de usuario no cambia la identidad de autenticación.
+
+Sin red, Java, cliente, bibliotecas y assets deben estar previamente instalados. Las credenciales Microsoft se mantienen cifradas por separado para permitir volver a elegir la cuenta oficial. No se incluyen cuentas, tokens ni comprobantes privados en el repositorio o el instalador.
 
 ## OptiFine
 

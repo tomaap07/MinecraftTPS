@@ -1,32 +1,56 @@
 # TP LAUNCHER · TP LABS
 
-Launcher de Minecraft Java para Windows con Tauri 2, Rust, Svelte 5 y TypeScript. Los clientes, runtimes, loaders y mods se descargan desde sus proveedores durante la instalación.
+[Español](README.es.md) · [Source code](https://github.com/tomaap07/MinecraftTPS) · [Contact and support](https://github.com/tomaap07/MinecraftTPS/issues)
 
-## Licencia y marca
+TP LAUNCHER is an independent Windows desktop launcher for **Minecraft: Java Edition**, built with Rust, Tauri 2, Svelte 5 and TypeScript. It manages game installations, compatible mod content, accounts and player creation tools. The current application version is **0.1.0**.
 
-El código original de TP LAUNCHER se distribuye bajo **GNU GPLv3**, identificada
-como `GPL-3.0-only`. El texto íntegro está en [LICENSE](LICENSE), obtenido de la
-[publicación oficial de GNU](https://www.gnu.org/licenses/gpl-3.0.txt).
+## Microsoft / Minecraft Services review summary
 
-La licencia del código no concede una licencia de marca para presentar una
-distribución modificada como el producto oficial **TP LAUNCHER**. El nombre
-comercial y la identidad visual —incluido el logotipo propio de
-`static/logos/tp-launcher.svg`— quedan reservados a sus titulares. Las referencias
-descriptivas y la atribución no deben sugerir aprobación o afiliación. Esta reserva
-de marca no limita los derechos que la GPL concede sobre el código.
+| Item | Implementation |
+| --- | --- |
+| Application | TP LAUNCHER, maintained by TP LABS |
+| Maintainer contact | [tplabs.contacto@gmail.com](mailto:tplabs.contacto@gmail.com); [tomaap07 on GitHub](https://github.com/tomaap07); [project issues](https://github.com/tomaap07/MinecraftTPS/issues) |
+| Public application ID | `6a4f8732-6bf7-49c3-a749-16607f97281d` |
+| Authentication | Microsoft identity platform **OAuth 2.0 v2.0 Authorization Code Flow with PKCE S256** in the user's system browser |
+| Microsoft scopes | `XboxLive.signin offline_access` |
+| Registered redirect | `http://localhost:8080`; a loopback callback validates method, Host, path and random `state` |
+| Minecraft authorization | Microsoft → Xbox Live → XSTS → Minecraft Services; Java entitlement and official profile are checked before completing sign-in |
+| Credential storage | Refresh tokens encrypted with **Windows DPAPI** for the current Windows user; Minecraft access tokens kept in memory. Passwords entered only on Microsoft's website |
+| Offline Mode | Available only after successful verification of a licensed Microsoft Minecraft Java account on this device, with saved protected credentials and a valid verification record |
+| First run | Microsoft sign-in and Minecraft Java ownership verification before language and optional Java setup |
 
-Las dependencias, fuentes, imágenes aportadas por usuarios, marcas y archivos de
-terceros conservan sus propias licencias y créditos; no se relicencian como obras
-originales del proyecto. El SVG de la nueva marca está construido con geometría
-propia y no contiene texturas extraídas del juego. No se afirma una garantía de
-ausencia de reclamaciones de terceros.
+TP LAUNCHER uses its own application registration. A client secret and another launcher's application ID are not distributed. The application does not provide an unverified account path to launch Minecraft. Creating or selecting a local gameplay profile is subject to the verified-account requirement in Rust and in the interface. A skin preview by username does not authenticate that username.
 
-**TP LAUNCHER no es un producto oficial de Minecraft. No está aprobado por Mojang
-ni asociado con Microsoft.**
+**Service access review is in progress; approval has not been confirmed.** Microsoft sign-in and Xbox authentication are separate from permission to use Minecraft Services. The observed Minecraft Services HTTP 403 is documented in the [authentication guide](docs/microsoft-client-configuration.md). Failed authorization is reported as a failure, not a connected account. [Application-review technical details](docs/minecraft-services-request.md).
 
-## Desarrollo
+**TP LAUNCHER is not an official Minecraft product. It is not approved by Mojang or associated with Microsoft.**
 
-Necesitas Node.js 22 o superior, Rust estable con MSVC, las herramientas de compilación C++ y el SDK de Windows de Tauri. Para empaquetar TP Companion configura JAVA_HOME con un JDK 21 o superior que incluya javac. El instalador suministra WebView2 offline.
+## Sign-in and Offline Mode
+
+1. Sign in through the official Microsoft page in your browser.
+2. The launcher obtains Xbox/XSTS authorization, checks the Minecraft Java entitlement and loads the official Minecraft profile.
+3. Successful verification and encrypted local storage enable Offline Mode and local gameplay profiles on that device. The launcher's verification cache lasts **30 days**, after which an online recheck is required. This duration is a launcher policy, not a claim about a Microsoft-mandated interval.
+4. Without eligible account evidence, local profiles remain disabled with this notice: “Para utilizar perfiles locales, debes iniciar sesión con una cuenta Microsoft al menos una vez en este equipo”. Existing local profiles do not bypass the requirement.
+
+Offline Mode does not provide a valid session for servers requiring official online authentication. Account credentials and verification records are local to the device and are not shipped in the installer or repository.
+
+Need Minecraft? Purchase a license from the [official Minecraft store](https://www.minecraft.net/es-es/store/minecraft-deluxe-collection-pc?tabs=%7B%22details%22%3A0%7D).
+
+## Features
+
+- **Play and installations:** Vanilla and loader catalogs, compatible Java selection, memory settings, recent installations and playtime. The background character uses the connected skin or a skin preview by username.
+- **Mods, modpacks, shaders and resource packs:** Modrinth and CurseForge catalogs, search, categories, project images, file details and dependencies. Installation selects a recent compatible file and asks for a compatible installed destination when needed.
+- **Isolated instances:** Separate modpack directories, import/export tools, installation progress, streaming downloads, hash checks and retry caches. Content redistribution remains subject to author and provider terms.
+- **Account and skins:** Microsoft profile, official skins and capes, local skin library and username-based appearance previews.
+- **3D studio:** Pose editing, camera, lighting and transparent PNG rendering, built with [skinview3d](https://github.com/bs-community/skinview3d) and [Three.js](https://threejs.org/), with their MIT notices preserved.
+- **Library and HUD:** Screenshots, worlds, resource/shader folders and persistent logs. Internal game metrics require compatible adapters; see [Universal HUD](docs/universal-hud.md) and [TP Companion](tp-companion/README.md).
+- **Languages:** Local dictionaries for ten primary languages, with additional variants and partial catalogs identified in the interface. MyMemory translation is optional and limited to public content summaries; [details](docs/translations.md).
+
+Game clients, libraries, Java runtimes, loaders and content are obtained from their providers during installation. The repository and launcher installer do not bundle Minecraft game clients or OptiFine installers. Installed third-party content retains its applicable terms and licenses.
+
+## Development
+
+Use Node.js 22 or later, Rust stable with MSVC, Visual Studio C++ build tools and Windows SDK. Building TP Companion requires a JDK 21 or later through `JAVA_HOME`. The Windows installer includes the WebView2 offline runtime installer.
 
 ```sh
 npm ci
@@ -36,107 +60,47 @@ npm run tauri dev
 ```sh
 npm run check
 npm run check:ui
-npm run build
 cargo test --manifest-path src-tauri/Cargo.toml
 npm run tauri build
 ```
 
-## Jugar y crear
+Configure your own Microsoft registration using the [authentication guide](docs/microsoft-client-configuration.md). A public client ID identifies an application; it is neither a client secret nor proof of service approval. Forks must use their own registration.
 
-- **Jugar:** catálogos Vanilla y loaders, personaje integrado en el fondo con una de las poses del catálogo elegida al iniciar, skin oficial o vista previa del nick offline y aspecto predeterminado obtenido de servicios públicos o recursos locales disponibles; Java automático, RAM y estadísticas por versión.
-- **Mods y modpacks:** búsqueda Modrinth/CurseForge con filtros y páginas; fichas con descripción, galería, archivos y dependencias. Instalar elige el archivo más reciente para modpacks; mods, shaders y recursos muestran un selector con instalaciones y modpacks descargados compatibles. Se conservan las dependencias obligatorias y la selección manual de un archivo desde la ficha.
-- **Modpack Studio:** instancias aisladas con Vanilla, Fabric, Forge, NeoForge, Quilt u OptiFine; gestión de mods, exportación ZIP/`.mrpack` e importación de formatos MinecraftTPS, Modrinth y CurseForge. Incluye progreso por etapas y archivo, avisos de éxito, descargas por streaming y reintentos con caché verificada. Las exportaciones excluyen OptiFine y binarios con permiso no verificable, muestran un informe de omisiones y pueden referenciar descargas Modrinth verificadas por hash. La instalación original permanece intacta.
-- **Cuenta:** sesión Microsoft, skin y capas oficiales, armario local persistente, importación por nick y sincronización de una skin guardada.
-- **Estudio 3D:** catálogo de poses, poses propias, rotación XYZ de siete articulaciones, posición del personaje, luz, cámara y segunda capa; renders PNG transparentes en HD y copia de imagen al portapapeles.
-- **Biblioteca:** instalaciones locales, capturas de las distintas instancias, mundos y accesos a resourcepacks y shaderpacks. Los registros de consola se conservan al cerrar Minecraft.
+Main entry points: `src/routes/+page.svelte`, `src-tauri/src/microsoft_oauth.rs`, `microsoft_services.rs`, `account_licensing.rs` and `launcher_settings.rs`. The content catalog uses `src/lib/ModStudio.svelte` and `src-tauri/src/mod_studio.rs`.
 
-## Integración de CurseForge
+## Provider integrations
 
-**Mods y modpacks** consulta CurseForge al seleccionar su proveedor. La clave se lee en ejecución desde `CURSEFORGE_API_KEY`, `.env` en desarrollo (debug) o `integrations.env` en la carpeta de datos local. No hay claves integradas en el código, frontend ni ejecutable; no se distribuye la clave del desarrollador. El parser conserva los signos `$` literalmente. Se usan `x-api-key`, `Accept: application/json` y un User-Agent que identifica a TP LAUNCHER.
+CurseForge credentials are read at runtime from the environment, a development `.env` file or the device's `integrations.env`. They are excluded from Git and the bundle; no developer key is distributed. Provider authorization and download restrictions are reported. If an author disables third-party downloads, the launcher requests the exact file from its official page and verifies its size and hash. [Content installation details](docs/modpack-installation.md).
 
-El catálogo usa `gameId=432`, `classId=6` para mods y `classId=4471` para modpacks. El backend comunica los errores de autorización o de descarga del proveedor en español. Cuando un autor restringe la descarga externa de un archivo de un modpack, la instancia queda pendiente y muestra su página oficial y el botón para importar la versión exacta. Se comprueban tamaño y hash antes de aceptarla. [Detalles de instalación y el caso RLCraft](docs/modpack-installation.md).
+Services include [Modrinth](https://docs.modrinth.com/api/), [CurseForge](https://docs.curseforge.com/rest-api/), [Fabric](https://meta.fabricmc.net/), [Quilt](https://meta.quiltmc.org/), [Forge](https://files.minecraftforge.net/), [OptiFine](https://optifine.net/downloads) and the [TP server catalog](https://tp-api-hazel.vercel.app/api/v1/servers). Names and logos identify their services and do not imply endorsement.
 
-Los archivos de credenciales locales están excluidos de Git y del bundle. El acceso y la distribución de esta integración están sujetos al acuerdo del titular con CurseForge; disponer de una clave no concede permiso general de marca ni permite compartirla. La clave que antes figuraba en el código debe revocarse antes de publicar otra distribución.
+## User files
 
-CurseForge limita cada consulta a 10.000 resultados accesibles. El launcher respeta este límite e informa cuando el proveedor restringe resultados o descargas; los filtros permiten explorar subconjuntos del catálogo.
+Preferences and the account library reside in `%APPDATA%/LauncherTPS/`. Game data defaults there for new installations; an existing `%APPDATA%/MinecraftTPS/` directory is retained. Settings can select another game-data directory. The table distinguishes configuration storage from the selected game-data root.
 
-## Archivos del usuario
-
-Los datos existentes conservan `%APPDATA%/MinecraftTPS/`. Las instalaciones nuevas usan `%APPDATA%/LauncherTPS/`; Ajustes permite seleccionar otra carpeta. La configuración y la bóveda de cuentas permanecen en `%APPDATA%/LauncherTPS/`.
-
-| Carpeta o archivo | Contenido |
+| Location | Contents |
 | --- | --- |
-| `versions`, `libraries`, `assets`, `runtime` | Archivos comunes de Minecraft y Java |
-| `instances/<nombre>-<id>/tps-pack.json` | Configuración de cada modpack propio |
-| `instances/<nombre>-<id>/{mods,config,saves,...}` | Contenido aislado de la instancia |
-| `skins_library/skins.json` | Índice del armario y sus PNG |
-| `custom_poses.json` | Poses creadas por el usuario |
-| `renders` | Exportaciones PNG de Poser |
-| `playtime.json` | Tiempo acumulado por jugador y versión |
-| `logs` | Registro persistente del launcher y de Java |
-| `cache/content`, `cache/modpacks` | Descargas verificadas y archivos de importación para reintentos |
+| Configuration: `launcher-settings.json` | Preferences, language and game-data directory |
+| Configuration: `accounts.json` | Account names, identifiers and selection; no plaintext tokens |
+| Configuration: `accounts/*.dat` | DPAPI-encrypted Microsoft refresh tokens |
+| Configuration: `minecraft-license-cache.dat` | DPAPI-encrypted Minecraft Java verification records |
+| Configuration: `translation-cache.json` | Cached translations of public descriptions |
+| Game data: `account.dat` | DPAPI-encrypted active Microsoft refresh token |
+| Game data: `versions`, `libraries`, `assets`, `runtime` | Downloaded dependencies and Java |
+| Game data: `instances/...` | Isolated mods, configuration, worlds and logs |
+| Game data: `skins_library` | Skin PNG files and library index |
+| Game data: `custom_poses.json`, `renders` | Custom poses and PNG exports |
+| Game data: `playtime.json`, `logs` | Playtime and diagnostics |
+| Game data: `cache/content`, `cache/modpacks` | Verified download and import caches |
 
-Las instancias Vanilla existentes conservan sus directorios anteriores. El tiempo se mide mientras el proceso del juego está abierto, con guardado periódico y al terminar la sesión.
+Do not commit or distribute local credentials, account data, verification caches, worlds or private configuration. Username appearance queries and screenshots are distinct from authentication.
 
-## Arquitectura y contribuciones
+## License, assets and distribution
 
-- `src/routes/+page.svelte`: navegación, lanzamiento y configuración general.
-- `src/lib/ModStudio.svelte` y `src-tauri/src/mod_studio.rs`: proveedores, archivos, dependencias e instancias.
-- `src/lib/AccountWardrobe.svelte`, `CapePreview.svelte` y `src-tauri/src/skin_library.rs`: cuenta y biblioteca de skins.
-- `src/lib/poses_catalog.ts`, `HeroShowcase.svelte`, `PoseStudio.svelte`, `SkinModelViewer.svelte` y `src-tauri/src/poser.rs`: catálogo, visor y herramientas de posado.
-- `src-tauri/src/launcher_tools.rs`: estadísticas, apariencias públicas y capturas.
-- `src-tauri/src/lib.rs`: autenticación, descarga, runtimes y proceso de Minecraft.
-- `src-tauri/src/studio_progress.rs`, `src/lib/ContentProgress.svelte` y `ContentNotifications.svelte`: operaciones de instalación y notificaciones.
-- `src-tauri/src/servers.rs`, `src/lib/ServersPanel.svelte`: lista NBT, consulta de servidores y LAN/e4mc.
-- `src-tauri/src/launcher_settings.rs`, `SettingsSuite.svelte` y `SetupWizard.svelte`: ajustes, multicuentas y bienvenida.
-- `src/lib/i18n.ts` y `src/lib/locales`: 16 idiomas, traducción reactiva y cobertura comprobable de los catálogos.
+Original launcher code is licensed under **GPL-3.0-only**; [LICENSE](LICENSE). This license does not grant trademark permission to present a modified distribution as official TP LAUNCHER. Project branding remains with its owner. Dependencies, provider marks, fonts and user-supplied artwork retain their licenses and attribution in [third-party notices](static/legal/THIRD-PARTY-NOTICES.txt).
 
-Puedes añadir poses con nuevas rotaciones en `poses_catalog.ts` o guardar poses propias desde el estudio. Cada adaptación de proveedor devuelve los mismos tipos de proyecto y archivo para mantener independiente la interfaz.
+Some optional visuals can read resources from the user's installed game JAR. Local access does not grant redistribution permission or make them original TP artwork. [Asset policy](docs/asset-policy-audit.md).
 
-El editor Poser de este launcher está construido con [skinview3d](https://github.com/bs-community/skinview3d) ([web y demostración](https://bs-community.github.io/skinview3d/)), creado por Kent Rasmussen, Haowei Wen, Sean Boult y sus colaboradores, y [Three.js](https://threejs.org/), de su equipo de autores y colaboradores. Ambos proyectos usan licencia MIT y sus créditos tienen enlaces directos dentro del estudio. El nombre del editor no implica que sea el programa MC Poser.
+The Windows build has **no Authenticode signing identity configured**. A signing workflow is available for a valid certificate; service approval and executable signing are separate requirements. See [Windows distribution](docs/distribution-windows.md). Automated checks do not certify every Minecraft version, adapter or third-party modpack.
 
-Las apariencias por nick se consultan en los servicios oficiales de Mojang/Minecraft, con respaldo de texturas de [MCHeads](https://mc-heads.net/) y [Minotar](https://minotar.net/) para identidades verificadas. La vista previa offline no cambia la identidad de autenticación del juego. La pose de bienvenida se conserva al cambiar de pestaña y se vuelve a elegir en el siguiente inicio.
-
-Formatos y servicios: [Modrinth API](https://docs.modrinth.com/api/), [formato mrpack](https://support.modrinth.com/en/articles/8802351-modrinth-modpack-format-mrpack), [CurseForge API](https://docs.curseforge.com/rest-api/), [Fabric Meta](https://meta.fabricmc.net/), [Quilt Meta](https://meta.quiltmc.org/), [Forge](https://files.minecraftforge.net/) y [OptiFine](https://optifine.net/downloads).
-
-El proyecto no incluye clientes, mods ni instaladores de OptiFine. Los archivos de terceros conservan las condiciones de sus autores.
-
-## Plataforma TP
-
-El catálogo propio de servidores está desplegado en [TP API](https://tp-api-hazel.vercel.app/api/v1/servers).
-Consulta el [estado verificado de la plataforma](docs/tp-platform-status.md), la
-[documentación del backend](tp-api/README.md) y la [compatibilidad de TP Companion](tp-companion/README.md).
-El complemento es opcional y requiere Minecraft 1.21.1 con Fabric. Para empaquetarlo
-desde un clon limpio configura `JAVA_HOME` con un JDK 21 o superior y ejecuta
-`npm run tauri build`; se compila el JAR propio antes de construir el launcher.
-
-El [HUD híbrido universal](docs/universal-hud.md) añade una ventana superpuesta para
-Vanilla, OptiFine, Fabric y Forge en Windows, con teclas/CPS y editor por Shift derecho/F8.
-Los datos internos siguen usando adaptadores compatibles. PresentMon aporta FPS externos
-cuando Windows autoriza ETW; sus requisitos y el resultado real de verificación están documentados.
-
-## Recursos visuales y revisión de derechos
-
-La [auditoría de recursos](docs/asset-policy-audit.md) documenta fuentes, condiciones y sustituciones. La interfaz y el instalador usan arte propio de TP; algunos iconos y objetos pueden leer recursos de un JAR instalado localmente, con respaldo vectorial cuando faltan. Esa lectura no concede permisos de redistribución ni sustituye las condiciones de Mojang. Los logos de las integraciones tienen su procedencia en `static/logos/sources.json` y licencias en `static/legal/THIRD-PARTY-NOTICES.txt`, disponibles desde el pie de la aplicación. Las integraciones cuyos logos se retiraron conservan su nombre y funciones con símbolos propios. Esto no certifica jurídicamente el producto ni los contenidos de terceros.
-
-### Datos del HUD y revisión de distribución
-
-`npm run build:desktop` prepara TP Bridge (Java 8+), TP Companion y la interfaz.
-Activa el HUD antes de iniciar Minecraft; un juego que ya estaba abierto debe
-reiniciarse para cargar el puente. Consulta [HUD universal](docs/universal-hud.md)
-y la [revisión actual de derechos e implementación](docs/implementation-review-2026-10-27.md).
-
-## Preparación de la versión 0.1.1
-
-- [Auditoría de secretos](docs/security-audit-2026-10-27.md): fuentes e historial, con hallazgos redactados; los Client IDs públicos no son secretos. Los archivos locales de credenciales nunca se incluyen.
-- [Revisión funcional y de derechos](docs/implementation-review-2026-10-27.md): alcance, fuentes y permisos pendientes.
-- [Catálogo y enlaces verificados](docs/validation/README.md): 920 manifiestos y 1.844 endpoints oficiales. La validación de metadatos no equivale a arrancar cada juego.
-- [Asistente de instalación](src-tauri/installer/README.md): arte original TP Explorer, logo vigente y pasos de instalación por usuario.
-
-Las compilaciones de Hit Color identificadas por huella que rompen los shaders de 26.3 se pausan únicamente cuando el launcher gestiona ese archivo; el resto del perfil se conserva. Las pruebas reales de arranque y sus límites figuran en el informe de validación de la versión.
-
-## Versión 0.1.2
-
-Instalador con Fariiuh, marco propio, tema negro y violeta y diez idiomas. El primer inicio ofrece idioma detectado de Windows, Java opcional y perfil local o Microsoft. Las comprobaciones de Java no abren consola, tienen límite de tiempo y se ejecutan en segundo plano.
-
-[Instalador y fuentes privados](https://github.com/tomaap07/MinecraftTPS/releases/tag/v0.1.2) · [Traducciones y MyMemory](docs/translations.md) · [SmartScreen y firma](docs/distribution-windows.md) · [Tema NSIS](src-tauri/installer/README.md).
+This 0.1.0 release is an explicit version renumbering accompanying the Microsoft-first account policy; it does not represent the absence of earlier development versions. Existing 0.1.1–0.1.3 installations require manual installation because 0.1.0 is lower under semantic versioning. Removing obsolete release downloads does not change the Git development history.

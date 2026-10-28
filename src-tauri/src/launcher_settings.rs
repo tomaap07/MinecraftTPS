@@ -587,11 +587,59 @@ pub fn list_launcher_accounts() -> Result<Vec<AccountSummary>, String> {
     }
     Ok(accounts.entries)
 }
-#[derive(Serialize)]pub struct OfflineEligibility{pub allowed:bool,pub verified_at:Option<u64>,pub expires_at:Option<u64>,pub message:String}
-fn offline_eligibility_for(_accounts:&Accounts)->OfflineEligibility{
- OfflineEligibility{allowed:true,verified_at:None,expires_at:None,message:"Perfiles locales disponibles sin iniciar sesión con Microsoft. No autentican tu identidad ni habilitan servidores que requieren una sesión oficial. Usa una copia del juego que tengas derecho a utilizar.".into()}
+pub(crate) const OFFLINE_SIGNIN_REQUIRED: &str = "Para utilizar perfiles locales, debes iniciar sesión con una cuenta Microsoft al menos una vez en este equipo";
+#[derive(Serialize)]
+pub struct OfflineEligibility {
+    pub allowed: bool,
+    pub verified_at: Option<u64>,
+    pub expires_at: Option<u64>,
+    pub message: String,
 }
-#[tauri::command]pub fn get_offline_eligibility()->Result<OfflineEligibility,String>{let _guard=account_lock().lock().map_err(|_|"Biblioteca de cuentas ocupada")?;Ok(offline_eligibility_for(&read_accounts()?))}
+fn usable_saved_token(path: &Path) -> bool {
+    let Ok(meta) = fs::symlink_metadata(path) else { return false; };
+    if !meta.is_file() || meta.file_type().is_symlink() || meta.len() == 0 || meta.len() > 65536 { return false; }
+    bounded_file(path, 65536).ok().and_then(|bytes| crate::token_storage::unprotect(&bytes).ok())
+        .is_some_and(|clear| !clear.is_empty() && clear.iter().all(|byte| byte.is_ascii_graphic()))
+}
+fn offline_eligibility_with(accounts: &Accounts, now: u64, mut evidence: impl FnMut(&AccountSummary) -> Option<u64>) -> OfflineEligibility {
+    let verified_at = accounts.entries.iter()
+        .filter(|entry| entry.kind == "microsoft" && entry.id.starts_with("microsoft-") && valid_account_id(&entry.id))
+        .filter_map(|entry| evidence(entry))
+        .filter(|verified| *verified <= now && crate::account_licensing::offline_expires_at(*verified) >= now)
+        .max();
+    let allowed = verified_at.is_some();
+    OfflineEligibility {
+        allowed,
+        verified_at,
+        expires_at: verified_at.map(crate::account_licensing::offline_expires_at),
+        message: if allowed {
+            "Offline Mode disponible después de verificar una cuenta Microsoft con licencia de Minecraft Java. La verificación local caduca a los 30 días; vuelve a conectar la cuenta para renovarla.".into()
+        } else { OFFLINE_SIGNIN_REQUIRED.into() },
+    }
+}
+fn offline_eligibility_for(accounts: &Accounts) -> OfflineEligibility {
+    let receipts: std::collections::HashMap<_, _> = crate::account_licensing::verified_accounts().into_iter().collect();
+    let root = config_root().ok();
+    offline_eligibility_with(accounts, crate::unix_time_seconds(), |entry| {
+        let profile_id = entry.id.strip_prefix("microsoft-")?;
+        let verified = receipts.get(profile_id).copied()?;
+        let vault = root.as_ref()?.join("accounts").join(format!("{}.dat", entry.id));
+        usable_saved_token(&vault).then_some(verified)
+    })
+}
+fn require_offline_for(accounts: &Accounts) -> Result<(), String> {
+    let eligibility = offline_eligibility_for(accounts);
+    if eligibility.allowed { Ok(()) } else { Err(eligibility.message) }
+}
+pub(crate) fn require_offline_eligibility() -> Result<(), String> {
+    let _guard = account_lock().lock().map_err(|_| "Biblioteca de cuentas ocupada")?;
+    require_offline_for(&read_accounts()?)
+}
+#[tauri::command]
+pub fn get_offline_eligibility() -> Result<OfflineEligibility, String> {
+    let _guard = account_lock().lock().map_err(|_| "Biblioteca de cuentas ocupada")?;
+    Ok(offline_eligibility_for(&read_accounts()?))
+}
 fn offline_selected(accounts:&Accounts)->bool{accounts.entries.iter().any(|entry|entry.id==accounts.active&&entry.kind=="offline")}
 pub(crate) fn offline_profile_selected()->Result<bool,String>{let _guard=account_lock().lock().map_err(|_|"Biblioteca de cuentas ocupada")?;Ok(offline_selected(&read_accounts()?))}
 pub(crate) fn validate_offline_name(name:&str)->Result<(),String>{if !(3..=16).contains(&name.len())||!name.bytes().all(|byte|byte.is_ascii_alphanumeric()||byte==b'_'){return Err("El nick debe tener de 3 a 16 letras, números o guiones bajos".into());}Ok(())}
@@ -603,6 +651,7 @@ pub fn add_offline_account(name: String) -> Result<AccountSummary, String> {
         .lock()
         .map_err(|_| "Biblioteca de cuentas ocupada")?;
     let mut accounts = read_accounts()?;
+    require_offline_for(&accounts)?;
     let id = format!(
         "offline-{}",
         uuid::Uuid::new_v3(
@@ -623,7 +672,7 @@ pub fn add_offline_account(name: String) -> Result<AccountSummary, String> {
         kind: "offline".into(),
         active: false,
         avatar_url: format!("https://mc-heads.net/avatar/{name}/64"),
-        status: "Perfil local sin autenticación".into(),
+        status: "Offline Mode tras verificar una cuenta Microsoft con licencia".into(),
     };
     accounts.entries.push(account.clone());
     save_accounts(&accounts)?;
@@ -671,6 +720,9 @@ pub async fn activate_launcher_account(
         .find(|entry| entry.id == id)
         .cloned()
         .ok_or("Cuenta no encontrada")?;
+    if account.kind == "offline" {
+        require_offline_for(&previous_accounts)?;
+    }
     let old_session = auth.session.lock().map_err(|_| "Cuenta ocupada")?.clone();
     let active_file = crate::root_dir()?.join("account.dat");
     let old_file = optional_file(&active_file)?;
@@ -715,6 +767,13 @@ pub async fn activate_launcher_account(
         }
         Err(error) => {
             let mut rollback = Vec::new();
+            if account.kind == "microsoft" && (crate::microsoft_oauth::is_reauthentication_error(&error) || crate::account_licensing::is_license_denied(&error)) {
+                if let Some(profile_id) = id.strip_prefix("microsoft-") {
+                    if let Err(reason) = crate::account_licensing::forget_verified(profile_id) {
+                        rollback.push(format!("No se pudo invalidar la verificación local: {reason}"));
+                    }
+                }
+            }
             if let Err(reason) = restore_file(&active_file, old_file.as_deref()) {
                 rollback.push(reason);
             }
@@ -1279,13 +1338,34 @@ mod tests {
         }
     }
     #[test]
-    fn local_profiles_do_not_require_or_claim_microsoft_entitlements(){
-        let mut accounts=Accounts::default();let eligibility=offline_eligibility_for(&accounts);
-        assert!(eligibility.allowed);assert!(eligibility.verified_at.is_none());assert!(eligibility.expires_at.is_none());assert!(!offline_selected(&accounts));
-        accounts.active="offline-example".into();accounts.entries.push(AccountSummary{id:accounts.active.clone(),name:"LocalPlayer".into(),kind:"offline".into(),active:false,avatar_url:String::new(),status:String::new()});
-        assert!(offline_selected(&accounts));accounts.entries[0].kind="microsoft".into();assert!(!offline_selected(&accounts));
+    fn local_profiles_require_verified_saved_microsoft_evidence(){
+        let now=10_000_000;
+        let mut accounts=Accounts::default();let eligibility=offline_eligibility_with(&accounts,now,|_|Some(now));
+        assert!(!eligibility.allowed);assert_eq!(eligibility.message,OFFLINE_SIGNIN_REQUIRED);assert!(eligibility.verified_at.is_none());assert!(eligibility.expires_at.is_none());assert!(!offline_selected(&accounts));
+        accounts.active=format!("offline-{}","b".repeat(32));accounts.entries.push(AccountSummary{id:accounts.active.clone(),name:"LocalPlayer".into(),kind:"offline".into(),active:false,avatar_url:String::new(),status:String::new()});
+        assert!(offline_selected(&accounts));assert!(!offline_eligibility_with(&accounts,now,|_|Some(now)).allowed);
+        let microsoft=AccountSummary{id:format!("microsoft-{}","a".repeat(32)),name:"LicensedPlayer".into(),kind:"microsoft".into(),active:false,avatar_url:String::new(),status:String::new()};
+        accounts.entries.push(microsoft);
+        assert!(!offline_eligibility_with(&accounts,now,|_|None).allowed);
+        let eligible=offline_eligibility_with(&accounts,now,|_|Some(now-5));
+        assert!(eligible.allowed);assert_eq!(eligible.verified_at,Some(now-5));assert_eq!(eligible.expires_at,Some(crate::account_licensing::offline_expires_at(now-5)));
+        assert!(!offline_eligibility_with(&accounts,now,|_|Some(now+1)).allowed);
+        assert!(!offline_eligibility_with(&accounts,now,|_|Some(now-31*24*60*60)).allowed);
+        accounts.entries.retain(|entry|entry.kind!="microsoft");
+        assert!(!offline_eligibility_with(&accounts,now,|_|Some(now)).allowed);
         for name in ["Steve","Local_Player","User123"]{assert!(validate_offline_name(name).is_ok());}
         for name in ["","ab","with space","../profile","abcdefghijklmnopq"]{assert!(validate_offline_name(name).is_err());}
+    }
+    #[cfg(windows)]
+    #[test]
+    fn offline_proof_requires_a_decryptable_dpapi_token_file(){
+        let scratch=Scratch::new();let file=scratch.0.join("token.dat");
+        assert!(!usable_saved_token(&file));
+        fs::write(&file,b"not-dpapi").unwrap();assert!(!usable_saved_token(&file));
+        fs::write(&file,crate::token_storage::protect(b"").unwrap()).unwrap();assert!(!usable_saved_token(&file));
+        fs::write(&file,crate::token_storage::protect(b"fixture-refresh-token").unwrap()).unwrap();assert!(usable_saved_token(&file));
+        fs::remove_file(&file).unwrap();assert!(!usable_saved_token(&file));
+        fs::create_dir(&file).unwrap();assert!(!usable_saved_token(&file));
     }
     #[test]
     fn settings_default_gc_and_update_validation_are_consistent() {

@@ -1,6 +1,6 @@
 {
   "name": "launchertps",
-  "version": "0.1.3",
+  "version": "0.1.0",
   "description": "TP LAUNCHER · Minecraft Java, contenido y creación",
   "type": "module",
   "scripts": {

@@ -18,6 +18,6 @@ La instalación conserva las páginas de licencia GPL, destino, menú Inicio, re
 
 `npm run tauri build` compila primero el tema nativo x86 de NSIS con las herramientas C++ de Visual Studio, después los conectores, la interfaz y el instalador. Los objetos y DLL generados quedan en `installer/build`, ignorado por Git. La compresión LZMA por archivo evita tener que descomprimir todo el paquete para cargar un recurso tardío del asistente.
 
-La salida actual es `src-tauri/target/release/bundle/nsis/TP LAUNCHER_0.1.3_x64-setup.exe`. Las pruebas de páginas previas no instalan la aplicación. Un ejecutable de prueba que use un recurso WebView2 simulado no es un instalador distribuible.
+La salida actual es `src-tauri/target/release/bundle/nsis/TP LAUNCHER_0.1.0_x64-setup.exe`. Las pruebas de páginas previas no instalan la aplicación. Un ejecutable de prueba que use un recurso WebView2 simulado no es un instalador distribuible.
 
 No se dispone de certificado de firma Authenticode. Compilar y comprobar malware no establece reputación SmartScreen; no se garantiza que Windows deje de avisar sobre un programa nuevo sin firma. No se añaden exclusiones ni se desactiva ninguna protección.

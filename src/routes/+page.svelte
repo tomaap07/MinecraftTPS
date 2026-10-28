@@ -1229,7 +1229,7 @@
     if(patch.backgroundUrl!==undefined)backgroundUrl=await invoke<string>("set_custom_background",{imageBase64:patch.backgroundUrl});
     saveConfig();
   }
-  async function refreshAccounts(){try{accounts=await invoke<AccountSummary[]>("list_launcher_accounts");const eligibility=await invoke<{allowed:boolean;message:string}>("get_offline_eligibility");offlineAllowed=eligibility.allowed;offlineMessage=eligibility.message;const offline=accounts.find(a=>a.active&&a.kind==="offline");if(offline&&!microsoftProfile)username=offline.name;}catch(error){addConsoleLine("stderr",String(error));}}
+  async function refreshAccounts(){try{accounts=await invoke<AccountSummary[]>("list_launcher_accounts");const eligibility=await invoke<{allowed:boolean;message:string}>("get_offline_eligibility");offlineAllowed=eligibility.allowed;offlineMessage=eligibility.message;if(!offlineAllowed&&!microsoftProfile)showWizard=true;const offline=accounts.find(a=>a.active&&a.kind==="offline");if(offline&&!microsoftProfile)username=offline.name;}catch(error){addConsoleLine("stderr",String(error));}}
   async function activateAccount(id:string){const result=await invoke<{account:AccountSummary;profile:MicrosoftProfile|null}>("activate_launcher_account",{id});microsoftProfile=result.profile;username=result.account.name;saveConfig();await refreshAccounts();void refreshMods();}
   async function addOfflineAccount(name:string){const account=await invoke<AccountSummary>("add_offline_account",{name});await activateAccount(account.id);}
   async function removeAccount(id:string){const wasActive=accounts.find(account=>account.id===id)?.active;await invoke("remove_launcher_account",{id});if(wasActive){microsoftProfile=null;username="Steve";saveConfig();}await refreshAccounts();}
@@ -1570,7 +1570,7 @@
   {/if}
   </div>
   <ExportReportDialog report={exportReport} onclose={()=>exportReport=null}/>
-  {#if showWizard}<SetupWizard {settings} onchange={changeSettings} {appearance} onappearance={changeAppearance} {themes} runtimes={javaRuntimes} onscanjava={refreshJavaRuntimes} oninstalljava={installJavaVersion} onconnectmicrosoft={addMicrosoftAccount} onaddoffline={addOfflineAccount} oncomplete={finishWizard} {totalMemoryGb} accountName={microsoftProfile?.name}/>{/if}
+  {#if showWizard}<SetupWizard {settings} onchange={changeSettings} {appearance} onappearance={changeAppearance} {themes} runtimes={javaRuntimes} onscanjava={refreshJavaRuntimes} oninstalljava={installJavaVersion} onconnectmicrosoft={addMicrosoftAccount} onaddoffline={addOfflineAccount} oncomplete={finishWizard} {totalMemoryGb} accountName={microsoftProfile?.name} localAccountName={username} {offlineAllowed} {offlineMessage}/>{/if}
 </main>
 
 <style>

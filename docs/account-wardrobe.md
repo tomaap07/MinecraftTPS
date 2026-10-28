@@ -2,14 +2,22 @@
 
 El apartado **Cuenta** reúne el perfil oficial, el visor 3D, la biblioteca local y las capas que pertenecen a la cuenta Microsoft conectada.
 
+## Cuenta verificada y Offline Mode
+
+El asistente comienza con Microsoft y exige confirmar la licencia de Minecraft Java. El acceso al modo sin conexión requiere que el equipo conserve una cuenta Microsoft guardada con credencial DPAPI descifrable y un registro cifrado de licencia Java vigente. La política de revalidación del launcher es de 30 días.
+
+Sin esa evidencia, crear o activar perfiles locales permanece bloqueado y muestra **«Para utilizar perfiles locales, debes iniciar sesión con una cuenta Microsoft al menos una vez en este equipo»**. El mismo requisito se valida en Rust al lanzar, incluidos los perfiles antiguos. Se incluye un enlace verde a la [tienda oficial de Minecraft](https://www.minecraft.net/es-es/store/minecraft-deluxe-collection-pc?tabs=%7B%22details%22%3A0%7D).
+
+Una vez cumplido el requisito, el propietario puede crear y gestionar sus perfiles locales. Estos no autentican una sesión ante servidores que exigen la cuenta oficial. Importar o previsualizar una skin por nombre de usuario es una función visual y no acredita propiedad de la cuenta consultada.
+
 ## Añadir y conservar skins
 
 - Arrastra un PNG a la zona de importación o pulsa **Subir archivo PNG**. Las dimensiones admitidas son 64 × 64 y 64 × 32, con un máximo de 2 MB.
 - Selecciona **Clásico (4 px)** o **Slim (3 px)** antes de importar el PNG. Este dato se conserva con la skin.
-- Para importar una skin pública, escribe un nick premium y pulsa **Importar**. Rust resuelve primero la identidad de Mojang y consulta su textura pública. Si falla la descarga de la textura, prueba MCHeads y Minotar usando el UUID ya resuelto.
+- Para importar una skin pública, escribe un nombre de usuario registrado y pulsa **Importar**. Rust resuelve primero la identidad de Mojang y consulta su textura pública. Si falla la descarga de la textura, prueba MCHeads y Minotar usando el UUID ya resuelto.
 - **Guardar skin actual en el armario** conserva el diseño del perfil activo; en modo offline guarda la textura que se muestra para el nick o el personaje predeterminado.
 
-La colección se guarda en `%APPDATA%\MinecraftTPS\skins_library\`. Cada PNG tiene un UUID como nombre de archivo. `skins.json` contiene el nombre visible, el modelo y la fecha; el índice no contiene credenciales. Los cambios del índice se escriben primero a un archivo temporal y se reemplazan al terminar.
+La colección se guarda en `skins_library/` dentro de la carpeta de datos de juego seleccionada: `%APPDATA%\LauncherTPS\` para instalaciones nuevas o `%APPDATA%\MinecraftTPS\` si se conserva el directorio anterior. Cada PNG tiene un UUID como nombre de archivo. `skins.json` contiene el nombre visible, el modelo y la fecha; el índice no contiene credenciales. Los cambios se escriben primero a un archivo temporal y se reemplazan al terminar.
 
 ## Previsualizar y sincronizar
 

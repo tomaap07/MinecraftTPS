@@ -27,6 +27,12 @@ Los datos del juego conservan `AppData/Roaming/MinecraftTPS` si ya existe. Las i
 
 ## Gestor de cuentas
 
+El primer inicio presenta Microsoft antes del idioma y Java. La conexión debe confirmar una licencia Java de Minecraft y obtener el perfil oficial. El modo de perfiles locales solo se habilita con una cuenta Microsoft guardada cuya credencial DPAPI pueda descifrarse y que tenga un comprobante cifrado de licencia vigente. Un perfil antiguo o metadatos de cuenta por sí solos no satisfacen el requisito.
+
+La política del launcher revalida esa licencia cada 30 días. Al faltar evidencia apta, la interfaz muestra **«Para utilizar perfiles locales, debes iniciar sesión con una cuenta Microsoft al menos una vez en este equipo»**, y Rust bloquea creación, activación y lanzamiento locales. Después de verificar, se permite gestionar los perfiles locales dentro del armario. La opción no produce una sesión válida en servidores que necesitan autenticación Microsoft.
+
+El bloque de compra enlaza a la tienda oficial de Minecraft en verde. Los errores de Microsoft, Xbox o Minecraft Services se propagan al panel: una respuesta incompleta o HTTP 403 no debe presentarse como «Listo» ni como una cuenta conectada.
+
 La biblioteca estable se guarda en `AppData/Roaming/LauncherTPS/accounts.json` y sus credenciales en `accounts/<id>.dat`, fuera de la carpeta de juego configurable. Cada `.dat` es una copia de la credencial Microsoft que el sistema existente protege mediante DPAPI de Windows. La biblioteca JSON contiene solamente identidad, estado y avatar: las APIs de cuentas no devuelven refresh tokens.
 
 Si había una biblioteca anterior en la carpeta de datos, se copian únicamente su JSON y las pequeñas credenciales cifradas. Los originales permanecen disponibles y no se mueven archivos del juego. Los archivos de credenciales tienen un límite de 64 KiB; la biblioteca admite hasta 128 cuentas y 1 MiB de metadatos.
@@ -37,7 +43,7 @@ Las operaciones de activación y eliminación se coordinan con el mismo bloqueo 
 
 ## Java y Discord
 
-El diagnóstico de Java acepta una ruta absoluta al ejecutable o a la carpeta del JDK. En Windows acepta rutas con espacios y comillas exteriores, y utiliza `java.exe` cuando se seleccionó `javaw.exe` con ese binario disponible al lado. Ejecuta solamente `-version`, oculta la consola auxiliar y limita la espera a ocho segundos.
+El diagnóstico de Java acepta una ruta absoluta al ejecutable o a la carpeta del JDK. En Windows acepta rutas con espacios y comillas exteriores, y utiliza `java.exe` cuando se seleccionó `javaw.exe` con ese binario disponible al lado. Ejecuta solamente `-version`, oculta la consola auxiliar y limita el sondeo a cuatro segundos; los resultados se reutilizan mientras el ejecutable no cambie.
 
 El campo `gc_mode` conserva `g1gc` de forma predeterminada al leer ajustes anteriores. Los únicos valores admitidos son `g1gc` y `zgc`; el lanzamiento valida por separado la compatibilidad de Java. La RAM global admite entre 2 y 128 GiB.
 
@@ -46,6 +52,8 @@ Discord Rich Presence está desactivado por defecto. Requiere un identificador d
 ## Actualizaciones
 
 El comprobador consulta la última versión pública de [GitHub Releases del proyecto](https://github.com/tomaap07/MinecraftTPS/releases), compara versiones con SemVer y presenta el instalador compatible para Windows. Si no hay una publicación, lo indica sin simular una actualización.
+
+La publicación 0.1.0 de la política Microsoft-first es una renumeración. Los usuarios de las compilaciones de desarrollo 0.1.1–0.1.3 deben instalarla manualmente, porque una comparación SemVer no ofrece una versión inferior como actualización. La retirada de publicaciones obsoletas no altera el historial de Git.
 
 La API de descarga obtiene nuevamente los metadatos oficiales y exige un instalador `.exe`/`.msi` con `digest` SHA-256 publicado por GitHub, URL HTTPS del repositorio y tamaño de hasta 512 MiB. Las redirecciones se restringen a los servidores oficiales de archivos de GitHub. Se escribe un archivo temporal, se comprueban tamaño y hash y solamente entonces se confirma en `LauncherTPS/updates`.
 

@@ -1414,9 +1414,18 @@ async fn ensure_microsoft_session(auth: &AuthState) -> Result<Option<MinecraftPr
             .session
             .lock()
             .map_err(|_| "Estado de cuenta bloqueado")? = None;
+        launcher_settings::require_offline_eligibility()?;
         return Ok(None);
     }
-    ensure_microsoft_session_locked(auth).await
+    let result = ensure_microsoft_session_locked(auth).await;
+    if result.as_ref().err().is_some_and(|error| microsoft_oauth::is_reauthentication_error(error) || account_licensing::is_license_denied(error)) {
+        for account in launcher_settings::list_launcher_accounts()?.into_iter().filter(|account| account.active && account.kind == "microsoft") {
+            if let Some(id) = account.id.strip_prefix("microsoft-") {
+                account_licensing::forget_verified(id)?;
+            }
+        }
+    }
+    result
 }
 
 async fn ensure_microsoft_session_locked(
@@ -3808,6 +3817,7 @@ async fn launch_game_session(
         return Err("Debes ingresar un nombre de usuario (Nick).".into());
     }
     if session.is_none() {
+        launcher_settings::require_offline_eligibility()?;
         launcher_settings::validate_offline_name(&username)?;
     }
     if !(2..=128).contains(&ram_gb) {
