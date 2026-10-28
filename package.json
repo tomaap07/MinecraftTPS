@@ -1,6 +1,6 @@
 {
   "name": "launchertps",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "TP LAUNCHER · Minecraft Java, contenido y creación",
   "type": "module",
   "scripts": {
@@ -16,7 +16,8 @@
     "tauri": "tauri",
     "build:bridge": "node scripts/build-bridge.mjs",
     "test:hud": "node scripts/test-hud-metrics.mjs && node scripts/test-bridge.mjs",
-    "build:installer-ui": "node scripts/build-installer-ui.mjs"
+    "build:installer-ui": "node scripts/build-installer-ui.mjs",
+    "build:signed": "node scripts/build-signed-windows.mjs"
   },
   "license": "GPL-3.0-only",
   "dependencies": {

@@ -41,6 +41,7 @@ mod launcher_tools;
 mod loader_catalogs;
 mod managed_addons;
 mod microsoft_oauth;
+mod microsoft_services;
 mod mod_studio;
 mod optifine_discovery;
 mod poser;
@@ -1353,99 +1354,16 @@ async fn minecraft_profile(
 async fn minecraft_session_from_microsoft_token(
     client: &reqwest::Client,
     microsoft_token: &str,
-) -> Result<(MinecraftProfile, String, String), String> {
-    let tickets = [
-
-        format!("d={microsoft_token}"),
-        microsoft_token.to_owned(),
-        format!("t={microsoft_token}"),
-    ];
-    let mut xbl = None;
-    for ticket in tickets {
-        let response = client
-            .post("https://user.auth.xboxlive.com/user/authenticate")
-            .header(reqwest::header::CONTENT_TYPE, "application/json")
-            .header(reqwest::header::ACCEPT, "application/json")
-            .header("x-xbl-contract-version", "1")
-            .json(&serde_json::json!({
-                "Properties": {
-                    "AuthMethod": "RPS",
-                    "SiteName": "user.auth.xboxlive.com",
-                    "RpsTicket": ticket
-                },
-                "RelyingParty": "http://auth.xboxlive.com",
-                "TokenType": "JWT"
-            }))
-            .send()
-            .await
-            .map_err(|e| e.to_string())?;
-        if matches!(
-            response.status(),
-            reqwest::StatusCode::UNAUTHORIZED | reqwest::StatusCode::BAD_REQUEST
-        ) {
-            continue;
-        }
-        if !response.status().is_success() {
-            let status = response.status();
-            return Err(format!(
-                "Xbox Live rechazó la cuenta (HTTP {}). Revisa el acceso Xbox de tu propia aplicación y las restricciones de la cuenta. La respuesta privada no se registra.",
-                status.as_u16()
-            ));
-        }
-        xbl = Some(
-            response
-                .json::<serde_json::Value>()
-                .await
-                .map_err(|e| e.to_string())?,
-        );
-        break;
-    }
-    let xbl = xbl.ok_or("Xbox Live rechazó la solicitud con los formatos d=, token puro y t=. Revisa los permisos de Xbox de la aplicación Microsoft propia.")?;
-    let xbl_token = xbl["Token"].as_str().ok_or("Xbox Live no devolvió token")?;
-    let user_hash = xbl
-        .pointer("/DisplayClaims/xui/0/uhs")
-        .and_then(|value| value.as_str())
-        .ok_or("Xbox Live no devolvió user hash")?;
-    let xuid = xbl
-        .pointer("/DisplayClaims/xui/0/xid")
-        .and_then(|value| value.as_str())
-        .unwrap_or_default()
-        .to_owned();
-    let xsts: serde_json::Value = client
-        .post("https://xsts.auth.xboxlive.com/xsts/authorize")
-        .json(&serde_json::json!({"Properties":{"SandboxId":"RETAIL","UserTokens":[xbl_token]},"RelyingParty":"rp://api.minecraftservices.com/","TokenType":"JWT"}))
-        .send()
-        .await
-        .map_err(|e| e.to_string())?
-        .error_for_status()
-        .map_err(|e| format!("Xbox XSTS rechazó la cuenta: {e}"))?
-        .json()
-        .await
-        .map_err(|e| e.to_string())?;
-    let xsts_token = xsts["Token"]
-        .as_str()
-        .ok_or("Xbox no devolvió token XSTS")?;
-    let minecraft: serde_json::Value = client
-        .post("https://api.minecraftservices.com/authentication/login_with_xbox")
-        .json(&serde_json::json!({
-            "identityToken": format!("XBL3.0 x={user_hash};{xsts_token}")
-        }))
-        .send()
-        .await
-        .map_err(|e| e.to_string())?
-        .error_for_status()
-        .map_err(|e| format!("Minecraft no aceptó la cuenta: {e}"))?
-        .json()
-        .await
-        .map_err(|e| e.to_string())?;
-    let minecraft_token = minecraft["access_token"]
-        .as_str()
-        .ok_or("Minecraft no devolvió access_token")?
-        .to_owned();
-    account_licensing::verify(client, &minecraft_token).await?;
-    let profile = minecraft_profile(client, &minecraft_token).await?;
+    notify: impl Fn(&str),
+) -> Result<(MinecraftProfile, String, String, u64), String> {
+    let token = microsoft_services::exchange(client, microsoft_token, &notify).await?;
+    let expires_at = unix_time_seconds().saturating_add(token.expires_in);
+    notify("Verificando la licencia de Minecraft Java…");
+    account_licensing::verify(client, &token.access_token).await?;
+    notify("Cargando el perfil, la skin y las capas…");
+    let profile = minecraft_profile(client, &token.access_token).await?;
     account_licensing::remember_verified(&profile)?;
-    Ok((profile, minecraft_token, xuid))
+    Ok((profile, token.access_token, token.xuid, expires_at))
 }
 
 #[tauri::command]
@@ -1453,23 +1371,22 @@ async fn begin_microsoft_login(
     app: AppHandle,
     auth: State<'_, AuthState>,
 ) -> Result<MinecraftProfile, String> {
+    let notify = |message: &str| { let _ = app.emit("microsoft-login-progress", message); };
     let token_response = microsoft_oauth::login(&app).await?;
-    let client = reqwest::Client::builder()
-        .timeout(std::time::Duration::from_secs(30))
-        .build()
-        .map_err(|e| e.to_string())?;
+    let client = microsoft_services::client()?;
     let microsoft_token = token_response["access_token"]
         .as_str()
         .ok_or("Microsoft no devolvió access_token")?;
     let refresh_token = token_response["refresh_token"]
         .as_str()
         .ok_or("Microsoft no devolvió refresh_token; vuelve a autorizar la cuenta para mantener la sesión entre reinicios.")?;
-    let (profile, minecraft_token, xuid) =
-        minecraft_session_from_microsoft_token(&client, microsoft_token).await?;
+    let (profile, minecraft_token, xuid, expires_at) =
+        minecraft_session_from_microsoft_token(&client, microsoft_token, &notify).await?;
     let _auth_guard = auth.refresh_lock.lock().await;
     launcher_settings::remember_current(&auth)?;
     token_storage::save_refresh_token(refresh_token)?;
-    let expires_at = unix_time_seconds() + token_response["expires_in"].as_u64().unwrap_or(86400);
+    notify("Guardando la cuenta de forma segura…");
+    launcher_settings::remember_profile(&profile)?;
     *auth
         .session
         .lock()
@@ -1480,7 +1397,6 @@ async fn begin_microsoft_login(
         xuid,
         expires_at,
     });
-    launcher_settings::remember_profile(&profile)?;
     Ok(profile)
 }
 
@@ -1530,7 +1446,7 @@ async fn ensure_microsoft_session_locked(
             }
         }
     };
-    let client = reqwest::Client::new();
+    let client = microsoft_services::client()?;
     let token_response = microsoft_oauth::refresh(&refresh_token).await?;
     let microsoft_token = token_response["access_token"]
         .as_str()
@@ -1539,15 +1455,15 @@ async fn ensure_microsoft_session_locked(
         .as_str()
         .unwrap_or(&refresh_token)
         .to_owned();
-    let (profile, access_token, xuid) =
-        minecraft_session_from_microsoft_token(&client, microsoft_token).await?;
+    let (profile, access_token, xuid, expires_at) =
+        minecraft_session_from_microsoft_token(&client, microsoft_token, |_| {}).await?;
     token_storage::save_refresh_token(&rotated_refresh)?;
     let session = MicrosoftSession {
         profile: profile.clone(),
         access_token,
         refresh_token: rotated_refresh,
         xuid,
-        expires_at: unix_time_seconds() + token_response["expires_in"].as_u64().unwrap_or(86400),
+        expires_at,
     };
     *auth
         .session

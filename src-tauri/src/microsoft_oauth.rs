@@ -2,7 +2,7 @@
 use base64::Engine;
 use futures_util::StreamExt;
 use sha2::{Digest, Sha256};
-use tauri::AppHandle;
+use tauri::{AppHandle, Emitter};
 use tauri_plugin_opener::OpenerExt;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 pub const SCOPE: &str = "XboxLive.signin offline_access";
@@ -162,7 +162,7 @@ pub async fn login(app: &AppHandle) -> Result<serde_json::Value, String> {
    let mut request=Vec::new();let mut block=[0u8;1024];let received=tokio::time::timeout(std::time::Duration::from_secs(5),async{while request.len()<16384{let n=stream.read(&mut block).await.map_err(|e|e.to_string())?;if n==0{break;}request.extend_from_slice(&block[..n]);if request.windows(4).any(|v|v==b"\r\n\r\n"){return Ok::<_,String>(());}}Err("Redirección incompleta".into())}).await;
    if !matches!(received,Ok(Ok(()))){continue;}
    let text=String::from_utf8_lossy(&request);let result=request_callback(&text,&state);
-   let body=if result.is_ok(){"Respuesta de Microsoft recibida. Vuelve a TP LAUNCHER para comprobar la cuenta y su licencia. Puedes cerrar esta pestana."}else{"Solicitud no valida. Vuelve a TP LAUNCHER para iniciar una nueva solicitud."};
+   let body=if result.is_ok(){"Microsoft respondio. La cuenta TODAVIA NO esta conectada a Minecraft: TP LAUNCHER debe verificar Xbox, Minecraft Services, la licencia y el perfil. Vuelve al launcher para consultar el resultado final. Puedes cerrar esta pestana."}else{"Solicitud no valida. Vuelve a TP LAUNCHER para iniciar una nueva solicitud."};
    let reply=format!("HTTP/1.1 {}\r\nContent-Type: text/plain; charset=utf-8\r\nCache-Control: no-store\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{body}",if result.is_ok(){"200 OK"}else{"400 Bad Request"},body.len());let _=stream.write_all(reply.as_bytes()).await;let _=stream.shutdown().await;
 
 
@@ -170,6 +170,7 @@ pub async fn login(app: &AppHandle) -> Result<serde_json::Value, String> {
   }
  }).await.map_err(|_|"Se agotó el tiempo para iniciar sesión con Microsoft")??;
     drop(listener);
+    let _ = app.emit("microsoft-login-progress", "Microsoft respondió. Canjeando la autorización…");
     token(&[
         ("client_id", &client),
         ("grant_type", "authorization_code"),

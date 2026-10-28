@@ -983,14 +983,18 @@
   }
 
   async function connectMicrosoft() {
+    if (loginBusy) throw new Error("Ya hay una conexión Microsoft en curso.");
     loginBusy = true; loginMessage = "Abriendo el inicio de sesión seguro de Microsoft…";
+    let unlisten: (() => void) | undefined;
     try {
+      unlisten = await listen<string>("microsoft-login-progress", event => { if (loginBusy) loginMessage = event.payload; }).catch(() => undefined);
       const profile = await invoke<MicrosoftProfile>("begin_microsoft_login");
+      if (!profile || !/^[a-f0-9]{32}$/i.test(profile.id) || !/^[A-Za-z0-9_]{3,16}$/.test(profile.name) || !Array.isArray(profile.skins) || !Array.isArray(profile.capes)) throw new Error("Minecraft no devolvió un perfil válido. La cuenta no se conectó.");
       microsoftProfile = profile; username = profile.name; saveConfig();
       loginMessage = `Sesión iniciada como ${profile.name}.`;
       await refreshAccounts();
-    } catch (err) { loginMessage = String(err); const line = `Inicio de sesión Microsoft: ${String(err)}`; void invoke("record_launcher_log", { stream: "stderr", line }).catch(() => addConsoleLine("stderr", line)); }
-    finally { loginBusy = false; }
+    } catch (err) { loginMessage = String(err); const line = `Inicio de sesión Microsoft: ${String(err)}`; void invoke("record_launcher_log", { stream: "stderr", line }).catch(() => addConsoleLine("stderr", line)); throw new Error(loginMessage); }
+    finally { unlisten?.(); loginBusy = false; }
   }
 
   async function signOutMicrosoft() {
@@ -1533,7 +1537,7 @@
     {:else if activeTab === "plugins"}
       <PluginsPanel />
     {:else if activeTab === "skins"}
-      <AccountWardrobe fallbackSkinUrl={accountSkinFallback} profile={microsoftProfile} skinUrl={activeSkinUrl} capeUrl={activeCapeUrl} model={activeSkinModel} {username} {loginBusy} {loginMessage} {offlineAllowed} {offlineMessage} onlogin={() => void connectMicrosoft()} onlogout={() => void signOutMicrosoft()} onoffline={() => void useOfflineMode()} onprofile={updateMicrosoftProfile} onpreview={previewLocalSkin} onposer={() => activeTab="poser"} />
+      <AccountWardrobe fallbackSkinUrl={accountSkinFallback} profile={microsoftProfile} skinUrl={activeSkinUrl} capeUrl={activeCapeUrl} model={activeSkinModel} {username} {loginBusy} {loginMessage} {offlineAllowed} {offlineMessage} onlogin={() => void connectMicrosoft().catch(() => {})} onlogout={() => void signOutMicrosoft()} onoffline={() => void useOfflineMode()} onprofile={updateMicrosoftProfile} onpreview={previewLocalSkin} onposer={() => activeTab="poser"} />
       <SocialProfile fallbackSkinUrl={accountSkinFallback} playerId={microsoftProfile?.id??`offline:${username.toLowerCase()}`} name={username} skinUrl={activeSkinUrl} capeUrl={activeCapeUrl} model={activeSkinModel} paused={$isGameRunning}/>
     {:else if activeTab === "poser"}
       <PoseStudio fallbackSkinUrl={accountSkinFallback} skinUrl={activeSkinUrl} capeUrl={activeCapeUrl} model={activeSkinModel} onclose={() => activeTab="jugar"} />

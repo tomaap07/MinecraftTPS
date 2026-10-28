@@ -1,5 +1,15 @@
 # Microsoft y perfiles desconectados
 
+## Rechazo de Minecraft Services después del login de Microsoft
+
+En los registros de la versión 0.1.2 se observó un HTTP 403 al llamar a `authentication/login_with_xbox`, después de Microsoft y Xbox. Un error de esta etapa impide obtener el token de Minecraft y no debe mostrarse como una cuenta conectada. Ajustes mostraba «Listo» porque la interfaz capturaba el error sin rechazar la operación; esto se corrige en 0.1.3 para Ajustes, Cuenta y el asistente inicial.
+
+Las aplicaciones nuevas deben solicitar el acceso a Minecraft Services. Registrar la aplicación en Entra y obtener un token de Microsoft son pasos diferentes de esta aprobación. El HTTP 403 es compatible con una aplicación pendiente de aprobación; por sí solo no prueba esa causa ni que falte la licencia del usuario. Si la aplicación ya está aprobada, hay que revisar el rechazo con el soporte del servicio.
+
+Formulario de revisión: https://aka.ms/mce-reviewappid. El titular debe indicar TP LAUNCHER, el Client ID propio registrado y la información del proyecto que solicite el formulario. No se ha enviado esta solicitud en nombre del titular ni se considera concedido el acceso. La biblioteca documenta el requisito y enlaza el formulario: https://minecraft-launcher-lib.readthedocs.io/en/stable/tutorial/microsoft_login.html#apply-for-permission.
+
+La página de retorno del navegador solo confirma la recepción de la autorización de Microsoft. El resultado definitivo está en el launcher, después de Xbox/XSTS, Minecraft Services, licencia, perfil y almacenamiento protegido. El progreso no incluye tokens ni respuestas privadas.
+
 TP LAUNCHER usa el identificador público de aplicación que facilitó su autor:
 `6a4f8732-6bf7-49c3-a749-16607f97281d`. Este es el valor predeterminado del
 backend y se puede sustituir por otro registro propio con `VITE_MS_CLIENT_ID`.
