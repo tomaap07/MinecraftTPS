@@ -1,0 +1,1 @@
+{"required":true,"package":"dev.tplauncher.client.mixin","compatibilityLevel":"JAVA_21","client":["GameRendererMixin","MouseMixin","SkinMixin"],"injectors":{"defaultRequire":1}}
