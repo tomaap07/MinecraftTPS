@@ -18,7 +18,7 @@ Sin una cuenta apta, la opción permanece deshabilitada con el aviso: **«Para u
 
 ¿Necesitas adquirir Minecraft? Visita la [tienda oficial de Minecraft](https://www.minecraft.net/es-es/store/minecraft-deluxe-collection-pc?tabs=%7B%22details%22%3A0%7D).
 
-**La revisión de acceso a Minecraft Services está en curso y no hay aprobación confirmada.** El registro ha mostrado HTTP 403 en esa etapa, después de Microsoft y Xbox. El launcher informa del fallo en lugar de anunciar una cuenta conectada. Consulta la [guía de autenticación](docs/microsoft-client-configuration.md) y los [datos técnicos para la solicitud](docs/minecraft-services-request.md).
+**El titular recibió una notificación de aprobación de la lista de acceso de AppID con fecha 30 de octubre de 2026.** Un intento posterior todavía devuelve HTTP 403 en Minecraft Services; aún no se ha confirmado un inicio de sesión completo. El launcher informa del Client ID efectivo y distingue los rechazos reconocidos sin exponer credenciales. Consulta la [guía de autenticación](docs/microsoft-client-configuration.md) y los [datos técnicos de la solicitud](docs/minecraft-services-request.md). Aprobar el acceso a la API no implica avalar el launcher como producto.
 
 **TP LAUNCHER no es un producto oficial de Minecraft. No está aprobado por Mojang ni asociado con Microsoft.**
 

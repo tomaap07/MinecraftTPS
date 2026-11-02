@@ -1,6 +1,6 @@
 # Datos para solicitar acceso de TP LAUNCHER a Minecraft Services
 
-La solicitud la presenta el titular desde https://aka.ms/mce-reviewappid. El titular está preparando el formulario; este documento reúne datos técnicos para sus campos y no demuestra que se haya enviado o aprobado la solicitud.
+La solicitud la presenta el titular desde https://aka.ms/mce-reviewappid. El 2 de noviembre de 2026 compartió una notificación de aprobación de Mojang Enforcement fechada el 30 de octubre. El mensaje no enumera identificadores y el acceso completo sigue en diagnóstico por un HTTP 403 posterior. Este documento conserva los datos técnicos para contrastar el registro enviado y el que utiliza el launcher.
 
 - Nombre de aplicación: **TP LAUNCHER**.
 - Contacto público autorizado: **tplabs.contacto@gmail.com**.
@@ -15,7 +15,7 @@ La solicitud la presenta el titular desde https://aka.ms/mce-reviewappid. El tit
 - Contraseña: se introduce únicamente en la página de Microsoft, nunca en el launcher.
 - Persistencia: token de renovación cifrado por Windows DPAPI en el equipo del usuario, identificador y nombre de perfil; token de acceso Minecraft en memoria. No se incluyen tokens ni contraseñas en GitHub o en el instalador.
 - Repositorio del titular: https://github.com/tomaap07/MinecraftTPS. Repositorio público desde el 28 de octubre de 2026, después de revisar el código y su historial. El README principal está en inglés y enlaza la versión española; no se necesita hacer públicos los datos locales de los usuarios.
-- Diagnóstico observado: Microsoft y Xbox completan sus etapas, pero `authentication/login_with_xbox` devuelve HTTP 403. Se solicita revisar la autorización del identificador propio para Minecraft Services.
+- Diagnóstico observado: Microsoft y Xbox completan sus etapas, pero `authentication/login_with_xbox` devuelve HTTP 403 incluso después de la notificación de aprobación. El diagnóstico distingue motivos reconocidos e indica el Client ID efectivo, sin exponer la respuesta privada del servicio. No se considera completada la autenticación hasta verificar licencia y perfil.
 
 El contacto público autorizado es [tplabs.contacto@gmail.com](mailto:tplabs.contacto@gmail.com), además de [el perfil del mantenedor](https://github.com/tomaap07) y [las incidencias del proyecto](https://github.com/tomaap07/MinecraftTPS/issues). El nombre legal, correo del formulario, país, enlaces públicos, política de privacidad y cualquier dato comercial deben ser completados por el titular. No inventar datos ni publicar cuentas, configuración privada o secretos para completar la solicitud.
 

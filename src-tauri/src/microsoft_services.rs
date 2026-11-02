@@ -24,18 +24,31 @@ pub(crate) fn client() -> Result<reqwest::Client, String> {
 
 fn rejected(stage: &str, status: u16, value: &Value) -> String {
     let detail = match (stage, status, value["XErr"].as_u64()) {
-        ("Minecraft Services", 403, _) => "Microsoft y Xbox respondieron, pero Minecraft Services rechazó el acceso de TP LAUNCHER. Revisa la aprobación de tu Client ID para Minecraft Services en https://aka.ms/mce-reviewappid. Si ya está aprobado, revisa con soporte el rechazo del servicio. La sesión de Minecraft no se completó.",
+        ("Minecraft Services", 403, _) if value.pointer("/details/reason").and_then(Value::as_str) == Some("ACCOUNT_SUSPENDED") => "Minecraft Services informó una suspensión de la cuenta (ACCOUNT_SUSPENDED). Consulta al soporte de Minecraft; este rechazo no indica que falte aprobar la aplicación.",
+        ("Minecraft Services", 403, _) if value["errorMessage"].as_str().is_some_and(|message| message.trim().eq_ignore_ascii_case("Invalid app registration") || message.trim().to_ascii_lowercase().starts_with("invalid app registration, see https://aka.ms/")) => "Minecraft Services devolvió INVALID_APP_REGISTRATION. Compara el Client ID indicado abajo con el enviado en el formulario aprobado. Si coinciden, consulta al soporte de Minecraft adjuntando la aprobación y este diagnóstico. El launcher no puede modificar la lista de acceso del servicio.",
+        ("Minecraft Services", 403, _) => "Minecraft Services devolvió un rechazo HTTP 403 sin un motivo reconocido. Este estado por sí solo no demuestra que falte aprobar la aplicación ni que la cuenta carezca de licencia. Consulta al soporte de Minecraft con este diagnóstico y la confirmación de aprobación.",
+        ("Minecraft Services", 401, _) => "Minecraft Services no aceptó la autorización de Xbox. Vuelve a iniciar sesión con Microsoft para obtener una autorización nueva.",
         ("Xbox XSTS", _, Some(2148916233)) => "La cuenta necesita un perfil Xbox. Completa su configuración en xbox.com y vuelve a conectar.",
         ("Xbox XSTS", _, Some(2148916238)) => "Xbox solicita revisar la configuración de familia y los permisos de esta cuenta.",
         (_, 429, _) => "El servicio limitó temporalmente las solicitudes. Espera antes de intentarlo otra vez.",
         (_, 500..=599, _) => "El servicio no está disponible temporalmente. Inténtalo más tarde.",
         _ => "El servicio rechazó la autorización. Revisa los permisos de la aplicación y la configuración de la cuenta.",
     };
-    format!("{stage} (HTTP {status}): {detail}")
+    let mut message = format!("{stage} (HTTP {status}): {detail}");
+    if stage == "Minecraft Services" {
+        if let Ok(client_id) = crate::microsoft_oauth::client_id() {
+            message.push_str(&format!(" Client ID utilizado: {client_id}."));
+        }
+        message.push_str(" No se completó la sesión de Minecraft.");
+    }
+    message
 }
 
 async fn response_json(response: reqwest::Response, stage: &str) -> Result<Value, String> {
     let status = response.status();
+    let request_id = ["x-request-id", "x-ms-request-id", "request-id"]
+        .into_iter().filter_map(|name| response.headers().get(name)?.to_str().ok())
+        .find_map(|value| uuid::Uuid::parse_str(value).ok());
     let mut bytes = Vec::new();
     let mut stream = response.bytes_stream();
     while let Some(chunk) = stream.next().await {
@@ -44,7 +57,13 @@ async fn response_json(response: reqwest::Response, stage: &str) -> Result<Value
         bytes.extend_from_slice(&chunk);
     }
     let value = serde_json::from_slice(&bytes);
-    if !status.is_success() { return Err(rejected(stage, status.as_u16(), &value.unwrap_or(Value::Null))); }
+    if !status.is_success() {
+        let value = value.unwrap_or(Value::Null);
+        let request_id = request_id.or_else(|| value["requestId"].as_str().and_then(|id| uuid::Uuid::parse_str(id).ok()));
+        let mut message = rejected(stage, status.as_u16(), &value);
+        if let Some(id) = request_id { message.push_str(&format!(" Referencia del servicio: {id}.")); }
+        return Err(message);
+    }
     value.map_err(|_| format!("{stage}: respuesta inválida"))
 }
 
@@ -54,6 +73,7 @@ fn required(value: &Value, field: &str, stage: &str) -> Result<String, String> {
 }
 
 pub(crate) async fn exchange(client: &reqwest::Client, token: &str, notify: impl Fn(&str)) -> Result<MinecraftToken, String> {
+    notify(&format!("Aplicación Microsoft: {}", crate::microsoft_oauth::client_id()?));
     exchange_with(client, token, &ENDPOINTS, notify).await
 }
 
@@ -136,7 +156,32 @@ mod tests {
         let (url,server)=server(vec![(200,xbl()),(200,xsts()),(403,json!({"errorMessage":"private-fixture-never-display"}))]).await;
         let stages=Arc::new(Mutex::new(Vec::new()));let seen=stages.clone();
         let result=exchange_with(&client().unwrap(),"microsoft-fixture",&Endpoints{xbox:&url,xsts:&url,minecraft:&url}, move |v|seen.lock().unwrap().push(v.to_owned())).await;
-        let error=result.err().unwrap();assert!(error.contains("Minecraft Services (HTTP 403)"));assert!(error.contains("https://aka.ms/mce-reviewappid"));assert!(!error.contains("private-fixture"));assert_eq!(stages.lock().unwrap().len(),3);server.await.unwrap();
+        let error=result.err().unwrap();assert!(error.contains("Minecraft Services (HTTP 403)"));assert!(error.contains("sin un motivo reconocido"));assert!(!error.contains("INVALID_APP_REGISTRATION"));assert!(error.contains("Client ID utilizado:"));assert!(!error.contains("private-fixture"));assert_eq!(stages.lock().unwrap().len(),3);server.await.unwrap();
+    }
+    #[test]
+    fn minecraft_403_distinguishes_registration_and_account_rejections() {
+        let registration = rejected("Minecraft Services", 403, &json!({"errorMessage":"Invalid app registration, see https://aka.ms/AppRegInfo for more information"}));
+        assert!(registration.contains("INVALID_APP_REGISTRATION"));
+        assert!(registration.contains("formulario aprobado"));
+        assert!(!registration.contains("https://aka.ms/AppRegInfo"));
+        let suspended = rejected("Minecraft Services", 403, &json!({"details":{"reason":"ACCOUNT_SUSPENDED"},"errorMessage":"private-account-fixture"}));
+        assert!(suspended.contains("ACCOUNT_SUSPENDED"));
+        assert!(!suspended.contains("private-account-fixture"));
+        assert!(!suspended.contains("INVALID_APP_REGISTRATION"));
+        let unknown = rejected("Minecraft Services", 403, &json!({"errorMessage":"private-token-fixture Invalid app registration"}));
+        assert!(unknown.contains("sin un motivo reconocido"));
+        assert!(!unknown.contains("private-token-fixture"));
+    }
+    #[tokio::test]
+    async fn failure_exposes_only_a_valid_service_reference() {
+        for (reference, expected) in [("a53d92c3-5cb1-47d0-99fb-84117723051c",true),("secret-token-never-display",false)] {
+            let (url,server)=server(vec![(403,json!({"requestId":reference,"access_token":"private-fixture","errorMessage":"unrecognized-private-fixture"}))]).await;
+            let response = client().unwrap().post(url).json(&json!({})).send().await.unwrap();
+            let error = response_json(response,"Minecraft Services").await.unwrap_err();
+            assert_eq!(error.contains(reference),expected);
+            assert!(!error.contains("private-fixture"));
+            server.await.unwrap();
+        }
     }
     #[tokio::test]
     async fn rejected_tickets_retry_but_xsts_failure_stops_before_minecraft() {

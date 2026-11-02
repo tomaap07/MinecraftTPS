@@ -21,7 +21,7 @@ TP LAUNCHER is an independent Windows desktop launcher for **Minecraft: Java Edi
 
 TP LAUNCHER uses its own application registration. A client secret and another launcher's application ID are not distributed. The application does not provide an unverified account path to launch Minecraft. Creating or selecting a local gameplay profile is subject to the verified-account requirement in Rust and in the interface. A skin preview by username does not authenticate that username.
 
-**Service access review is in progress; approval has not been confirmed.** Microsoft sign-in and Xbox authentication are separate from permission to use Minecraft Services. The observed Minecraft Services HTTP 403 is documented in the [authentication guide](docs/microsoft-client-configuration.md). Failed authorization is reported as a failure, not a connected account. [Application-review technical details](docs/minecraft-services-request.md).
+**The owner received an AppID allow-list approval notification dated October 30, 2026.** A subsequent login still returned Minecraft Services HTTP 403; successful end-to-end access has not yet been confirmed. The launcher reports the effective client ID and distinguishes recognized service rejections without exposing credentials. See the [authentication guide](docs/microsoft-client-configuration.md) and [application-review technical details](docs/minecraft-services-request.md). API access approval does not endorse the launcher as a product.
 
 **TP LAUNCHER is not an official Minecraft product. It is not approved by Mojang or associated with Microsoft.**
 
