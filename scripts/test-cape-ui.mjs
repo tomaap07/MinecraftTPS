@@ -1,0 +1,63 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import {chromium} from 'playwright-core';
+const executablePath=['C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe','C:/Program Files/Microsoft/Edge/Application/msedge.exe'].find(fs.existsSync);
+assert.ok(executablePath,'Edge is required for desktop UI tests');
+const port=Number(process.env.TP_TEST_PORT??1420);
+assert.ok(Number.isInteger(port)&&port>=1024&&port<=65535);
+const browser=await chromium.launch({executablePath,headless:true,args:['--use-angle=swiftshader','--enable-unsafe-swiftshader','--no-first-run']});
+try{
+ const page=await browser.newPage({viewport:{width:1440,height:1000}});const errors=[];page.on('pageerror',error=>errors.push(error.message));
+ await page.addInitScript(()=>{
+  const canvas=document.createElement('canvas');canvas.width=64;canvas.height=32;const context=canvas.getContext('2d');context.fillStyle='#300050';context.fillRect(0,0,64,32);
+  let capes=[{id:'a'.repeat(64),name:'Test original',original:true,data_url:canvas.toDataURL('image/png')}];
+  const profile={id:'0123456789abcdef0123456789abcdef',name:'TestArtist',skins:[],capes:[]};
+  window.testCalls=[];
+  window.__TAURI_EVENT_PLUGIN_INTERNALS__={unregisterListener:()=>{}};
+  window.__TAURI_INTERNALS__={metadata:{currentWindow:{label:'main'},currentWebview:{label:'main'}},transformCallback:()=>1,unregisterCallback:()=>{},invoke:async(cmd,args={})=>{
+   window.testCalls.push({cmd,args});
+   if(cmd==='get_launcher_settings')return {language:'es-419',translate_dynamic_content:false,launch_behavior:'keep',data_root:'C:/TP-test',first_run_completed:true,ui_scale_percent:100,launcher_width:1440,launcher_height:1000,launcher_maximized:false,resolution_width:1280,resolution_height:720,ram_gb:4,discord_presence:false,automatic_updates:false};
+   if(cmd==='get_microsoft_profile')return profile;
+   if(cmd==='get_offline_eligibility')return {allowed:true,message:'Licencia verificada en entorno de prueba'};
+   if(cmd==='list_launcher_accounts')return [{id:'microsoft-'+profile.id,name:profile.name,kind:'microsoft',active:true}];
+   if(cmd==='get_game_session')return {running:false,active_games:0,username:'',version:'',server:''};
+   if(cmd==='get_system_locale')return 'es-CL';
+   if(cmd==='get_system_summary')return {total_memory_gb:16,recommended_ram_gb:8};
+   if(cmd==='available_java_versions')return [8,17,21,25];
+   if(cmd==='studio_current_operation')return null;
+   if(cmd==='get_root_path')return 'C:/TP-test';
+   if(cmd==='get_custom_background'||cmd==='get_custom_app_icon')return '';
+   if(cmd==='get_version_java_requirement')return 21;
+   if(cmd==='check_java')return {installed:true,major:21,version:'21-test',path:'C:/TP-test/java.exe',is_portable:true};
+   if(cmd==='get_playtime_stats')return {total_seconds:0,active_games:0,versions:[]};
+   if(cmd==='get_social_profile')return {schema_version:1,show_links:false,links:{},cosmetics:{cape:'none',wings:false,aura:false}};
+   if(cmd==='list_tp_capes')return capes;
+   if(cmd==='studio_install_targets')return [{id:'compatible',name:'Test Fabric',version_id:'fabric-1.21.1',game_version:'1.21.1',loader:'fabric',pack_id:null},{id:'incompatible',name:'Other version',version_id:'vanilla-1.20',game_version:'1.20',loader:'vanilla',pack_id:null}];
+   if(cmd==='save_tp_cape'){const cape={id:'b'.repeat(64),name:args.name,original:false,data_url:args.dataUrl};capes=[capes[0],cape];return cape;}
+   if(cmd==='equip_tp_cosmetics')return 'Local cosmetics applied in test';
+   if(cmd.includes('is_maximized'))return false;
+   if(cmd.startsWith('plugin:'))return 1;
+   if(/appearance|artwork|skin/.test(cmd))throw new Error('Artwork unavailable in isolated UI fixture');
+   return [];
+  }};
+ });
+ await page.goto(`http://127.0.0.1:${port}/`,{waitUntil:'domcontentloaded'});
+ await page.getByRole('button',{name:'Cuenta y skins',exact:true}).click();
+ const studio=page.locator('.cape-studio');await studio.getByRole('heading',{name:'Tu capa, tu diseño'}).waitFor();
+ const canvas=studio.locator('canvas').first();
+ await page.waitForFunction(()=>document.querySelector('.cape-studio .preview canvas')!==null);
+ const before=await canvas.evaluate(c=>c.toDataURL());
+ const box=await canvas.boundingBox();assert.ok(box);
+ await canvas.click({position:{x:Math.min(20,box.width/2),y:Math.min(20,box.height/2)}});
+ const painted=await canvas.evaluate(c=>c.toDataURL());assert.notEqual(painted,before);
+ await studio.getByRole('button',{name:'Deshacer',exact:true}).click();assert.equal(await canvas.evaluate(c=>c.toDataURL()),before);
+ await studio.getByRole('button',{name:'Rehacer',exact:true}).click();assert.equal(await canvas.evaluate(c=>c.toDataURL()),painted);
+ await studio.getByLabel('Nombre',{exact:true}).fill('UI original');
+ await studio.getByRole('button',{name:'Guardar capa',exact:true}).click();await studio.getByRole('status').filter({hasText:'Capa guardada localmente'}).waitFor();
+ assert.equal(await studio.getByLabel('Instancia',{exact:true}).locator('option').count(),2,'Only compatible Fabric target is shown');
+ await studio.getByRole('button',{name:'Aplicar equipamiento',exact:true}).click();await studio.getByRole('status').filter({hasText:'Local cosmetics applied'}).waitFor();
+ const calls=await page.evaluate(()=>window.testCalls);const saved=calls.find(c=>c.cmd==='save_tp_cape');const equipped=calls.find(c=>c.cmd==='equip_tp_cosmetics');
+ assert.equal(saved.args.name,'UI original');assert.ok(saved.args.dataUrl.startsWith('data:image/png;base64,'));assert.equal(equipped.args.versionId,'fabric-1.21.1');assert.equal(equipped.args.capeId,'b'.repeat(64));
+ assert.ok(!calls.some(c=>c.cmd==='begin_microsoft_login'));assert.deepEqual(errors,[]);
+ console.log('Cape UI: paint, undo/redo, local save, compatibility filtering and explicit equip verified with isolated IPC fixtures.');
+}finally{await browser.close();}

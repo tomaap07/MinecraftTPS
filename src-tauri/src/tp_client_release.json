@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "version": "0.1.0",
+  "minecraft": "1.21.1",
+  "loader": "fabric",
+  "java": 21,
+  "sha256": "7ebbf3a4c64f6d9e1ec3f3cd931037803bd684e6390145c218c30e6941d15ba6"
+}

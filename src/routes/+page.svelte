@@ -21,10 +21,13 @@
   import HostingOptions from "$lib/HostingOptions.svelte";
   import NewsHub from "$lib/NewsHub.svelte";
   import ScreenshotGallery from "$lib/ScreenshotGallery.svelte";
+  import TpClips from "$lib/TpClips.svelte";
   import AchievementsPanel from "$lib/AchievementsPanel.svelte";
   import WorldSky from "$lib/WorldSky.svelte";
   import CommunityTools from "$lib/CommunityTools.svelte";
-  import PluginsPanel from "$lib/PluginsPanel.svelte";
+  import ManagedAddonPanel from "$lib/ManagedAddonPanel.svelte";
+  import TpClientPanel from "$lib/TpClientPanel.svelte";
+  import PerformanceCenter from "$lib/PerformanceCenter.svelte";
   import LaunchDock from "$lib/LaunchDock.svelte";
   import EndBackdrop from "$lib/EndBackdrop.svelte";
   import LegalNotice from "$lib/LegalNotice.svelte";
@@ -1529,13 +1532,16 @@
     {:else if activeTab === "mods"}
       <ModStudio initialSection={studioInitialSection} {versionCatalog} currentVersion={selectedVersion.split(/\s+/)[0]} currentGameVersion={selectedMinecraftVersion} currentLoader={selectedModLoader} currentPackId={selectedPackId} username={microsoftProfile?.name ?? username} onplay={playStudioPack} oninstalled={() => { void refreshInstallations(); void refreshStudioPacks(); }} />
     {:else if activeTab === "capturas"}
+      <TpClips />
       <ScreenshotGallery />
     {:else if activeTab === "logros"}
       <AchievementsPanel />
     {:else if activeTab === "comunidad"}
       <CommunityTools />
     {:else if activeTab === "plugins"}
-      <PluginsPanel />
+      <TpClientPanel username={microsoftProfile?.name??username} oninstallations={()=>activeTab="instalaciones"}/>
+      <PerformanceCenter username={microsoftProfile?.name??username}/>
+      <ManagedAddonPanel />
     {:else if activeTab === "skins"}
       <AccountWardrobe fallbackSkinUrl={accountSkinFallback} profile={microsoftProfile} skinUrl={activeSkinUrl} capeUrl={activeCapeUrl} model={activeSkinModel} {username} {loginBusy} {loginMessage} {offlineAllowed} {offlineMessage} onlogin={() => void connectMicrosoft().catch(() => {})} onlogout={() => void signOutMicrosoft()} onoffline={() => void useOfflineMode()} onprofile={updateMicrosoftProfile} onpreview={previewLocalSkin} onposer={() => activeTab="poser"} />
       <SocialProfile fallbackSkinUrl={accountSkinFallback} playerId={microsoftProfile?.id??`offline:${username.toLowerCase()}`} name={username} skinUrl={activeSkinUrl} capeUrl={activeCapeUrl} model={activeSkinModel} paused={$isGameRunning}/>

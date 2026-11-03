@@ -17,7 +17,7 @@ const languageByExtension = new Map([
   ['.sh', 'shell'], ['.sql', 'sql'], ['.toml', 'toml'], ['.properties', 'properties']
 ]);
 const excludedSegments = new Set(['.git', 'node_modules', 'target', 'build', 'dist', '.svelte-kit', 'vendor', 'generated', 'coverage', 'attachments']);
-const thirdPartyFiles = new Set(['tp-companion/gradlew', 'tp-companion/gradlew.bat', 'tp-companion/gradle/wrapper/gradle-wrapper.properties']);
+const thirdPartyFiles = new Set(['tp-companion/gradlew', 'tp-companion/gradlew.bat', 'tp-companion/gradle/wrapper/gradle-wrapper.properties', 'tp-client/gradlew', 'tp-client/gradlew.bat', 'tp-client/gradle/wrapper/gradle-wrapper.properties']);
 
 function run(command, args, input) {
   const result = spawnSync(command, args, { cwd: root, input, encoding: 'utf8', windowsHide: true, maxBuffer: 32 * 1024 * 1024 });

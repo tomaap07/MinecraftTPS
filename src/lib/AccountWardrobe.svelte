@@ -8,6 +8,7 @@
   import UiIcon from "./UiIcon.svelte";
   import SkinModelViewer from "./SkinModelViewer.svelte";
   import CapePreview from "./CapePreview.svelte";
+  import CapeStudio from "./CapeStudio.svelte";
 
   type Profile = { id: string; name: string; skins: { id: string; state?: string; url?: string; variant?: string }[]; capes: { id: string; alias?: string; url?: string; state?: string }[] };
   type SavedSkin = { id: string; name: string; model: "classic" | "slim"; created_at: number; file_name: string; data_url: string; error?: string };
@@ -229,6 +230,8 @@
     {#if profile?.capes.length}<div class="capes-grid">{#each profile.capes as cape (cape.id)}<article class:equipped={cape.state === "ACTIVE"} class="cape-card">{#if cape.url}<CapePreview url={cape.url} name={cape.alias ?? "Capa oficial"}/>{:else}<div class="empty-cape">Sin textura disponible</div>{/if}<div class="cape-label"><strong>{cape.alias ?? "Capa oficial"}</strong><small>{cape.state === "ACTIVE" ? "Equipada" : "Disponible en tu cuenta"}</small></div><button class={cape.state === "ACTIVE" ? "outline" : "primary"} onclick={() => changeCape(cape.id)} disabled={busy || cape.state === "ACTIVE"}><UiIcon name={cape.state==="ACTIVE"?"check":"shield"} size={16}/>{cape.state === "ACTIVE" ? "Capa activa" : "Equipar capa"}</button></article>{/each}</div>{:else}<div class="empty-state"><strong>{profile ? "Esta cuenta no tiene capas oficiales" : "Conecta tu cuenta para ver tus capas"}</strong><p>Las capas disponibles se consultan directamente desde tu perfil de Minecraft.</p></div>{/if}
   </section>
 </div>
+
+<CapeStudio {skinUrl} {fallbackSkinUrl} {model} username={profile?.name || username}/>
 
 <style>
 .skin-providers{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:4px;color:#a99ab7;font-size:10px;line-height:1.6}.skin-providers button{padding:0;border:0;background:none;color:#cda1f4;font:inherit;text-decoration:underline;text-underline-offset:2px;cursor:pointer}

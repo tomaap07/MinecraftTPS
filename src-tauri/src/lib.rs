@@ -18,6 +18,8 @@ use uuid::Uuid;
 mod account_licensing;
 mod addon_compatibility;
 mod content_targets;
+mod cosmetics_library;
+mod performance_center;
 mod first_run;
 mod dynamic_translation;
 mod export_policy;
@@ -55,6 +57,8 @@ mod server_extras;
 mod servers;
 mod skin_library;
 mod studio_progress;
+mod tp_client;
+mod tp_clips;
 
 #[derive(Clone, Serialize)]
 struct JavaInfo {
@@ -4423,7 +4427,7 @@ async fn launch_game_session(
         }
     }
     let mut process_args = jvm_args;
-    if launcher_plugins::get_launcher_plugins(app.clone()).is_ok_and(|w| w.profile.native_overlay) {
+    if !tp_client::installed_in(&instance) && launcher_plugins::get_launcher_plugins(app.clone()).is_ok_and(|w| w.profile.native_overlay) {
         if let Err(error) = launcher_plugins::disable_pause_on_focus_loss(&instance) {
             emit_launcher_log(
                 &app,
@@ -4696,6 +4700,19 @@ pub fn run() {
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
+            tp_clips::tp_clips_workspace,
+            tp_clips::tp_clips_start,
+            tp_clips::tp_clips_stop,
+            tp_clips::tp_clips_open,
+            tp_clips::tp_clips_folder,
+            cosmetics_library::list_tp_capes,
+            cosmetics_library::save_tp_cape,
+            cosmetics_library::equip_tp_cosmetics,
+            performance_center::performance_workspace,
+            performance_center::performance_apply_preset,
+            performance_center::performance_restore,
+            performance_center::performance_diagnose,
+            performance_center::performance_samples,
             launcher_settings::get_launcher_settings,
             first_run::get_system_locale,
             first_run::available_java_versions,
@@ -4734,6 +4751,9 @@ pub fn run() {
             launcher_plugins::save_launcher_plugins,
             launcher_plugins::open_launcher_plugins_folder,
             launcher_plugins::prepare_launcher_plugins,
+            tp_client::tp_client_workspace,
+            tp_client::tp_client_install,
+            tp_client::tp_client_remove,
             launcher_social::get_social_profile,
             launcher_social::save_social_profile,
             launcher_overlay::set_launcher_overlay,
