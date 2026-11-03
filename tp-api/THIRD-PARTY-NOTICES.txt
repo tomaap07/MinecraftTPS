@@ -1,0 +1,34 @@
+TP API - notices for dependencies added by the TP Cloud staging implementation
+Reviewed 2026-11-02 against the exact installed package manifests and license files.
+These notices supplement package-provided notices and the root project notices.
+They do not replace those licenses or license TP API under a different license.
+
+pngjs 7.0.0
+Role: runtime dependency of the server-side PNG validation/normalization endpoint.
+License: MIT.
+Source: https://github.com/lukeapage/pngjs
+Full package notice: licenses/PNGJS-MIT.txt
+Original work Copyright (c) 2015 Luke Page & Original Contributors.
+Derived work Copyright (c) 2012 Kuba Niegowski.
+
+@types/pngjs 6.0.5
+Role: development-only TypeScript declarations; not shipped as server runtime code.
+License: MIT.
+Source: https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/pngjs
+Full package notice: licenses/TYPES-PNGJS-MIT.txt
+
+@electric-sql/pglite 0.5.14
+Role: development-only PostgreSQL/WASM engine for local SQL/RLS tests.
+License: Apache-2.0, as declared by this exact package; not the PostgreSQL License.
+Source: https://github.com/electric-sql/pglite
+Full package license: licenses/PGLITE-APACHE-2.0.txt
+The package also contains a build of PostgreSQL, whose separate license is retained
+in licenses/POSTGRESQL.txt. The upstream PostgreSQL license is published at
+https://www.postgresql.org/about/licence/. This notice does not claim that the
+PGlite wrapper and PostgreSQL have the same license.
+
+These backend/test dependencies are not added to the TP Launcher Windows installer
+or the TP Client JAR by this task. A deployment that distributes compiled TP API
+must retain the applicable package notices with that deployment. The installed
+packages and lockfile remain the authority for dependency versions; an update
+requires reviewing the updated package licenses again.

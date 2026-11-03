@@ -3,7 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "engines": { "node": ">=22" },
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "check": "tsc -p tsconfig.json --noEmit",
@@ -12,8 +14,13 @@
     "keys:create": "node --env-file-if-exists=.env.local dist/scripts/create-api-key.js"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "0.5.14",
     "@types/node": "22.15.30",
+    "@types/pngjs": "6.0.5",
     "typescript": "6.0.3"
   },
-  "license": "GPL-3.0-only"
+  "license": "GPL-3.0-only",
+  "dependencies": {
+    "pngjs": "7.0.0"
+  }
 }
