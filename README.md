@@ -17,7 +17,7 @@ TP LAUNCHER is an independent Windows desktop launcher for **Minecraft: Java Edi
 | Minecraft authorization | Microsoft → Xbox Live → XSTS → Minecraft Services; Java entitlement and official profile are checked before completing sign-in |
 | Credential storage | Refresh tokens encrypted with **Windows DPAPI** for the current Windows user; Minecraft access tokens kept in memory. Passwords entered only on Microsoft's website |
 | Offline Mode | Available only after successful verification of a licensed Microsoft Minecraft Java account on this device, with saved protected credentials and a valid verification record |
-| First run | Microsoft sign-in and Minecraft Java ownership verification before language and optional Java setup |
+| First run | Microsoft sign-in and Minecraft Java ownership verification before completing setup. “Explore launcher” opens the library without completing account verification |
 
 TP LAUNCHER uses its own application registration. A client secret and another launcher's application ID are not distributed. The application does not provide an unverified account path to launch Minecraft. Creating or selecting a local gameplay profile is subject to the verified-account requirement in Rust and in the interface. A skin preview by username does not authenticate that username.
 
@@ -33,6 +33,8 @@ TP LAUNCHER uses its own application registration. A client secret and another l
 4. Without eligible account evidence, local profiles remain disabled with this notice: “Para utilizar perfiles locales, debes iniciar sesión con una cuenta Microsoft al menos una vez en este equipo”. Existing local profiles do not bypass the requirement.
 
 Offline Mode does not provide a valid session for servers requiring official online authentication. Account credentials and verification records are local to the device and are not shipped in the installer or repository.
+
+You can choose **Explore launcher** to browse its library and tools while sign-in is unavailable. This closes the assistant for the current window; it does not complete setup, create an authenticated account or enable unverified gameplay. Starting Minecraft still checks the account and license.
 
 Need Minecraft? Purchase a license from the [official Minecraft store](https://www.minecraft.net/es-es/store/minecraft-deluxe-collection-pc?tabs=%7B%22details%22%3A0%7D).
 

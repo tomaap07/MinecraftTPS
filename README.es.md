@@ -1,5 +1,7 @@
 # TP LAUNCHER · TP LABS
 
+**Explorar launcher** permite abrir la biblioteca y las herramientas aunque el inicio de sesión no esté disponible. Cierra el asistente en la ventana actual sin marcar la cuenta ni la configuración como verificadas. Iniciar Minecraft sigue comprobando la cuenta y su licencia.
+
 Contacto: [tplabs.contacto@gmail.com](mailto:tplabs.contacto@gmail.com).
 
 [English / Microsoft review summary](README.md) · [Código fuente](https://github.com/tomaap07/MinecraftTPS) · [Contacto y soporte](https://github.com/tomaap07/MinecraftTPS/issues)
@@ -8,7 +10,7 @@ TP LAUNCHER es un launcher independiente de **Minecraft: Java Edition** para Win
 
 ## Inicio de sesión y juego sin conexión
 
-El primer inicio requiere conectar una cuenta Microsoft y verificar su licencia de Minecraft Java antes de continuar con el idioma y la instalación opcional de Java. El login usa el navegador del sistema, **OAuth 2.0 v2.0 Authorization Code con PKCE S256**, un estado aleatorio y la redirección registrada `http://localhost:8080`. La contraseña se introduce únicamente en la página de Microsoft.
+El asistente solicita conectar una cuenta Microsoft y verificar su licencia de Minecraft Java antes de completar la configuración de idioma y Java. También permite explorar las herramientas sin completar ese proceso. El login usa el navegador del sistema, **OAuth 2.0 v2.0 Authorization Code con PKCE S256**, un estado aleatorio y la redirección registrada `http://localhost:8080`. La contraseña se introduce únicamente en la página de Microsoft.
 
 La cadena Microsoft → Xbox Live → XSTS → Minecraft Services debe completarse, confirmar la licencia Java y obtener el perfil oficial. Los tokens de renovación se guardan cifrados con **Windows DPAPI** para el usuario actual de Windows; los tokens de acceso de Minecraft permanecen en memoria. Se utiliza el registro propio `6a4f8732-6bf7-49c3-a749-16607f97281d`, sin distribuir un client secret ni usar el Client ID de otro launcher.
 

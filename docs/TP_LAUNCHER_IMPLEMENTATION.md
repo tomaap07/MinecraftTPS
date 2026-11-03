@@ -69,3 +69,7 @@ Registro de esta cohorte; resultados definitivos se actualizan después de ejecu
 | 2026-11-02 | Clips | `tp_clips.rs`, `TpClips.svelte` | Encoder manual opcional y MP4 sintético verificado; no búfer retroactivo ni audio |
 
 Los commits se incorporan al cerrar cada cohorte verificable por el coordinador. Un bloqueo de infraestructura no transforma un botón sin servicio en una función terminada y no excluye el requisito del alcance.
+
+## Ajuste del 3 de noviembre: acceso a la interfaz
+
+Por petición del propietario, `SetupWizard.svelte` permite Explorar launcher cuando Microsoft no está disponible. Es una salida temporal del asistente para consultar biblioteca y herramientas; no cambia `first_run_completed`, la cuenta, la caché de licencias ni el control de lanzamiento de Rust. `refreshAccounts` respeta esa elección durante la ventana actual. `test-launcher-browse-ui.mjs` comprobó con IPC simulado que se puede cerrar el asistente y que un intento de Jugar sin verificación no invoca preparación, juego, creación de perfiles ni login. Svelte pasó sin errores/advertencias y los dos textos nuevos tienen traducción en los idiomas principales (1468 claves del catálogo). El launcher de desarrollo se observó abierto en Jugar sin el asistente.
