@@ -1,0 +1,53 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import {chromium} from 'playwright-core';
+const executablePath=['C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe','C:/Program Files/Microsoft/Edge/Application/msedge.exe'].find(fs.existsSync);
+assert.ok(executablePath,'Edge is required for desktop UI tests');
+const port=Number(process.env.TP_TEST_PORT??1420);
+assert.ok(Number.isInteger(port)&&port>=1024&&port<=65535);
+const browser=await chromium.launch({executablePath,headless:true,args:['--use-angle=swiftshader','--enable-unsafe-swiftshader','--no-first-run']});
+try{
+ const page=await browser.newPage({viewport:{width:1440,height:1000}});const errors=[];
+ page.on('pageerror',error=>errors.push(error.message));
+ await page.addInitScript(()=>{
+  window.testCalls=[];
+  window.__TAURI_EVENT_PLUGIN_INTERNALS__={unregisterListener:()=>{}};
+  window.__TAURI_INTERNALS__={metadata:{currentWindow:{label:'main'},currentWebview:{label:'main'}},transformCallback:()=>1,unregisterCallback:()=>{},invoke:async(cmd,args={})=>{
+   window.testCalls.push({cmd,args});
+   if(cmd==='get_launcher_settings')return {language:'es-419',translate_dynamic_content:false,launch_behavior:'keep',data_root:'C:/TP-test',first_run_completed:false,ui_scale_percent:100,launcher_width:1440,launcher_height:1000,launcher_maximized:false,resolution_width:1280,resolution_height:720,ram_gb:4,discord_presence:false,automatic_updates:false};
+   if(cmd==='get_microsoft_profile')return null;
+   if(cmd==='get_offline_eligibility')return {allowed:false,message:'Para utilizar perfiles locales, debes iniciar sesión con una cuenta Microsoft al menos una vez en este equipo'};
+   if(cmd==='list_launcher_accounts')return [{id:'offline-fixture',name:'TestPlayer',kind:'offline',active:true}];
+   if(cmd==='get_game_session')return {running:false,active_games:0,username:'',version:'',server:''};
+   if(cmd==='get_system_locale')return 'es-CL';
+   if(cmd==='get_system_summary')return {total_memory_gb:16,recommended_ram_gb:8};
+   if(cmd==='available_java_versions')return [8,17,21,25];
+   if(cmd==='studio_current_operation')return null;
+   if(cmd==='get_root_path')return 'C:/TP-test';
+   if(cmd==='get_custom_background'||cmd==='get_custom_app_icon')return '';
+   if(cmd==='get_version_java_requirement')return 21;
+   if(cmd==='check_java')return {installed:true,major:21,version:'21-test',path:'C:/TP-test/java.exe',is_portable:true};
+   if(cmd==='get_playtime_stats')return {total_seconds:0,active_games:0,versions:[]};
+   if(cmd==='get_social_profile')return {schema_version:1,show_links:false,links:{},cosmetics:{cape:'none',wings:false,aura:false}};
+   if(cmd.includes('is_maximized'))return false;
+   if(cmd.startsWith('plugin:'))return 1;
+   if(/appearance|artwork|skin/.test(cmd))throw new Error('Artwork unavailable in isolated UI fixture');
+   return [];
+  }};
+ });
+ await page.goto(`http://127.0.0.1:${port}/`,{waitUntil:'domcontentloaded'});
+ const wizard=page.locator('.wizard-shell');
+ await wizard.getByRole('button',{name:'Explorar launcher',exact:true}).click();
+ await page.waitForFunction(()=>document.querySelector('.wizard-shell')===null);
+ await page.getByRole('heading',{name:/Tu próximo mundo/}).waitFor();
+ const previousChecks=await page.evaluate(()=>window.testCalls.filter(c=>c.cmd==='get_offline_eligibility').length);
+ await page.locator('.play-btn').click();
+ await page.waitForFunction(previous=>window.testCalls.filter(c=>c.cmd==='get_offline_eligibility').length>previous,previousChecks);
+ await page.waitForFunction(()=>[...document.querySelectorAll('button.active')].some(button=>button.textContent.trim()==='Cuenta y skins'));
+ const calls=await page.evaluate(()=>window.testCalls);
+ for(const command of ['launch_game','prepare_launcher_plugins','add_offline_account','begin_microsoft_login'])assert.ok(!calls.some(call=>call.cmd===command),`${command} must not be invoked by browsing or an unverified launch`);
+ assert.ok(!calls.some(call=>call.cmd==='save_launcher_settings'&&call.args.settings?.first_run_completed===true));
+ assert.equal(await wizard.count(),0,'Account refresh must not trap the user in onboarding again');
+ assert.deepEqual(errors,[]);
+ console.log('Launcher browsing: onboarding can close without authentication; launch remains gated; no license, account or completed-setup state is fabricated (isolated IPC fixture).');
+}finally{await browser.close();}

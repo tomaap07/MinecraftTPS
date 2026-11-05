@@ -225,6 +225,9 @@ pub fn get_launcher_plugins(app:AppHandle) -> Result<PluginWorkspace, String> {
     } else {
         HudProfile::default()
     };
+    let mut profile=profile;
+    profile.native_overlay=false;
+    profile.companion_enabled=false;
     Ok(PluginWorkspace {
         profile,
         profile_saved: path.exists(),
@@ -306,25 +309,27 @@ pub async fn prepare_launcher_plugins(app:AppHandle,username:String,version_id:S
     let _lock=PREPARE.lock().await;
     let profile=get_launcher_plugins(app.clone())?.profile;
     let mut result=PluginPreparation{installed:vec![],skipped:vec![],launch_version:None,compatibility_warnings:vec![]};
-    if profile.native_overlay{if let Err(error)=crate::launcher_overlay::set_launcher_overlay(app.clone(),true).await{result.skipped.push(format!("HUD universal no disponible: {error}. Minecraft puede iniciarse igualmente."));}}
+    let dir=if let Some(id)=instance_id.as_deref().filter(|id|!id.is_empty()){crate::mod_studio::pack_game_dir(id)?}else{crate::version_game_dir(&crate::root_dir()?,&username,&version_id)?};
+    let native_client=crate::tp_client::installed_in(&dir);
+    if crate::launcher_overlay::get_launcher_overlay(app.clone()) { let _=crate::launcher_overlay::set_launcher_overlay(app.clone(),false).await; }
+    if native_client {
+        result.skipped.push("TP Client está instalado: se utiliza su HUD nativo; no se instala TP Companion ni se activa el overlay de escritorio.".into());
+    } else if profile.native_overlay{if let Err(error)=crate::launcher_overlay::set_launcher_overlay(app.clone(),true).await{result.skipped.push(format!("HUD universal no disponible: {error}. Minecraft puede iniciarse igualmente."));}}
     let enabled=|id:&str|profile.modules.iter().any(|module|module.id==id&&module.enabled);
     let mut selected:Vec<Addon>=[("sodium","Sodium","sodium"),("lithium","Lithium","lithium"),("ferritecore","FerriteCore","ferrite-core"),("entityculling","EntityCulling","entityculling"),("immediatelyfast","ImmediatelyFast","immediatelyfast"),("dynamicfps","Dynamic FPS","dynamic-fps"),("iris","Iris","iris")].iter().filter(|(id,_,_)|enabled(id)).map(|(id,name,project)|Addon::new(id,name,project)).collect();
     let visual:Vec<Addon>=serde_json::from_str(include_str!("../../src/lib/data/visual_addons.json")).map_err(|_|"Catálogo de efectos inválido")?;
     selected.extend(visual.into_iter().filter(|addon|enabled(&addon.id)));
-    let mut loader=loader.to_lowercase();let mut version_id=version_id;
-    if loader=="vanilla"&&!selected.is_empty()&&instance_id.as_deref().is_none_or(str::is_empty)&&game_version.split('.').all(|p|!p.is_empty()&&p.bytes().all(|b|b.is_ascii_digit())){
-        match crate::install_fabric(game_version.clone()).await{
-            Ok(id)=>{version_id=id.clone();loader="fabric".into();result.launch_version=Some(id);result.installed.push(format!("TP Turbo: instalación Fabric preparada para Minecraft {game_version}."));}
-            Err(error)=>{result.skipped.push(format!("No hay un cargador disponible para {game_version}: {error}. Se conserva el lanzamiento Vanilla."));return Ok(result);}
-        }
+    let loader=loader.to_lowercase();
+    if loader=="vanilla"&&!selected.is_empty(){
+        result.skipped.push("Se conserva Vanilla sin mods. Para usar optimizadores o TP Client, crea o selecciona explícitamente una instalación Fabric compatible desde Instalaciones.".into());
+        return Ok(result);
     }
-    let companion=if profile.companion_enabled&&game_version=="1.21.1"&&loader=="fabric"{
+    let companion=if !native_client&&profile.companion_enabled&&game_version=="1.21.1"&&loader=="fabric"{
         match companion_artifact(&app){Some(path)=>{selected.insert(0,Addon::new("fabric_api","Fabric API","fabric-api"));Some(path)},None=>{result.skipped.push("TP Companion no está empaquetado.".into());None}}
-    }else{if profile.companion_enabled{result.skipped.push("TP Companion: adaptador actual Fabric 1.21.1; las demás ediciones usan el puente y sus capacidades.".into());}None};
+    }else{if !native_client&&profile.companion_enabled{result.skipped.push("TP Companion: adaptador actual Fabric 1.21.1; las demás ediciones usan el puente y sus capacidades.".into());}None};
     if !["fabric","forge","neoforge","quilt"].contains(&loader.as_str()){
         if !selected.is_empty(){result.skipped.push("Los mods visuales y optimizadores requieren un cargador compatible.".into());}return Ok(result);
     }
-    let dir=if let Some(id)=instance_id.as_deref().filter(|id|!id.is_empty()){crate::mod_studio::pack_game_dir(id)?}else{crate::version_game_dir(&crate::root_dir()?,&username,&version_id)?};
     let mut managed=crate::managed_addons::Store::load(&dir)?;
     let (effective,warnings)=managed.compatible_profile(&dir,&profile,&game_version,&loader)?;
     result.compatibility_warnings=warnings;

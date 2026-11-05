@@ -1,4 +1,5 @@
 import licenseGate from './license-gate';
+import launcherBrowse from './launcher-browse';
 import expanded from './expanded';
 import releaseUi0 from './release-ui-pt-BR';
 import releaseUi1 from './release-ui-fr-FR';
@@ -276,6 +277,8 @@ Object.assign(english,licenseGate['en-US']);
 for(const [code,values] of Object.entries(licenseGate)){if(partialCatalogs[code])Object.assign(partialCatalogs[code],values);}
 Object.assign(english,expanded['en-US']);
 for(const [code,values] of Object.entries(expanded)){if(partialCatalogs[code])Object.assign(partialCatalogs[code],values);}
+Object.assign(english,launcherBrowse['en-US']);
+for(const [code,values] of Object.entries(launcherBrowse)){if(partialCatalogs[code])Object.assign(partialCatalogs[code],values);}
 for(const [key,value] of Object.entries(english)){
  if(!partialCatalogs['en-PT'][key])partialCatalogs['en-PT'][key]=dialect(value,pirateWords);
  if(!partialCatalogs['lol-US'][key])partialCatalogs['lol-US'][key]=dialect(value,catWords);

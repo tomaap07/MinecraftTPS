@@ -2,6 +2,26 @@
 
 Guía de comportamiento vigente. Los informes de versiones anteriores conservan su fecha y documentan el comportamiento de aquellas compilaciones; véase el [índice de documentación](README.md).
 
+## Restauración y reconexión del 5 de noviembre de 2026
+
+La inspección local encontró una credencial DPAPI en el directorio histórico `MinecraftTPS`. La biblioteca vigente de `LauncherTPS` tenía un perfil local activo y ninguna credencial Microsoft. Los registros distinguen los intentos manuales que recibieron `403 FORBIDDEN` de los intentos de restauración. «Conectar Microsoft» canjea un código nuevo y, desde esta revisión, pide autenticación al navegador con `prompt=login`. El rechazo real de Minecraft Services sigue pendiente de una nueva prueba.
+
+La restauración prioriza el archivo cifrado de la cuenta seleccionada en `accounts/*.dat`. Las nuevas credenciales incluyen el Client ID dentro de la protección DPAPI. Un ID distinto requiere reconectar. Los archivos antiguos se pueden renovar si Microsoft los acepta y el perfil obtenido coincide con el que se está restaurando. `account.dat` se conserva como origen de migración cuando no hay biblioteca, o como respaldo de una cuenta activa cuyo archivo falta. La comprobación del perfil evita guardar el resultado de ese respaldo en otra cuenta.
+
+## Investigación de compatibilidad del 4 de noviembre de 2026
+
+Las capturas de Entra confirman el Client ID `6a4f8732-6bf7-49c3-a749-16607f97281d`, cuentas personales y la URI `http://localhost:8080` bajo aplicaciones móviles y de escritorio. No apareció un reemplazo del Client ID en `.env.local`, `.env` ni en el entorno del proceso de compilación inspeccionado. Esto no identifica por sí solo la aplicación incluida en una aprobación enviada por correo.
+
+Se comparó el intercambio con el código público actual de [Prism](https://github.com/PrismLauncher/PrismLauncher/blob/develop/launcher/minecraft/auth/steps/LauncherLoginStep.cpp) y [Modrinth](https://github.com/modrinth/code/blob/main/packages/app-lib/src/state/minecraft_auth.rs). Ambos usan `POST https://api.minecraftservices.com/launcher/login` con `xtoken` y `platform: PC_LAUNCHER`. TP utilizaba `/authentication/login_with_xbox` con `identityToken`; esta revisión alinea ese paso con el formato de los clientes examinados. No se ha demostrado que el endpoint anterior sea la causa del rechazo ni que haya dejado de funcionar para todas las aplicaciones.
+
+El diagnóstico nuevo indica `/launcher/login` y el Client ID efectivo. Microsoft OAuth con PKCE, los tokens de la cuenta obtenidos de Xbox/XSTS, la comprobación de licencia y el perfil oficial siguen siendo obligatorios. Una respuesta 401/403 termina el intercambio y no provoca intentos por otros endpoints ni cambios de identidad. Las pruebas HTTP locales verifican el contrato de solicitud y la propagación de rechazos; no verifican la aprobación real de Mojang. Hace falta un nuevo inicio de sesión del titular en una compilación con este cambio antes de declarar resuelto el problema del `.exe` instalado.
+
+El titular probó la compilación nueva y compartió un HTTP 403 de `/launcher/login` que el diagnóstico inicial no reconoció. Las capturas también confirman cuentas personales, compatibilidad Live SDK y flujos de cliente público habilitados. El cambio de endpoint no resolvió ese intento; no se debe presentar como causa confirmada ni como reparación validada.
+
+Se añadieron diagnósticos limitados al tipo de contenido (lista fija), forma del JSON, tamaño del cuerpo, presencia de campos conocidos y códigos de error de una lista cerrada. El texto libre, nombres de campos no reconocidos, tokens y cabeceras arbitrarias no se muestran. Se reconoce el motivo exacto de registro inválido también en `message`, `error`, `reason` y `details.reason`. La comprobación local de red verificó TLS de Minecraft Services con emisor Microsoft y no detectó entradas de hosts para los cuatro dominios de autenticación ni variables de proxy en el proceso. Esto no demuestra el estado de la lista de acceso ni descarta todos los problemas de red.
+
+Validación local de esta revisión: 13 pruebas de autenticación y licencia relacionadas aprobadas (`cargo test microsoft_`), `npm run check` sin errores ni advertencias y auditoría de los dos archivos modificados sin coincidencias con secretos locales. El inicio de sesión real sigue rechazado y pendiente del nuevo diagnóstico.
+
 ## Rechazo de Minecraft Services después del login de Microsoft
 
 En los registros de una compilación de desarrollo 0.1.2 se observó HTTP 403 al llamar a `authentication/login_with_xbox`, después de Microsoft y Xbox. Ese error impide obtener el token de Minecraft. El código actual conserva la corrección que propaga el fallo a Ajustes, Cuenta y el asistente, sin mostrar «Listo» ni una cuenta conectada cuando la autenticación no terminó.

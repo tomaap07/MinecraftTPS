@@ -21,10 +21,13 @@
   import HostingOptions from "$lib/HostingOptions.svelte";
   import NewsHub from "$lib/NewsHub.svelte";
   import ScreenshotGallery from "$lib/ScreenshotGallery.svelte";
+  import TpClips from "$lib/TpClips.svelte";
   import AchievementsPanel from "$lib/AchievementsPanel.svelte";
   import WorldSky from "$lib/WorldSky.svelte";
   import CommunityTools from "$lib/CommunityTools.svelte";
-  import PluginsPanel from "$lib/PluginsPanel.svelte";
+  import ManagedAddonPanel from "$lib/ManagedAddonPanel.svelte";
+  import TpClientPanel from "$lib/TpClientPanel.svelte";
+  import PerformanceCenter from "$lib/PerformanceCenter.svelte";
   import LaunchDock from "$lib/LaunchDock.svelte";
   import EndBackdrop from "$lib/EndBackdrop.svelte";
   import LegalNotice from "$lib/LegalNotice.svelte";
@@ -40,7 +43,7 @@
   import LoaderLogo from "$lib/LoaderLogo.svelte";
   import VersionIcon from "$lib/VersionIcon.svelte";
   import { DEFAULT_LAUNCHER_SETTINGS, type LauncherSettings, type AppearanceSettings, type AccountSummary, type SettingsTab, type QuickFolder } from "$lib/settings.types";
-  import { setLocale, translateUi, detectNativeLanguage } from "$lib/i18n";
+  import { setLocale, translate, translateUi, detectNativeLanguage } from "$lib/i18n";
   import { FALLBACK_SKIN, FALLBACK_AVATAR } from "$lib/poses_catalog";
   import {defaultPlayerAppearance,crafatarSkinUrl,type PublicPlayerAppearance} from "$lib/player_skins";
   import {refreshLocalGameArtwork} from '$lib/local_game_art';
@@ -57,6 +60,7 @@
   let settingsTab = $state<SettingsTab>("general");
   let accounts = $state<AccountSummary[]>([]);
   let offlineAllowed=$state(false),offlineMessage=$state("Comprobando la disponibilidad de perfiles locales.");
+  let browsingLauncher=$state(typeof window!=='undefined'&&import.meta.env.DEV&&new URLSearchParams(window.location.search).get('view')==='launcher');
   let showWizard = $state(false);
   let totalMemoryGb = $state(16);
   let backgroundUrl = $state("");
@@ -431,11 +435,12 @@
     let unlistenConsole: (() => void) | undefined;
     void (async () => {
     loadConfig();
+    if(browsingLauncher){activeTab="jugar";launchMessage=translate('Puedes explorar el launcher. Para iniciar Minecraft debes verificar una cuenta con licencia.');}
     try {
       settings=await invoke<LauncherSettings>("get_launcher_settings");
       if(!settings.language){settings={...settings,language:await detectNativeLanguage()};settings=await invoke<LauncherSettings>("save_launcher_settings",{settings});}
       setLocale(settings.language);dynamicTranslationEnabled.set(settings.translate_dynamic_content);ramGb=settings.ram_gb;
-      showWizard=!settings.first_run_completed;
+      showWizard=!settings.first_run_completed&&!browsingLauncher;
       const memory=await invoke<{total_memory_gb:number;recommended_ram_gb:number}>("get_system_summary");totalMemoryGb=memory.total_memory_gb;
       if(showWizard){ramGb=memory.recommended_ram_gb;settings={...settings,ram_gb:ramGb};}
       if(settings.automatic_updates)void checkUpdates().then(message=>addConsoleLine("launcher",message)).catch(()=>{});
@@ -1229,12 +1234,13 @@
     if(patch.backgroundUrl!==undefined)backgroundUrl=await invoke<string>("set_custom_background",{imageBase64:patch.backgroundUrl});
     saveConfig();
   }
-  async function refreshAccounts(){try{accounts=await invoke<AccountSummary[]>("list_launcher_accounts");const eligibility=await invoke<{allowed:boolean;message:string}>("get_offline_eligibility");offlineAllowed=eligibility.allowed;offlineMessage=eligibility.message;if(!offlineAllowed&&!microsoftProfile)showWizard=true;const offline=accounts.find(a=>a.active&&a.kind==="offline");if(offline&&!microsoftProfile)username=offline.name;}catch(error){addConsoleLine("stderr",String(error));}}
+  async function refreshAccounts(){try{accounts=await invoke<AccountSummary[]>("list_launcher_accounts");const eligibility=await invoke<{allowed:boolean;message:string}>("get_offline_eligibility");offlineAllowed=eligibility.allowed;offlineMessage=eligibility.message;if(!offlineAllowed&&!microsoftProfile&&!browsingLauncher)showWizard=true;const offline=accounts.find(a=>a.active&&a.kind==="offline");if(offline&&!microsoftProfile)username=offline.name;}catch(error){addConsoleLine("stderr",String(error));}}
   async function activateAccount(id:string){const result=await invoke<{account:AccountSummary;profile:MicrosoftProfile|null}>("activate_launcher_account",{id});microsoftProfile=result.profile;username=result.account.name;saveConfig();await refreshAccounts();void refreshMods();}
   async function addOfflineAccount(name:string){const account=await invoke<AccountSummary>("add_offline_account",{name});await activateAccount(account.id);}
   async function removeAccount(id:string){const wasActive=accounts.find(account=>account.id===id)?.active;await invoke("remove_launcher_account",{id});if(wasActive){microsoftProfile=null;username="Steve";saveConfig();}await refreshAccounts();}
   async function addMicrosoftAccount(){await connectMicrosoft();await refreshAccounts();}
   async function finishWizard(){await changeSettings({first_run_completed:true,ram_gb:ramGb});showWizard=false;}
+  function exploreLauncher(){browsingLauncher=true;showWizard=false;activeTab="jugar";launchMessage=translate('Puedes explorar el launcher. Para iniciar Minecraft debes verificar una cuenta con licencia.');}
   async function checkUpdates(){const result=await invoke<UpdateInfo>("check_launcher_updates");updateInfo=result;if(result.available&&result.verifiable&&settings.automatic_updates)void downloadUpdate();return result.message;}
   async function downloadUpdate(){if(!updateInfo?.asset_id||updateBusy)return;updateBusy=true;updateMessage="Descargando actualización verificada…";try{const result=await invoke<{path:string}>("download_launcher_update",{assetId:updateInfo.asset_id});updateDownload=result.path;updateMessage="Actualización descargada y verificada. Puedes instalarla cuando cierres Minecraft.";}catch(error){updateMessage=String(error);}finally{updateBusy=false;}}
   async function installUpdate(){if(!updateDownload||updateBusy)return;updateBusy=true;try{await invoke("install_launcher_update",{path:updateDownload});}catch(error){updateMessage=String(error);updateBusy=false;}}
@@ -1529,13 +1535,16 @@
     {:else if activeTab === "mods"}
       <ModStudio initialSection={studioInitialSection} {versionCatalog} currentVersion={selectedVersion.split(/\s+/)[0]} currentGameVersion={selectedMinecraftVersion} currentLoader={selectedModLoader} currentPackId={selectedPackId} username={microsoftProfile?.name ?? username} onplay={playStudioPack} oninstalled={() => { void refreshInstallations(); void refreshStudioPacks(); }} />
     {:else if activeTab === "capturas"}
+      <TpClips />
       <ScreenshotGallery />
     {:else if activeTab === "logros"}
       <AchievementsPanel />
     {:else if activeTab === "comunidad"}
       <CommunityTools />
     {:else if activeTab === "plugins"}
-      <PluginsPanel />
+      <TpClientPanel username={microsoftProfile?.name??username} oninstallations={()=>activeTab="instalaciones"}/>
+      <PerformanceCenter username={microsoftProfile?.name??username}/>
+      <ManagedAddonPanel />
     {:else if activeTab === "skins"}
       <AccountWardrobe fallbackSkinUrl={accountSkinFallback} profile={microsoftProfile} skinUrl={activeSkinUrl} capeUrl={activeCapeUrl} model={activeSkinModel} {username} {loginBusy} {loginMessage} {offlineAllowed} {offlineMessage} onlogin={() => void connectMicrosoft().catch(() => {})} onlogout={() => void signOutMicrosoft()} onoffline={() => void useOfflineMode()} onprofile={updateMicrosoftProfile} onpreview={previewLocalSkin} onposer={() => activeTab="poser"} />
       <SocialProfile fallbackSkinUrl={accountSkinFallback} playerId={microsoftProfile?.id??`offline:${username.toLowerCase()}`} name={username} skinUrl={activeSkinUrl} capeUrl={activeCapeUrl} model={activeSkinModel} paused={$isGameRunning}/>
@@ -1570,7 +1579,7 @@
   {/if}
   </div>
   <ExportReportDialog report={exportReport} onclose={()=>exportReport=null}/>
-  {#if showWizard}<SetupWizard {settings} onchange={changeSettings} {appearance} onappearance={changeAppearance} {themes} runtimes={javaRuntimes} onscanjava={refreshJavaRuntimes} oninstalljava={installJavaVersion} onconnectmicrosoft={addMicrosoftAccount} onaddoffline={addOfflineAccount} oncomplete={finishWizard} {totalMemoryGb} accountName={microsoftProfile?.name} localAccountName={username} {offlineAllowed} {offlineMessage}/>{/if}
+  {#if showWizard}<SetupWizard {settings} onchange={changeSettings} {appearance} onappearance={changeAppearance} {themes} runtimes={javaRuntimes} onscanjava={refreshJavaRuntimes} oninstalljava={installJavaVersion} onconnectmicrosoft={addMicrosoftAccount} onaddoffline={addOfflineAccount} oncomplete={finishWizard} onexplore={exploreLauncher} {totalMemoryGb} accountName={microsoftProfile?.name} localAccountName={username} {offlineAllowed} {offlineMessage}/>{/if}
 </main>
 
 <style>

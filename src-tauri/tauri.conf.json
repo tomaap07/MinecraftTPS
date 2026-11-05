@@ -32,6 +32,7 @@
     "license": "GPL-3.0-only",
     "licenseFile": "../LICENSE",
     "resources": {
+      "../tp-client/build/libs/tp-client-0.1.0.jar": "clients/tp-client-0.1.0.jar",
       "../tp-companion/build/libs/tp-companion-0.1.0.jar": "companions/tp-companion-0.1.0.jar",
       "../tp-bridge/build/tp-bridge-0.1.0.jar": "companions/tp-bridge-0.1.0.jar",
       "../LICENSE": "licenses/TP-LAUNCHER-GPL-3.0.txt",

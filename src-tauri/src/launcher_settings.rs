@@ -515,42 +515,72 @@ pub fn deactivate_account() -> Result<(), String> {
     }
     save_accounts(&accounts)
 }
-pub fn restore_active_account_token() -> Result<(), String> {
-    let _guard = account_lock()
-        .lock()
-        .map_err(|_| "Biblioteca de cuentas ocupada")?;
-    let target = crate::root_dir()?.join("account.dat");
-    if target.exists() {
-        return Ok(());
-    }
-    let accounts = read_accounts()?;
-    if accounts
-        .entries
-        .iter()
-        .any(|entry| entry.id == accounts.active && entry.kind == "microsoft")
-    {
-        let saved = token_file(&accounts.active)?;
-        if saved.exists() {
-            write_atomic(&target, &bounded_file(&saved, 64 * 1024)?)?;
+fn saved_microsoft_path(
+    accounts: &Accounts,
+    requested: Option<&str>,
+    has_account_index: bool,
+    vault: &Path,
+    legacy: &Path,
+) -> Result<Option<(PathBuf, Option<String>)>, String> {
+    let selected = requested.unwrap_or(&accounts.active);
+    if let Some(profile_id) = selected.strip_prefix("microsoft-") {
+        if !accounts.entries.iter().any(|entry| entry.id == selected && entry.kind == "microsoft") {
+            return Err("Cuenta Microsoft no encontrada".into());
         }
+        let saved = vault.join(format!("{selected}.dat"));
+        if saved.exists() {
+            return Ok(Some((saved, Some(profile_id.into()))));
+        }
+        if requested.is_none() && legacy.is_file() {
+            return Ok(Some((legacy.into(), Some(profile_id.into()))));
+        }
+        return Err(crate::microsoft_oauth::REAUTHENTICATION_REQUIRED.into());
     }
-    Ok(())
+    if !has_account_index && selected.is_empty() && legacy.is_file() {
+        return Ok(Some((legacy.into(), None)));
+    }
+    Ok(None)
 }
-pub fn remember_profile(profile: &crate::MinecraftProfile) -> Result<(), String> {
-    let _guard = account_lock()
-        .lock()
-        .map_err(|_| "Biblioteca de cuentas ocupada")?;
+
+pub(crate) fn load_saved_microsoft(
+    requested: Option<&str>,
+    client_id: &str,
+) -> Result<Option<(String, Option<String>)>, String> {
+    let _guard = account_lock().lock().map_err(|_| "Biblioteca de cuentas ocupada")?;
+    let accounts = read_accounts()?;
+    let config = config_root()?;
+    let legacy = crate::root_dir()?.join("account.dat");
+    let Some((path, profile_id)) = saved_microsoft_path(
+        &accounts, requested, config.join("accounts.json").exists(), &config.join("accounts"), &legacy,
+    )? else {
+        return Ok(None);
+    };
+    let encrypted = bounded_file(&path, 65536)?;
+    let clear = crate::token_storage::unprotect(&encrypted)?;
+    let refresh_token = crate::microsoft_oauth::decode_saved_refresh_token(&clear, Some(client_id))?;
+    Ok(Some((refresh_token, profile_id)))
+}
+
+pub(crate) fn remember_profile(
+    profile: &crate::MinecraftProfile,
+    client_id: &str,
+    refresh_token: &str,
+) -> Result<(), String> {
+    let _guard = account_lock().lock().map_err(|_| "Biblioteca de cuentas ocupada")?;
     if profile.id.len() != 32 || !profile.id.bytes().all(|byte| byte.is_ascii_hexdigit()) {
         return Err("El perfil Microsoft no tiene un UUID válido".into());
     }
     let mut accounts = read_accounts()?;
     let id = format!("microsoft-{}", profile.id.to_ascii_lowercase());
-    let current = crate::root_dir()?.join("account.dat");
-    if current.exists() {
-        write_atomic(&token_file(&id)?, &bounded_file(&current, 64 * 1024)?)?;
-    }
     if !accounts.entries.iter().any(|entry| entry.id == id) && accounts.entries.len() >= 128 {
         return Err("La biblioteca admite hasta 128 cuentas".into());
+    }
+    let vault = token_file(&id)?;
+    let previous = optional_file(&vault)?;
+    let clear = crate::microsoft_oauth::encode_saved_refresh_token(client_id, refresh_token)?;
+    let encrypted = crate::token_storage::protect(&clear)?;
+    if encrypted.len() > 65536 {
+        return Err("La sesión supera el tamaño de almacenamiento permitido".into());
     }
     accounts.entries.retain(|entry| entry.id != id);
     accounts.entries.push(AccountSummary {
@@ -562,17 +592,11 @@ pub fn remember_profile(profile: &crate::MinecraftProfile) -> Result<(), String>
         status: "Sesión guardada".into(),
     });
     accounts.active = id;
-    save_accounts(&accounts)
-}
-pub fn remember_current(auth: &crate::AuthState) -> Result<(), String> {
-    let profile = auth
-        .session
-        .lock()
-        .map_err(|_| "Cuenta ocupada")?
-        .as_ref()
-        .map(|session| session.profile.clone());
-    if let Some(profile) = profile {
-        remember_profile(&profile)?;
+    write_atomic(&vault, &encrypted)?;
+    if let Err(error) = save_accounts(&accounts) {
+        restore_file(&vault, previous.as_deref())
+            .map_err(|rollback| format!("{error}. No se pudo restaurar la credencial anterior: {rollback}"))?;
+        return Err(error);
     }
     Ok(())
 }
@@ -599,7 +623,7 @@ fn usable_saved_token(path: &Path) -> bool {
     let Ok(meta) = fs::symlink_metadata(path) else { return false; };
     if !meta.is_file() || meta.file_type().is_symlink() || meta.len() == 0 || meta.len() > 65536 { return false; }
     bounded_file(path, 65536).ok().and_then(|bytes| crate::token_storage::unprotect(&bytes).ok())
-        .is_some_and(|clear| !clear.is_empty() && clear.iter().all(|byte| byte.is_ascii_graphic()))
+        .is_some_and(|clear| crate::microsoft_oauth::decode_saved_refresh_token(&clear, None).is_ok())
 }
 fn offline_eligibility_with(accounts: &Accounts, now: u64, mut evidence: impl FnMut(&AccountSummary) -> Option<u64>) -> OfflineEligibility {
     let verified_at = accounts.entries.iter()
@@ -707,98 +731,39 @@ pub async fn activate_launcher_account(
     id: String,
 ) -> Result<ActivatedAccount, String> {
     let _auth_guard = auth.refresh_lock.lock().await;
-    remember_current(&auth)?;
-    let previous_accounts = {
-        let _guard = account_lock()
-            .lock()
-            .map_err(|_| "Biblioteca de cuentas ocupada")?;
-        read_accounts()?
-    };
-    let mut account = previous_accounts
-        .entries
-        .iter()
-        .find(|entry| entry.id == id)
-        .cloned()
-        .ok_or("Cuenta no encontrada")?;
-    if account.kind == "offline" {
-        require_offline_for(&previous_accounts)?;
-    }
-    let old_session = auth.session.lock().map_err(|_| "Cuenta ocupada")?.clone();
-    let active_file = crate::root_dir()?.join("account.dat");
-    let old_file = optional_file(&active_file)?;
-    let result = async {
-        if account.kind == "microsoft" {
-            let bytes = bounded_file(&token_file(&id)?, 64 * 1024)
-                .map_err(|_| "La cuenta necesita iniciar sesión de nuevo")?;
-            write_atomic(&active_file, &bytes)?;
-        } else {
-            crate::token_storage::clear_saved_refresh_token()?;
-        }
-        *auth.session.lock().map_err(|_| "Cuenta ocupada")? = None;
-        let profile = if account.kind == "microsoft" {
-            let profile = crate::ensure_microsoft_session_locked(&auth)
-                .await?
-                .ok_or("La cuenta necesita iniciar sesión de nuevo")?;
-            if format!("microsoft-{}", profile.id.to_ascii_lowercase()) != id {
-                return Err(
-                    "La sesión guardada pertenece a otra cuenta; se restauró la cuenta anterior"
-                        .into(),
-                );
-            }
-            Some(profile)
-        } else {
-            None
-        };
-        {
-            let _guard = account_lock()
-                .lock()
-                .map_err(|_| "Biblioteca de cuentas ocupada")?;
-            let mut accounts = read_accounts()?;
+    let mut account = {
+        let _guard = account_lock().lock().map_err(|_| "Biblioteca de cuentas ocupada")?;
+        let mut accounts = read_accounts()?;
+        let account = accounts.entries.iter().find(|entry| entry.id == id).cloned()
+            .ok_or("Cuenta no encontrada")?;
+        if account.kind == "offline" {
+            require_offline_for(&accounts)?;
             accounts.active = id.clone();
             save_accounts(&accounts)?;
         }
-        Ok::<_, String>(profile)
-    }
-    .await;
-    match result {
-        Ok(profile) => {
-            account.active = true;
-            Ok(ActivatedAccount { account, profile })
-        }
-        Err(error) => {
-            let mut rollback = Vec::new();
-            if account.kind == "microsoft" && (crate::microsoft_oauth::is_reauthentication_error(&error) || crate::account_licensing::is_license_denied(&error)) {
-                if let Some(profile_id) = id.strip_prefix("microsoft-") {
-                    if let Err(reason) = crate::account_licensing::forget_verified(profile_id) {
-                        rollback.push(format!("No se pudo invalidar la verificación local: {reason}"));
+        account
+    };
+    let profile = if account.kind == "microsoft" {
+        match crate::ensure_microsoft_session_locked(&auth, Some(&id)).await {
+            Ok(Some(profile)) => Some(profile),
+            Ok(None) => return Err(crate::microsoft_oauth::REAUTHENTICATION_REQUIRED.into()),
+            Err(error) => {
+                if crate::microsoft_oauth::is_reauthentication_error(&error)
+                    || crate::account_licensing::is_license_denied(&error)
+                {
+                    if let Some(profile_id) = id.strip_prefix("microsoft-") {
+                        crate::account_licensing::forget_verified(profile_id)?;
                     }
                 }
-            }
-            if let Err(reason) = restore_file(&active_file, old_file.as_deref()) {
-                rollback.push(reason);
-            }
-            match auth.session.lock() {
-                Ok(mut session) => *session = old_session,
-                Err(_) => rollback.push("No se pudo restaurar la memoria de la sesión".into()),
-            }
-            {
-                let _guard = account_lock()
-                    .lock()
-                    .map_err(|_| "Biblioteca de cuentas ocupada")?;
-                if let Err(reason) = save_accounts(&previous_accounts) {
-                    rollback.push(reason);
-                }
-            }
-            if rollback.is_empty() {
-                Err(error)
-            } else {
-                Err(format!(
-                    "{error}. La restauración de la cuenta anterior requiere atención: {}",
-                    rollback.join("; ")
-                ))
+                return Err(error);
             }
         }
-    }
+    } else {
+        *auth.session.lock().map_err(|_| "Cuenta ocupada")? = None;
+        None
+    };
+    account.active = true;
+    Ok(ActivatedAccount { account, profile })
 }
 #[tauri::command]
 pub async fn remove_launcher_account(
@@ -1366,6 +1331,31 @@ mod tests {
         fs::write(&file,crate::token_storage::protect(b"fixture-refresh-token").unwrap()).unwrap();assert!(usable_saved_token(&file));
         fs::remove_file(&file).unwrap();assert!(!usable_saved_token(&file));
         fs::create_dir(&file).unwrap();assert!(!usable_saved_token(&file));
+    }
+    #[test]
+    fn selected_microsoft_account_takes_priority_over_stale_game_data() {
+        let scratch = Scratch::new();
+        let legacy = scratch.0.join("account.dat");
+        fs::write(&legacy, b"dummy-old-credential").unwrap();
+        let profile = "a".repeat(32);
+        let id = format!("microsoft-{profile}");
+        let saved = scratch.0.join(format!("{id}.dat"));
+        fs::write(&saved, b"dummy-selected-credential").unwrap();
+        let mut accounts = Accounts {
+            active: id.clone(),
+            entries: vec![AccountSummary {
+                id: id.clone(), name: "LicensedPlayer".into(), kind: "microsoft".into(),
+                active: true, avatar_url: String::new(), status: String::new(),
+            }],
+        };
+        let selection = saved_microsoft_path(&accounts, None, true, &scratch.0, &legacy).unwrap();
+        assert_eq!(selection, Some((saved.clone(), Some(profile.clone()))));
+        fs::remove_file(saved).unwrap();
+        assert!(saved_microsoft_path(&accounts, Some(&id), true, &scratch.0, &legacy).is_err());
+        assert_eq!(saved_microsoft_path(&accounts, None, true, &scratch.0, &legacy).unwrap(), Some((legacy.clone(), Some(profile))));
+        accounts.active.clear();
+        assert!(saved_microsoft_path(&accounts, None, true, &scratch.0, &legacy).unwrap().is_none());
+        assert_eq!(saved_microsoft_path(&Accounts::default(), None, false, &scratch.0, &legacy).unwrap(), Some((legacy, None)));
     }
     #[test]
     fn settings_default_gc_and_update_validation_are_consistent() {
