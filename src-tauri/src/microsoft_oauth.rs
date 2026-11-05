@@ -13,9 +13,41 @@ pub const REDIRECT_URI: &str = "http://localhost:8080";
 const LOOPBACK_PORT: u16 = 8080;
 const AUTHORIZE_URL: &str = "https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize";
 const TOKEN_URL: &str = "https://login.microsoftonline.com/consumers/oauth2/v2.0/token";
-static LOGIN: tokio::sync::Mutex<()> = tokio::sync::Mutex::const_new(());
-const REAUTHENTICATION_REQUIRED: &str = "La sesión necesita volver a iniciarse con la aplicación Microsoft propia de TP LAUNCHER";
+pub(crate) const REAUTHENTICATION_REQUIRED: &str = "La sesión necesita volver a iniciarse con la aplicación Microsoft propia de TP LAUNCHER";
 pub(crate) fn is_reauthentication_error(message: &str) -> bool { message == REAUTHENTICATION_REQUIRED }
+
+#[derive(serde::Serialize, serde::Deserialize)]
+struct SavedRefreshToken {
+    client_id: String,
+    refresh_token: String,
+}
+
+pub(crate) fn encode_saved_refresh_token(client_id: &str, refresh_token: &str) -> Result<Vec<u8>, String> {
+    if refresh_token.is_empty() || !refresh_token.bytes().all(|byte| byte.is_ascii_graphic()) {
+        return Err("Microsoft no devolvió una credencial de renovación válida".into());
+    }
+    serde_json::to_vec(&SavedRefreshToken { client_id: client_id.into(), refresh_token: refresh_token.into() })
+        .map_err(|_| "No se pudo preparar la sesión para guardarla".into())
+}
+
+pub(crate) fn decode_saved_refresh_token(bytes: &[u8], expected_client_id: Option<&str>) -> Result<String, String> {
+    let token = if bytes.starts_with(b"{") {
+        let saved: SavedRefreshToken = serde_json::from_slice(bytes)
+            .map_err(|_| REAUTHENTICATION_REQUIRED)?;
+        if uuid::Uuid::parse_str(&saved.client_id).map_or(true, |id| id.is_nil())
+            || expected_client_id.is_some_and(|id| !id.eq_ignore_ascii_case(&saved.client_id))
+        {
+            return Err(REAUTHENTICATION_REQUIRED.into());
+        }
+        saved.refresh_token
+    } else {
+        String::from_utf8(bytes.to_vec()).map_err(|_| REAUTHENTICATION_REQUIRED)?
+    };
+    if token.is_empty() || !token.bytes().all(|byte| byte.is_ascii_graphic()) {
+        return Err(REAUTHENTICATION_REQUIRED.into());
+    }
+    Ok(token)
+}
 pub fn client_id() -> Result<String, String> {
     configured_client_id(
         std::env::var("VITE_MS_CLIENT_ID").ok(),
@@ -101,7 +133,7 @@ fn authorize_url(client: &str, state: &str, verifier: &str) -> Result<url::Url, 
         ("state", state),
         ("code_challenge", challenge.as_str()),
         ("code_challenge_method", "S256"),
-        ("prompt", "select_account"),
+        ("prompt", "login"),
     ]);
     Ok(authorize)
 }
@@ -143,11 +175,7 @@ async fn token(form: &[(&str, &str)]) -> Result<serde_json::Value, String> {
     }
     Ok(value)
 }
-pub async fn login(app: &AppHandle) -> Result<serde_json::Value, String> {
-    let _login = LOGIN
-        .try_lock()
-        .map_err(|_| "Ya hay un inicio de sesión Microsoft en curso en el navegador")?;
-    let client = client_id()?;
+pub async fn login(app: &AppHandle, client_id: &str) -> Result<serde_json::Value, String> {
     let listener=tokio::net::TcpListener::bind((std::net::Ipv4Addr::LOCALHOST,LOOPBACK_PORT)).await.map_err(|error|if error.kind()==std::io::ErrorKind::AddrInUse{"El puerto local 8080 está ocupado. Cierra la aplicación que lo usa y vuelve a iniciar sesión"}else{"No se pudo preparar la redirección local http://localhost:8080"})?;
     let state = uuid::Uuid::new_v4().simple().to_string();
     let verifier = format!(
@@ -155,7 +183,7 @@ pub async fn login(app: &AppHandle) -> Result<serde_json::Value, String> {
         uuid::Uuid::new_v4().simple(),
         uuid::Uuid::new_v4().simple()
     );
-    let authorize = authorize_url(&client, &state, &verifier)?;
+    let authorize = authorize_url(client_id, &state, &verifier)?;
     app.opener()
         .open_url(authorize.as_str(), None::<&str>)
         .map_err(|_| "No se pudo abrir el navegador oficial de Microsoft")?;
@@ -174,7 +202,7 @@ pub async fn login(app: &AppHandle) -> Result<serde_json::Value, String> {
     drop(listener);
     let _ = app.emit("microsoft-login-progress", "Microsoft respondió. Canjeando la autorización…");
     token(&[
-        ("client_id", &client),
+        ("client_id", client_id),
         ("grant_type", "authorization_code"),
         ("scope", SCOPE),
         ("code", &code),
@@ -183,10 +211,9 @@ pub async fn login(app: &AppHandle) -> Result<serde_json::Value, String> {
     ])
     .await
 }
-pub async fn refresh(refresh_token: &str) -> Result<serde_json::Value, String> {
-    let client = client_id()?;
+pub async fn refresh(client_id: &str, refresh_token: &str) -> Result<serde_json::Value, String> {
     token(&[
-        ("client_id", &client),
+        ("client_id", client_id),
         ("grant_type", "refresh_token"),
         ("scope", SCOPE),
         ("refresh_token", refresh_token),
@@ -250,6 +277,7 @@ mod tests {
         assert_eq!(params["scope"], "XboxLive.signin offline_access");
         assert_eq!(params["response_type"], "code");
         assert_eq!(params["response_mode"], "query");
+        assert_eq!(params["prompt"], "login");
         assert_eq!(params["code_challenge_method"], "S256");
         assert_eq!(
             params["code_challenge"],
@@ -257,5 +285,16 @@ mod tests {
         );
         assert!(!params.contains_key("client_secret"));
         assert!(!params.contains_key("code_verifier"));
+    }
+
+    #[test]
+    fn restored_credentials_reject_another_client_and_accept_the_legacy_format() {
+        let other = "a53d92c3-5cb1-47d0-99fb-84117723051c";
+        let saved = encode_saved_refresh_token(DEFAULT_CLIENT_ID, "dummy-refresh-token").unwrap();
+        assert_eq!(decode_saved_refresh_token(&saved, Some(DEFAULT_CLIENT_ID)).unwrap(), "dummy-refresh-token");
+        assert!(is_reauthentication_error(&decode_saved_refresh_token(&saved, Some(other)).unwrap_err()));
+        assert_eq!(decode_saved_refresh_token(b"dummy-legacy-token", Some(DEFAULT_CLIENT_ID)).unwrap(), "dummy-legacy-token");
+        assert!(decode_saved_refresh_token(b"{invalid}", Some(DEFAULT_CLIENT_ID)).is_err());
+        assert!(decode_saved_refresh_token(b"", Some(DEFAULT_CLIENT_ID)).is_err());
     }
 }

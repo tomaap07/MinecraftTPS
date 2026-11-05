@@ -281,6 +281,7 @@ struct MinecraftProfile {
 }
 #[derive(Clone)]
 struct MicrosoftSession {
+    client_id: String,
     profile: MinecraftProfile,
     access_token: String,
     refresh_token: String,
@@ -395,29 +396,6 @@ mod token_storage {
         Ok(bytes)
     }
 
-    pub fn save_refresh_token(token: &str) -> Result<(), String> {
-        let encrypted = protect(token.as_bytes())?;
-        let path = root_dir()?.join("account.dat");
-        let staged = root_dir()?.join("account.dat.new");
-        fs::write(&staged, encrypted).map_err(|e| format!("No se pudo guardar la sesión: {e}"))?;
-        if path.exists() {
-            fs::remove_file(&path).map_err(|e| format!("No se pudo actualizar la sesión: {e}"))?;
-        }
-        fs::rename(staged, path).map_err(|e| format!("No se pudo confirmar la sesión: {e}"))
-    }
-
-    pub fn load_refresh_token() -> Result<Option<String>, String> {
-        let path = root_dir()?.join("account.dat");
-        if !path.exists() {
-            return Ok(None);
-        }
-        let encrypted = fs::read(path).map_err(|e| format!("No se pudo leer la sesión: {e}"))?;
-        let clear = unprotect(&encrypted)?;
-        String::from_utf8(clear)
-            .map(Some)
-            .map_err(|e| format!("La sesión guardada no es válida: {e}"))
-    }
-
     pub fn clear_saved_refresh_token() -> Result<(), String> {
         let path = root_dir()?.join("account.dat");
         if path.exists() {
@@ -434,12 +412,6 @@ mod token_storage {
     }
     pub(crate) fn unprotect(_: &[u8]) -> Result<Vec<u8>, String> {
         Err("El almacenamiento protegido solo está disponible en Windows".into())
-    }
-    pub fn save_refresh_token(_: &str) -> Result<(), String> {
-        Err("El almacenamiento seguro de sesiones solo está habilitado en Windows.".into())
-    }
-    pub fn load_refresh_token() -> Result<Option<String>, String> {
-        Ok(None)
     }
     pub fn clear_saved_refresh_token() -> Result<(), String> {
         Ok(())
@@ -1347,9 +1319,15 @@ async fn minecraft_profile(
             .unwrap_or("La cuenta no tiene un perfil Java de Minecraft o el token expiró.")
             .to_owned());
     }
+    let id = body["id"].as_str().filter(|value| {
+        value.len() == 32 && value.bytes().all(|byte| byte.is_ascii_hexdigit())
+    }).ok_or("Minecraft devolvió un perfil sin UUID válido")?;
+    let name = body["name"].as_str().filter(|value| {
+        (3..=16).contains(&value.len()) && value.bytes().all(|byte| byte.is_ascii_alphanumeric() || byte == b'_')
+    }).ok_or("Minecraft devolvió un perfil sin nombre válido")?;
     Ok(MinecraftProfile {
-        id: body["id"].as_str().ok_or("Perfil sin UUID")?.to_owned(),
-        name: body["name"].as_str().ok_or("Perfil sin nombre")?.to_owned(),
+        id: id.to_ascii_lowercase(),
+        name: name.to_owned(),
         skins: body["skins"].as_array().cloned().unwrap_or_default(),
         capes: body["capes"].as_array().cloned().unwrap_or_default(),
     })
@@ -1358,6 +1336,7 @@ async fn minecraft_profile(
 async fn minecraft_session_from_microsoft_token(
     client: &reqwest::Client,
     microsoft_token: &str,
+    expected_profile: Option<&str>,
     notify: impl Fn(&str),
 ) -> Result<(MinecraftProfile, String, String, u64), String> {
     let token = microsoft_services::exchange(client, microsoft_token, &notify).await?;
@@ -1366,6 +1345,9 @@ async fn minecraft_session_from_microsoft_token(
     account_licensing::verify(client, &token.access_token).await?;
     notify("Cargando el perfil, la skin y las capas…");
     let profile = minecraft_profile(client, &token.access_token).await?;
+    if expected_profile.is_some_and(|id| !id.eq_ignore_ascii_case(&profile.id)) {
+        return Err("La credencial guardada corresponde a otro perfil. Vuelve a conectar Microsoft".into());
+    }
     account_licensing::remember_verified(&profile)?;
     Ok((profile, token.access_token, token.xuid, expires_at))
 }
@@ -1376,7 +1358,10 @@ async fn begin_microsoft_login(
     auth: State<'_, AuthState>,
 ) -> Result<MinecraftProfile, String> {
     let notify = |message: &str| { let _ = app.emit("microsoft-login-progress", message); };
-    let token_response = microsoft_oauth::login(&app).await?;
+    let _auth_guard = auth.refresh_lock.try_lock()
+        .map_err(|_| "El launcher está comprobando otra sesión. Espera a que termine y vuelve a conectar Microsoft")?;
+    let client_id = microsoft_oauth::client_id()?;
+    let token_response = microsoft_oauth::login(&app, &client_id).await?;
     let client = microsoft_services::client()?;
     let microsoft_token = token_response["access_token"]
         .as_str()
@@ -1385,16 +1370,14 @@ async fn begin_microsoft_login(
         .as_str()
         .ok_or("Microsoft no devolvió refresh_token; vuelve a autorizar la cuenta para mantener la sesión entre reinicios.")?;
     let (profile, minecraft_token, xuid, expires_at) =
-        minecraft_session_from_microsoft_token(&client, microsoft_token, &notify).await?;
-    let _auth_guard = auth.refresh_lock.lock().await;
-    launcher_settings::remember_current(&auth)?;
-    token_storage::save_refresh_token(refresh_token)?;
+        minecraft_session_from_microsoft_token(&client, microsoft_token, None, &notify).await?;
     notify("Guardando la cuenta de forma segura…");
-    launcher_settings::remember_profile(&profile)?;
+    launcher_settings::remember_profile(&profile, &client_id, refresh_token)?;
     *auth
         .session
         .lock()
         .map_err(|_| "Estado de cuenta bloqueado")? = Some(MicrosoftSession {
+        client_id,
         profile: profile.clone(),
         access_token: minecraft_token,
         refresh_token: refresh_token.to_owned(),
@@ -1421,7 +1404,7 @@ async fn ensure_microsoft_session(auth: &AuthState) -> Result<Option<MinecraftPr
         launcher_settings::require_offline_eligibility()?;
         return Ok(None);
     }
-    let result = ensure_microsoft_session_locked(auth).await;
+    let result = ensure_microsoft_session_locked(auth, None).await;
     if result.as_ref().err().is_some_and(|error| microsoft_oauth::is_reauthentication_error(error) || account_licensing::is_license_denied(error)) {
         for account in launcher_settings::list_launcher_accounts()?.into_iter().filter(|account| account.active && account.kind == "microsoft") {
             if let Some(id) = account.id.strip_prefix("microsoft-") {
@@ -1434,55 +1417,52 @@ async fn ensure_microsoft_session(auth: &AuthState) -> Result<Option<MinecraftPr
 
 async fn ensure_microsoft_session_locked(
     auth: &AuthState,
+    requested_account: Option<&str>,
 ) -> Result<Option<MinecraftProfile>, String> {
-    let current = auth
-        .session
-        .lock()
-        .map_err(|_| "Estado de cuenta bloqueado")?
-        .clone();
+    let client_id = microsoft_oauth::client_id()?;
+    let current = if requested_account.is_none() {
+        auth.session.lock().map_err(|_| "Estado de cuenta bloqueado")?.clone()
+    } else {
+        None
+    };
     if let Some(session) = &current {
+        if session.client_id != client_id {
+            return Err(microsoft_oauth::REAUTHENTICATION_REQUIRED.into());
+        }
         if session.expires_at > unix_time_seconds() + 60 {
             if account_licensing::verified_at(&session.profile.id).is_none() {
-                account_licensing::verify(&reqwest::Client::new(), &session.access_token).await?;
+                account_licensing::verify(&microsoft_services::client()?, &session.access_token).await?;
                 account_licensing::remember_verified(&session.profile)?;
             }
             return Ok(Some(session.profile.clone()));
         }
     }
-    let refresh_token = match current {
-        Some(session) => session.refresh_token,
-        None => {
-            launcher_settings::restore_active_account_token()?;
-            match token_storage::load_refresh_token()? {
-                Some(token) => token,
-                None => return Ok(None),
-            }
-        }
+    let (refresh_token, expected_profile) = match current {
+        Some(session) => (session.refresh_token, Some(session.profile.id)),
+        None => match launcher_settings::load_saved_microsoft(requested_account, &client_id)? {
+            Some(saved) => saved,
+            None => return Ok(None),
+        },
     };
     let client = microsoft_services::client()?;
-    let token_response = microsoft_oauth::refresh(&refresh_token).await?;
+    let token_response = microsoft_oauth::refresh(&client_id, &refresh_token).await?;
     let microsoft_token = token_response["access_token"]
         .as_str()
         .ok_or("Microsoft no devolvió access_token al renovar la sesión")?;
-    let rotated_refresh = token_response["refresh_token"]
-        .as_str()
-        .unwrap_or(&refresh_token)
-        .to_owned();
-    let (profile, access_token, xuid, expires_at) =
-        minecraft_session_from_microsoft_token(&client, microsoft_token, |_| {}).await?;
-    token_storage::save_refresh_token(&rotated_refresh)?;
+    let rotated_refresh = token_response["refresh_token"].as_str().unwrap_or(&refresh_token);
+    let (profile, access_token, xuid, expires_at) = minecraft_session_from_microsoft_token(
+        &client, microsoft_token, expected_profile.as_deref(), |_| {},
+    ).await?;
+    launcher_settings::remember_profile(&profile, &client_id, rotated_refresh)?;
     let session = MicrosoftSession {
+        client_id,
         profile: profile.clone(),
         access_token,
-        refresh_token: rotated_refresh,
+        refresh_token: rotated_refresh.to_owned(),
         xuid,
         expires_at,
     };
-    *auth
-        .session
-        .lock()
-        .map_err(|_| "Estado de cuenta bloqueado")? = Some(session);
-    launcher_settings::remember_profile(&profile)?;
+    *auth.session.lock().map_err(|_| "Estado de cuenta bloqueado")? = Some(session);
     Ok(Some(profile))
 }
 #[tauri::command]
@@ -1494,13 +1474,12 @@ async fn get_microsoft_profile(
 #[tauri::command]
 async fn logout_microsoft(auth: State<'_, AuthState>) -> Result<(), String> {
     let _auth_guard = auth.refresh_lock.lock().await;
-    launcher_settings::remember_current(&auth)?;
+    launcher_settings::deactivate_account()?;
     *auth
         .session
         .lock()
         .map_err(|_| "Estado de cuenta bloqueado")? = None;
-    token_storage::clear_saved_refresh_token()?;
-    launcher_settings::deactivate_account()
+    token_storage::clear_saved_refresh_token()
 }
 #[tauri::command]
 async fn upload_minecraft_skin(

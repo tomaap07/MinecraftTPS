@@ -2,6 +2,12 @@
 
 Guía de comportamiento vigente. Los informes de versiones anteriores conservan su fecha y documentan el comportamiento de aquellas compilaciones; véase el [índice de documentación](README.md).
 
+## Restauración y reconexión del 5 de noviembre de 2026
+
+La inspección local encontró una credencial DPAPI en el directorio histórico `MinecraftTPS`. La biblioteca vigente de `LauncherTPS` tenía un perfil local activo y ninguna credencial Microsoft. Los registros distinguen los intentos manuales que recibieron `403 FORBIDDEN` de los intentos de restauración. «Conectar Microsoft» canjea un código nuevo y, desde esta revisión, pide autenticación al navegador con `prompt=login`. El rechazo real de Minecraft Services sigue pendiente de una nueva prueba.
+
+La restauración prioriza el archivo cifrado de la cuenta seleccionada en `accounts/*.dat`. Las nuevas credenciales incluyen el Client ID dentro de la protección DPAPI. Un ID distinto requiere reconectar. Los archivos antiguos se pueden renovar si Microsoft los acepta y el perfil obtenido coincide con el que se está restaurando. `account.dat` se conserva como origen de migración cuando no hay biblioteca, o como respaldo de una cuenta activa cuyo archivo falta. La comprobación del perfil evita guardar el resultado de ese respaldo en otra cuenta.
+
 ## Investigación de compatibilidad del 4 de noviembre de 2026
 
 Las capturas de Entra confirman el Client ID `6a4f8732-6bf7-49c3-a749-16607f97281d`, cuentas personales y la URI `http://localhost:8080` bajo aplicaciones móviles y de escritorio. No apareció un reemplazo del Client ID en `.env.local`, `.env` ni en el entorno del proceso de compilación inspeccionado. Esto no identifica por sí solo la aplicación incluida en una aprobación enviada por correo.

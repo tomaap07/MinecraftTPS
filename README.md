@@ -97,10 +97,10 @@ Preferences and the account library reside in `%APPDATA%/LauncherTPS/`. Game dat
 | --- | --- |
 | Configuration: `launcher-settings.json` | Preferences, language and game-data directory |
 | Configuration: `accounts.json` | Account names, identifiers and selection; no plaintext tokens |
-| Configuration: `accounts/*.dat` | DPAPI-encrypted Microsoft refresh tokens |
+| Configuration: `accounts/*.dat` | DPAPI-encrypted Microsoft refresh credentials, with the OAuth Client ID for new sessions |
 | Configuration: `minecraft-license-cache.dat` | DPAPI-encrypted Minecraft Java verification records |
 | Configuration: `translation-cache.json` | Cached translations of public descriptions |
-| Game data: `account.dat` | DPAPI-encrypted active Microsoft refresh token |
+| Game data: `account.dat` | Legacy DPAPI-encrypted refresh credential, read for compatible account migration |
 | Game data: `versions`, `libraries`, `assets`, `runtime` | Downloaded dependencies and Java |
 | Game data: `instances/...` | Isolated mods, configuration, worlds and logs |
 | Game data: `skins_library` | Skin PNG files and library index |
